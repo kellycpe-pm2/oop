@@ -1,6 +1,5 @@
-public class tesqqq {
+public class test {
     public static void main(String[] args) {
-        dddddd
         
     }
 }
