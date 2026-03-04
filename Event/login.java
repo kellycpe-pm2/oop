@@ -6,12 +6,13 @@ public class login {
     private String loginEmail ;
     private String loginPassword ;
     private user existUser = new user();
-// --------------------------Login of Constructor---------------------------
+
+    // --------------------------Login of Constructor---------------------------
     // default constructor
     login() {
         this.loginEmail = " ";
         this.loginPassword = " ";
-        this.loginUsername = " ";  
+        this.loginUsername = " ";
     }
 //parameterized constructor
     login(String loginEmail, String loginPassword){
@@ -23,16 +24,18 @@ public class login {
     public String getLoginPassword() {
         return loginPassword;
     }
-//-------------------------- setter---------------------------
+
+    // -------------------------- setter---------------------------
     public void setLoginEmail(String loginEmail) {
         this.loginEmail = loginEmail;
     }
+
     public void setLoginUsername(String loginUsername) {
         this.loginUsername = loginUsername;
     }
+
     public void setLoginPassword(String loginPassword) {
         this.loginPassword = loginPassword;
     }
-    //-------------------------- method---------------------------
+    // -------------------------- method---------------------------
 }
-
