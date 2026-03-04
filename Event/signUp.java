@@ -26,15 +26,15 @@ public class signUp {
 
 //-------------------------- getter---------------------------
     public String getSignUpName() {
-        return signUpName;
+        return this.signUpName;
     }
 
     public String getSignUpEmail() {
-        return signUpEmail;
+        return this.signUpEmail;
     }
 
     public String getSignUpPassword() {
-        return signUpPassword;
+        return this.signUpPassword;
     }
 //-------------------------- setter---------------------------
     public void setSignUpName(String signUpName) {
@@ -52,11 +52,8 @@ public class signUp {
     //validation
     public boolean validationExist(){
         for (int i=0 ; i< existUser.getNo();i++){
-            if(this.signUpEmail.equals(existUser.getEmail(i))){
+            if(this.signUpName.equals(existUser.getUsername(i))){
                 return false;
-            }
-            else{
-                return true;
             }
         }
         return true;

@@ -6,13 +6,14 @@ import java.util.List;
 import java.io.IOException;
 import java.io.File;
 import java.io.Writer;
+import java.lang.String;
 
 public class user {
     // instance variable
     private static String[] username = new String[100];
     private static String[] password = new String[100];
     private static String[] email = new String[100];
-    //no is from 0 to 99
+    // no is from 0 to 99
     private static int no = 0;
 
     // ------------------constructor-------------------------------
@@ -31,19 +32,19 @@ public class user {
 
     // ------------------getter-------------------------------
     public String getUsername(int no) {
-        return username[no];
+        return this.username[no];
     }
 
     public String getPassword(int no) {
-        return password[no];
+        return this.password[no];
     }
 
     public String getEmail(int no) {
-        return email[no];
+        return this.email[no];
     }
 
     public int getNo() {
-        return no;
+        return this.no;
     }
 
     // ------------------setter-------------------------------
@@ -61,6 +62,7 @@ public class user {
 
     // ------------------method-------------------------------
 
+    // create user file if not exist
     public void createUserFile() {
         try {
             File user = new File("user.json");
@@ -74,69 +76,78 @@ public class user {
         }
     }
 
+    // load the data from user.json
     public void readUserData() {
-        createUserFile();
         // Read user data from the file and populate the arrays
         try {
-            String filePath = "user.json";
-            List<String> lines = Files.readAllLines(Paths.get(filePath));
-            int i=0;
-            no = lines.size() / 5; 
-            for (String line : lines) {
-                line = line.strip();
-                if (line.contains("  \"username\": \"")) {
-                    username[i] = line.split(":")[1].trim().replace("\"", "").replace(",", "");                
-                } else if (line.contains("  \"password\": \"")) {
-                    password[i] = line.split(":")[1].trim().replace("\"", "").replace(",", "");
-                } else if (line.contains("  \"email\": \"")) {
-                    email[i] = line.split(":")[1].trim().replace("\"", "").replace(",", "");    
-                    i++;
-                }
-                
-                
+            List<String> lines = Files.readAllLines(Paths.get("user.json"));
+            // check the file is empty or not
+            if (lines.isEmpty()) {
+                no = 0;
 
-            }
+                // STORE Data
+            } else {
+                // get the index of last user
+                no = (lines.size() / 3) - 1;
+                // store data into 2D array
+                String[][] information = new String[no + 1][3];
+
+                for (int i = 0; i < lines.size(); i += 1) {
+
+                    // for username
+                    if (i % 3 == 0) {
+                        information[i / 3][0] = lines.get(i);
+                    }
+
+                    // for password
+                    if ((i) % 3 == 1) {
+                        information[i / 3][1] = lines.get(i);
+                    }
+
+                    // for email
+                    if ((i) % 3 == 2) {
+                        information[(i / 3)][2] = lines.get(i);
+                    }
+                }
+
+                for (int i = 0; i < no + 1; i++) {
+                    this.username[i] = information[i][0];
+                    this.password[i] = information[i][1];
+                    this.email[i] = information[i][2];
+                }
+
+            } // create user file
         } catch (IOException e) {
-            System.out.println("Error reading user data: " + e.getMessage());
+            createUserFile();
         }
-        
+
     }
 
     public void storeUserData() {
-        readUserData();
-        try (Writer writer = new java.io.FileWriter("user.json",true)) {
-            // Write user data to the file in JSON format
-            for (int i = 0; i < no; i++) {
-                if (this.username[i] != null && this.password[i] != null && this.email[i] != null) {
-                    writer.write("{\n");
-                    writer.write("  \"username\": \"" + this.username[i] + "\",\n");
-                    writer.write("  \"password\": \"" + this.password[i] + "\",\n");
-                    writer.write("  \"email\": \"" + this.email[i] + "\"\n");
-                    writer.write("}\n");
-                }
-                
+        // append the new user data to user.json
+        // if user.json is not exist, create it first
+        try (Writer writer = new java.io.FileWriter("user.json", true)) {
+            // avoid store null data into file
+            if (this.username[no] != null && this.password[no] != null && this.email[no] != null) {
+                writer.write(this.username[no] + "\n");
+                writer.write(this.password[no] + "\n");
+                writer.write(this.email[no] + "\n");
             }
+
         } catch (IOException e) {
             System.out.println("Error storing user data: " + e.getMessage());
         }
     }
 
     public void createAccount(signUp signUpObj) {
-        if (signUpObj.getResult() == true) {
-            this.username[no] = signUpObj.getSignUpName();
-            this.password[no] = signUpObj.getSignUpPassword();
-            this.email[no] = signUpObj.getSignUpEmail();
-            this.no++;
-            storeUserData();
-            
-        }
-        
+
+        readUserData();
+        this.no++;
         this.username[no] = signUpObj.getSignUpName();
         this.password[no] = signUpObj.getSignUpPassword();
         this.email[no] = signUpObj.getSignUpEmail();
-        this.no++;
+
         storeUserData();
-        
 
     }
 
