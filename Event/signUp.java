@@ -98,21 +98,14 @@ public class signUp {
         }
     }
 
-    public boolean validationEmpty(){
-        if(this.signUpName.strip().isEmpty() || this.signUpEmail.strip().isEmpty() || this.signUpPassword.strip().isEmpty() || this.signUpPassword2.strip().isEmpty()){
+    public boolean validationEmpty(String data){
+        if(data.isEmpty()){
             return false;
         }else{
             return true;
         }
     }
 
-    public boolean getResult(){
-        if(validationExist() && validationName() && validationEmail() && validationPassword() && validationPassword2() && validationEmpty()){
-            return true;
-    }else{
-            return false;
-    }
-}
 
 
 }
