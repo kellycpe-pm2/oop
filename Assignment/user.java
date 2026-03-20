@@ -1,152 +1,257 @@
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.io.IOException;
-import java.io.File;
-import java.io.Writer;
-import java.lang.String;
 
-public class user {
-    // instance variable
-    private static String[] username = new String[100];
-    private static String[] password = new String[100];
-    private static String[] email = new String[100];
-    // no is from 0 to 99
-    private static int no = 0;
+public class User {
+    // Sign Up of Instance
+    private String signUpName;
+    private String signUpEmail;
+    private String signUpPassword;
+    private String signUpPassword2;
 
-    // ------------------constructor-------------------------------
+    // Login of Instance
+    private String loginUsername;
+    private String loginEmail;
+    private String loginPassword;
+
+
+    // the user
+    private String username;
+    private String pswd;
+    private int userno;
+
+    // --------------------------Sign Up of Constructor---------------------------
     // default constructor
-    user() {
+    User() {
+        this.signUpName = " ";
+        this.signUpEmail = " ";
+        this.signUpPassword = " ";
+        this.signUpPassword2 = " ";
 
+        this.loginEmail = " ";
+        this.loginPassword = " ";
+        this.loginUsername = " ";
+        this.userno = 0;
     }
 
     // parameterized constructor
-    user(String username, String password, String email) {
-        this.username[no] = username;
-        this.password[no] = password;
-        this.email[no] = email;
-        this.no = no;
+    User(String signUpName, String signUpEmail, String signUpPassword, String signUpPassword2) {
+        this.signUpName = signUpName;
+        this.signUpEmail = signUpEmail;
+        this.signUpPassword = signUpPassword;
+        this.signUpPassword2 = signUpPassword2;
     }
 
-    // ------------------getter-------------------------------
-    public String getUsername(int no) {
-        return this.username[no];
+    User(String loginUsername, String loginEmail, String loginPassword) {
+        this.loginEmail = loginEmail;
+        this.loginPassword = loginPassword;
+        this.loginUsername = loginUsername;
     }
 
-    public String getPassword(int no) {
-        return this.password[no];
+    // -------------------------- getter---------------------------
+    public String getSignUpName() {
+        return this.signUpName;
     }
 
-    public String getEmail(int no) {
-        return this.email[no];
+    public String getSignUpEmail() {
+        return this.signUpEmail;
     }
 
-    public int getNo() {
-        return this.no;
+    public String getSignUpPassword() {
+        return this.signUpPassword;
     }
 
-    // ------------------setter-------------------------------
-    public void setUsername(String username) {
-        this.username[no] = username;
+    public String getLoginPassword() {
+        return loginPassword;
     }
 
-    public void setPassword(String password) {
-        this.password[no] = password;
+    public String getAccessUsername() {
+        return this.username;
     }
 
-    public void setEmail(String email) {
-        this.email[no] = email;
+    public String getAccessPassword() {
+        return this.pswd;
     }
 
-    // ------------------method-------------------------------
+    // -------------------------- setter---------------------------
+    public void setSignUpName(String signUpName) {
+        this.signUpName = signUpName;
+    }
 
-    // create user file if not exist
-    public void createUserFile() {
-        try {
-            File user = new File("user.json");
-            if (user.createNewFile()) {
-                System.out.println("Please Waiting...");
-                System.out.println("User file created: " + user.getName());
+    public void setSignUpEmail(String signUpEmail) {
+        this.signUpEmail = signUpEmail;
+    }
+
+    public void setSignUpPassword(String signUpPassword) {
+        this.signUpPassword = signUpPassword;
+    }
+
+    public void setLoginEmail(String loginEmail) {
+        this.loginEmail = loginEmail;
+    }
+    public void setSignUpPassword2(String signUpPassword2) {
+        this.signUpPassword2 = signUpPassword2;
+    }
+
+    public void setLoginUsername(String loginUsername) {
+        this.loginUsername = loginUsername;
+    }
+
+    public void setLoginPassword(String loginPassword) {
+        this.loginPassword = loginPassword;
+    }
+    // -------------------------- method---------------------------
+
+    // -------------------------Access User------------------------
+
+    public void signUpUser() {
+        username = signUpName;
+        pswd = signUpPassword;
+    }
+
+    public void loginUser() {
+        username = loginUsername;
+        pswd = loginPassword;
+    }
+
+    // validation for signup
+    public boolean validationExist( String[] existUser) {
+        if (validationEmpty(this.signUpName)) {
+
+            return false;
+        }
+        for (int i = 0; i < existUser.length; i++) {
+            if (this.signUpName.equals(existUser[i])) {
+                System.out.println("Error: The Username Has Already Exist ! ");
+
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean validationName() {
+        char[] namearray = this.signUpName.toCharArray();
+        if (validationEmpty(this.signUpName)) {
+            return false;
+
+        } else if (namearray.length < 3) {
+            System.out.println("Input Error : Your Name length must be at least 3 length.");
+            return false;
+        }
+
+        else {
+
+            for (char charname : namearray) {
+                if (!((int) charname >= 65 && (int) charname <= 90)
+                        && !((int) charname >= 97 && (int) charname <= 122)) {
+                    System.out.println("Input Error : Please Enter In alpha !");
+                    return false;
+                }
             }
 
-        } catch (IOException e) {
-            System.out.println("Error creating user file: " + e.getMessage());
-        }
-    }
-
-    // load the data from user.json
-    public void readUserData() {
-        // Read user data from the file and populate the arrays
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("user.json"));
-            // check the file is empty or not
-            if (lines.isEmpty()) {
-                no = 0;
-
-                // STORE Data
-            } else {
-                // get the index of last user
-                no = (lines.size() / 3) - 1;
-                // store data into 2D array
-                String[][] information = new String[no + 1][3];
-
-                for (int i = 0; i < lines.size(); i += 1) {
-
-                    // for username
-                    if (i % 3 == 0) {
-                        information[i / 3][0] = lines.get(i);
-                    }
-
-                    // for password
-                    if ((i) % 3 == 1) {
-                        information[i / 3][1] = lines.get(i);
-                    }
-
-                    // for email
-                    if ((i) % 3 == 2) {
-                        information[(i / 3)][2] = lines.get(i);
-                    }
-                }
-
-                for (int i = 0; i < no + 1; i++) {
-                    this.username[i] = information[i][0];
-                    this.password[i] = information[i][1];
-                    this.email[i] = information[i][2];
-                }
-
-            } // create user file
-        } catch (IOException e) {
-            createUserFile();
+            return true;
         }
 
     }
 
-    public void storeUserData() {
-        // append the new user data to user.json
-        // if user.json is not exist, create it first
-        try (Writer writer = new java.io.FileWriter("user.json", true)) {
-            // avoid store null data into file
-            if (this.username[no] != null && this.password[no] != null && this.email[no] != null) {
-                writer.write(this.username[no] + "\n");
-                writer.write(this.password[no] + "\n");
-                writer.write(this.email[no] + "\n");
+    public boolean validationEmail() {
+        if (validationEmpty(this.signUpEmail)) {
+            return false;
+        }
+        char[] emailArray = this.signUpEmail.toCharArray();
+
+        // check the first character of email
+        if (!((int) emailArray[0] >= 65 && (int) emailArray[0] <= 90)
+                && !((int) emailArray[0] >= 97 && (int) emailArray[0] <= 122)) {
+            System.out.println("Input Error: The first Character Cannot Be Symbols ! ");
+            return false;
+        }
+        // check the email format
+        else if (!(this.signUpEmail.contains("@gmail.com"))) {
+
+            System.out.println("Input Error: Please Input In Gmail Format ! ");
+            return false;
+
+        } else {
+
+            return true;
+
+        }
+    }
+
+    // validation password (it length must be more than 5 char)
+    public boolean validationPassword() {
+        if (validationEmpty(this.signUpPassword)) {
+            return false;
+        }
+        if (this.signUpPassword.length() < 5) {
+
+            System.out.println("Input Error: Your Password Must be More Than 5 Character ! ");
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean validationPassword2() {
+        if (validationEmpty(this.signUpPassword2)) {
+            return false;
+        }
+        if (!(this.signUpPassword2.equals(this.signUpPassword))) {
+            System.out.println(" Error: Your Password Is Not Matched ! ");
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean validationEmpty(String data) {
+        if (data == null) {
+            System.out.println("Input Error: Don't Empty Your Input ! ");
+
+            return true;
+
+        } else if (data.isEmpty()) {
+            System.out.println("Input Error: Don't Empty Your Input ! ");
+
+            return true;
+
+        } else {
+
+            return false;
+        }
+    }
+
+    // validation for login
+
+        
+    public boolean validationNoExistName(String[] existUser) {
+        if (validationEmpty(this.loginUsername)) {
+
+            return false;
+        }
+        for (int i = 0; i < existUser.length; i++) {
+            if (this.loginUsername.equals(existUser[i])) {
+                this.userno=i;
+                return true;
             }
-
-        } catch (IOException e) {
-            System.out.println("Error storing user data: " + e.getMessage());
         }
+        System.out.println("Error: The Username Is Not Matched ! ");
+
+        return false;
     }
 
-    public void createAccount(signUp signUpObj) {
+    public boolean validationLoginPwd(String[] password) {
+        if (validationEmpty(this.loginPassword)) {
+            return false;
+        }
+           if (this.loginPassword.equals(password[this.userno])) {
+                return true;
+            
+        }
+        System.out.println("Error: Inccorrect Password ! ");
 
-        readUserData();
-        this.no++;
-        this.username[no] = signUpObj.getSignUpName();
-        this.password[no] = signUpObj.getSignUpPassword();
-        this.email[no] = signUpObj.getSignUpEmail();
-
-        storeUserData();
-
+        return false;
     }
 
 }
