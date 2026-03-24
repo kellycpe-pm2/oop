@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Attendee extends User{
-    private static int no = 0;
+    List<Attendee> attendees = new ArrayList<>();
     private List<Ticket> ticketHistory = new ArrayList<>();
 
     // constructor
@@ -16,77 +16,61 @@ public class Attendee extends User{
     }
 
     public Attendee(String username, String password, String email, String contactNo) {
-        //super(username, password, email, contactNo);
+        super(username, password, email, contactNo);
     }
 
-    public int getno() {
-        return no;
+    //create Attendee file
+    public void createAttendeeFile() {
+        try { File attFile = new File("Attendee.json");
+            if (attFile.createNewFile()) { 
+                System.out.println("Please Waiting..."); 
+                System.out.println("Attendee file created: " + attFile.getName()); 
+            } 
+        } catch (IOException e) { 
+            System.out.println("Error creating attendee file: " + e.getMessage()); 
+        } 
     }
 
-    public String toString(int no) {
-        return String.format("%-15s",getAccessUsername());
+    // Reads all attendees from "Attendee.json" and returns them as a list of Attendee objects
+    public static List<Attendee> readAttendeeData() {
+        List<Attendee> attendees = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get("Attendee.json"));
+            if (!lines.isEmpty()) {
+                for (int i = 0; i < lines.size(); i += 4) { // 4 lines per user
+                    String username = lines.get(i);
+                    String password = lines.get(i + 1);
+                    String email = lines.get(i + 2);
+                    String contactNo = lines.get(i + 3);
+
+                    Attendee a = new Attendee(username, password, email, contactNo);
+                    attendees.add(a);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading attendee data: " + e.getMessage());
+        }
+        return attendees;
     }
 
-    // display info
-    public void displayInfo() {
+    // display attendee
+    public static void displayAllAttendees(List<Attendee> attendees) {
         System.out.println("=== Attendee Info ===");
         System.out.printf("%-15s %-25s %-15s%n", "Username", "Email", "Contact No");
         System.out.println("----------------------------------------------------");
-        for (int i = 0; i <= no; i++) {
-            System.out.println(toString(i));
+        for (Attendee a : attendees) {
+            System.out.printf("%-15s %-25s %-15s%n", a.getAccessUsername(), a.getAccessEmail(), a.getAccessContactNo());
         }
     }
-
-
-    // create attendee file if not exist
     
-    public void createAttendeeFile() {
-        try {
-        File attFile = new File("Attendee.json");
-        if (attFile.createNewFile()) {
-            System.out.println("Please Waiting...");
-            System.out.println("Attendee file created: " + attFile.getName());
-        }
-        } catch (IOException e) {
-        System.out.println("Error creating attendee file: " + e.getMessage());
-        }
-    }
-    // load the data from attendee.json
-    
-    public void readAttendeeData() {
-        try {
-        List<String> lines = Files.readAllLines(Paths.get("Attendee.json"));
-        if (lines.isEmpty()) {
-            no = 0;
-        } else {
-    // each record has 4 fields: username, password, email, contactNo
-            no = (lines.size() / 4) - 1;
-            String[][] information = new String[no + 1][4];
-
-            for (int i = 0; i < lines.size(); i++) {
-                information[i / 4][i % 4] = lines.get(i);
-            }
-
-            for (int i = 0; i <= no; i++) {
-                set(information[i][0]);
-                setPassword(information[i][1]);
-                setEmail(information[i][2]);
-                this.contactNo[i] = information[i][3];
-            }
-        }
-        } catch (IOException e) {
-            createAttendeeFile();
-        }
-        }
-    
-    // store attendee data to Attendee.json
-    public void storeAttendeeData() {
-        try (Writer writer = new java.io.FileWriter("Attendee.json", true)) {
-            if (getAccessUsername() != null && getEmail(no) != null && this.contactNo[no]!= null) {
-                writer.write(getUsername(no) + "\n");
-                writer.write(getPassword(no) + "\n");
-                writer.write(getEmail(no) + "\n");
-                writer.write(this.contactNo[no] + "\n");
+    // store attendee data to attendee file
+    public static void storeAttendeeData(List<Attendee> attendees) {
+        try (Writer writer = new java.io.FileWriter("Attendee.json")) { // overwrite file
+            for (Attendee a : attendees) {
+                writer.write(a.getAccessUsername() + "\n");
+                writer.write(a.getAccessPassword() + "\n");
+                writer.write(a.getAccessEmail() + "\n");
+                writer.write(a.getAccessContactNo() + "\n");
             }
         } catch (IOException e) {
             System.out.println("Error storing attendee data: " + e.getMessage());
