@@ -98,7 +98,7 @@ public class Attendee extends User{
     if (ticket != null) {
         ticketHistory.add(ticket);
     }
-
+    }
     // display ticket history
     public void displayHistory(){
         System.out.println("\n=== Ticket Purchase History ===");
@@ -113,6 +113,5 @@ public class Attendee extends User{
         System.out.println("----------------------------");
     }
     }
-}
 }
 
