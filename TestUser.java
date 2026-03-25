@@ -15,6 +15,8 @@ public class TestUser {
     static int speakerCount = 0;
     static int eventCount = 0;
 
+    static Attendee attendee;
+
     public static void main(String[] args) {
         // data store for user
         String[] username = new String[100];
@@ -170,7 +172,10 @@ public class TestUser {
             if (user.getAccessPassword().equals("12345")) {
                 organizer = new Organizer(user.getAccessUsername(), user.getAccessPassword(), user.getAccessEmail(),user.getAccessContactNo());
                 organizerMenu();
-
+            }
+            else{
+                attendee = new Attendee(user.getAccessUsername(), user.getAccessPassword(), user.getAccessEmail(),user.getAccessContactNo());
+                attendeeMenu(attendee);
             }
     }
 
@@ -599,4 +604,96 @@ public class TestUser {
      * }
      * }
      */
+
+    //Attendee part
+    static void attendeeMenu(Attendee attendee) {
+
+        boolean inMenu = true;
+        String eventId;
+        EventManagementSystem system = new EventManagementSystem();
+
+        while (inMenu) {
+
+            viewEvents();
+            while(true){
+                System.out.print("Do you want to purchase ticket? (Y/N): ");
+                char choice = scan.next().charAt(0);
+                scan.nextLine();
+
+                if (Character.toLowerCase(choice) == 'y') {
+                    break;
+                } 
+                else if (Character.toLowerCase(choice) == 'n') {
+                    inMenu = false;
+                    return;
+                } 
+                else {
+                    System.out.println("Invalid option. Try again.");
+                }
+            }
+            
+            while (true){
+                System.out.print("Enter Event Id: ");
+                eventId = scan.nextLine();
+
+                if (system.validationInputEventId(events,eventId)) {
+                    break;
+                }
+                else{
+                    System.out.println("Invalid Event Id. Try again.");
+                }
+            }
+
+        Event event = system.findEventById(events,eventId);
+        String ticketType;
+
+        System.out.println("===== Ticket Type =====");
+        System.out.println("1. EarlyBird");
+        System.out.println("2. Standard");
+        System.out.println("3. VIP");
+
+        while (true){
+            System.out.print("Select ticket type: ");
+            int type = scan.nextInt();
+            scan.nextLine();
+
+            switch (type) {
+                case 1:
+                    ticketType = "earlybird";
+                    break;
+                case 2:
+                    ticketType = "standard";
+                    break;
+                case 3:
+                    ticketType = "vip";
+                    break;
+                default:
+                    System.out.println("Invalid option. Try again.");
+                    continue;
+            }
+            break;
+        }
+
+        System.out.println("\nThe total amount = RM "+event.getTicketType().getPrice(ticketType));
+        
+        while (true){
+            System.out.println("Payment Method\n1. Touch N Go\n2.Credit/Debit Card\n3.Online Banking\nSelect your payment method:");
+            int method = scan.nextInt();
+            scan.nextLine();
+
+            switch (method) {
+                case 1:case 2:case 3:
+                    System.out.println("\nProcessing payment...");
+                    System.out.println("Payment Success!");
+                    break;
+                default:
+                    System.out.println("Invalid option. Try again.");
+                    continue;
+            }
+            break;
+        }
+        system.purchaseTicket(attendee, event, ticketType);
+
+        }
+    }
 }
