@@ -20,7 +20,6 @@ public class Ticket {
         this.bookingId = bookingId;
         this.eventId = eventId;
         this.purchaseDate = purchaseDate;
-
         this.ticketId = "T" + String.format("%05d", countTicket+1);
         countTicket++;
     }
@@ -41,6 +40,10 @@ public class Ticket {
         this.totalAmount = tt.getPrice(ticketType);
 
         return true; // success
+    }
+
+    public double getTotalAmount(){
+        return this.totalAmount;
     }
 
     // display ticket details
