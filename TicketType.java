@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TicketType {
-    private String typeName;
+    private String eventId;
     private String perks;
     private int totalQuantity;
     private int availableQuantity;
@@ -22,8 +22,8 @@ public class TicketType {
     private List<String> earlyBirdSeats;
 
     //constructor
-    public TicketType(String typeName, int totalQuantity,int quantityEarlyBird,int quantityStandard,int quantityVip,double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart, LocalDate salesEnd){
-        this.typeName=typeName;
+    public TicketType(String eventId, int totalQuantity,int quantityEarlyBird,int quantityStandard,int quantityVip,double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart, LocalDate salesEnd){
+        this.eventId=eventId;
         this.totalQuantity=totalQuantity;
         this.quantityEarlyBird=quantityEarlyBird;
         this.quantityStandard=quantityStandard;
@@ -40,8 +40,8 @@ public class TicketType {
     }
 
     //getter method
-    public String getTypeName() {
-        return this.typeName;
+    public String getEventId() {
+        return this.eventId;
     }
     public int getTotalQuantity() {
         return this.totalQuantity;
@@ -222,6 +222,11 @@ public class TicketType {
                 break;
         }
         return null; // no seat available
+    }
+
+    //display ticket type detail
+    public void displayTicketType(){
+        
     }
 
 }
