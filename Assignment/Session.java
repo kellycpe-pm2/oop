@@ -33,7 +33,7 @@ public class Session {
     public String getTime() {
         return time;
     }
-
+    
     public int getSpeakerCount() {
         return speakerCount;
     }
@@ -50,7 +50,9 @@ public class Session {
     public void setTime(String time) {
         this.time = time;
     }
-
+    
+//these speaker method can do in the eventmanagementsystem
+    //assign the speaker in the eventmanagementsystem
     // Assign a Speaker to this session (aggregation)
     public boolean assignSpeaker(Speaker sp) {
         if (speakerCount < MAX_SPEAKERS) {
