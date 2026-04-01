@@ -23,47 +23,57 @@ public class TestUser {
         String[] password = new String[100];
         String[] email = new String[100];
         String[] contactNo = new String[100];
-
+        User [] alluser = new User[100];
         // no set as array to pass the value and change the value (only reference
         // variable will be affect)
         int[] no = { 0 };
         // no is from 0 to 99
         // load data
-        readUserData(no, username, password, email, contactNo);
+        readUserData(no, username, password, email, contactNo,alluser);
         boolean active = true;
         while (active) {
-
-            int option = displayAccessInterface();
-            User user = new User();
-
-            switch (option) {
-                case 1:
+            try{
+                int option = displayAccessInterface();
+                User user = new User();
+            
+                switch (option) {
+                    case 1:
                     // login
-                    displayLoginInterface(user, username, password);
+                        if (!displayLoginInterface(user, username, password,alluser,no)){
+                            break;
+                        }
 
                     // set the access user
-                    user.loginUser(email, contactNo);
+                        user.loginUser(email, contactNo);
 
-                    accessmenu(user);
-                    break;
+                        accessmenu(user);
+                        break;
 
-                case 2:
+                    case 2:
                     // signup
 
-                    displaySignUpInterface(username, user);
+                        displaySignUpInterface(username, user);
                     // set the access user
-                    user.signUpUser();
+                        user.signUpUser();
 
                     // create and store data
-                    createAccount(no, username, password, email, contactNo, user);
-                    storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
-                            user.getSignUpContactNo());
+                        createAccount(no, username, password, email, contactNo, user,alluser);
+                        storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
+                        user.getSignUpContactNo());
 
-                    accessmenu(user);
-                    break;
-                case 0:
-                    System.out.println("GoodBye!");
-                    active = false;
+                        accessmenu(user);
+                        break;
+                    case 0:
+                        System.out.println("GoodBye!");
+                        active = false;
+                        break;
+                    default :
+                        System.out.println("Error: Please Select The Correct Number");
+
+                }
+
+            }catch(Exception e){
+                    System.out.println("Error: Please Select The Correct Number");
 
             }
 
@@ -95,30 +105,34 @@ public class TestUser {
         return option;
     }
 
-    public static void displayLoginInterface(User user, String[] checkname, String[] checkpwd) {
+    public static boolean displayLoginInterface(User user, String[] checkname, String[] checkpwd, User [] alluser,int [] no) {
         Scanner scan = new Scanner(System.in);
+        int logincount =0;
 
         System.out.println("-------------------------- Login --------------------------");
+        do {
+
+                logincount++;
+                System.out.print("\nPlease enter your name: ");
+                String name = scan.nextLine();
+                user.setLoginUsername(name);
+                if(logincount>2){
+                    return false;
+                }
+        } while (!user.validationNoExistName(alluser,no));
 
         do {
 
-            System.out.println("Please enter your name: ");
-            String name = scan.nextLine();
-            user.setLoginUsername(name);
-
-        } while (!user.validationNoExistName(checkname));
-
-        do {
-
-            System.out.println("Please enter your Password: ");
+            System.out.print("\nPlease enter your Password: ");
             String password = scan.nextLine();
             user.setLoginPassword(password);
 
         } while (!user.validationLoginPwd(checkpwd));
 
         System.out.println("------------------------------------------------------------");
-
+        return true;
     }
+    
 
     public static void displaySignUpInterface(String[] username, User user) {
         Scanner scan = new Scanner(System.in);
@@ -127,14 +141,14 @@ public class TestUser {
 
         do {
 
-            System.out.println("Please enter your name: ");
+            System.out.print("\nPlease enter your name: ");
             String name = scan.nextLine();
             user.setSignUpName(name);
         } while (!user.validationName() || !user.validationExist(username));
 
         do {
 
-            System.out.println("Please enter your email: ");
+            System.out.print("\nPlease enter your email: ");
             String email = scan.nextLine();
             user.setSignUpEmail(email);
             ;
@@ -143,7 +157,7 @@ public class TestUser {
 
         do {
 
-            System.out.println("Please enter your Contact Number: ");
+            System.out.print("\nPlease enter your Contact Number [eg. 01113018399]: ");
             String contactNo = scan.nextLine();
             user.setSignUpContactNo(contactNo);
 
@@ -151,7 +165,7 @@ public class TestUser {
 
         do {
 
-            System.out.println("Please enter your Password: ");
+            System.out.print("\nPlease enter your Password: ");
             String password = scan.nextLine();
             user.setSignUpPassword(password);
 
@@ -159,7 +173,7 @@ public class TestUser {
 
         do {
 
-            System.out.println("Please enter your comfirm password: ");
+            System.out.print("\nPlease enter your comfirm password: ");
             String password2 = scan.nextLine();
             user.setSignUpPassword2(password2);
 
@@ -181,7 +195,7 @@ public class TestUser {
 
     // load the data from user.json
     public static void readUserData(int[] no, String[] username, String[] password, String[] email,
-            String[] contactNo) {
+            String[] contactNo,User [] alluser) {
         // Read user data from the file and populate the arrays
         try {
             List<String> lines = Files.readAllLines(Paths.get("user.json"));
@@ -214,7 +228,7 @@ public class TestUser {
                         information[(i / 4)][2] = lines.get(i);
                     }
                     // for contact Number
-                    if ((i) % 4 == 2) {
+                    if ((i) % 4 == 3) {
                         information[(i / 4)][3] = lines.get(i);
                     }
 
@@ -225,7 +239,7 @@ public class TestUser {
                     password[i] = information[i][1];
                     email[i] = information[i][2];
                     contactNo[i] = information[i][3];
-
+                    alluser[i]= new User (information[i][0],information[i][2],information[i][1],information[i][3]);
                 }
 
             } // create user file
@@ -253,13 +267,15 @@ public class TestUser {
     }
 
     public static void createAccount(int[] no, String[] username, String[] password, String[] email, String[] contactNo,
-            User user) {
+            User user,User [] alluser) {
 
         username[no[0]] = user.getSignUpName();
         password[no[0]] = user.getSignUpPassword();
         email[no[0]] = user.getSignUpEmail();
-        email[no[0]] = user.getSignUpContactNo();
+        contactNo[no[0]] = user.getSignUpContactNo();
+        alluser[no[0]]=new User (username[no[0]],email[no[0]] ,password[no[0]],contactNo[no[0]]);
         no[0]++;
+
     }
 
     // create user file if not exist
