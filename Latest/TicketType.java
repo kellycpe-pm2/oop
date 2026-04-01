@@ -12,7 +12,7 @@ public class TicketType {
     private int quantityVip;
     private double priceEarlyBird;
     private double priceStandard;
-    private double priceVip;   
+    private double priceVip;
     private LocalDate salesStart;
     private LocalDate salesEnd;
     private LocalDate earlyBirdEnd;
@@ -21,156 +21,142 @@ public class TicketType {
     private List<String> standardSeats;
     private List<String> earlyBirdSeats;
 
-    //constructor
-    public TicketType(String eventId, int totalQuantity,int quantityEarlyBird,int quantityStandard,int quantityVip,double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart, LocalDate salesEnd){
-        this.eventId=eventId;
-        this.totalQuantity=totalQuantity;
-        this.quantityEarlyBird=quantityEarlyBird;
-        this.quantityStandard=quantityStandard;
-        this.quantityVip=quantityVip;
-        this.priceEarlyBird=priceEarlyBird;
-        this.priceStandard=priceStandard;
-        this.priceVip=priceVip;
-        this.perks=perks;
-        this.salesStart=salesStart;
-        this.salesEnd=salesEnd;
-        this.earlyBirdEnd=salesStart.plusDays(1);
+    // constructor
+    public TicketType(String eventId, int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip,
+            double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart,
+            LocalDate salesEnd) {
+        this.eventId = eventId;
+        this.totalQuantity = totalQuantity;
+        this.quantityEarlyBird = quantityEarlyBird;
+        this.quantityStandard = quantityStandard;
+        this.quantityVip = quantityVip;
+        this.priceEarlyBird = priceEarlyBird;
+        this.priceStandard = priceStandard;
+        this.priceVip = priceVip;
+        this.perks = perks;
+        this.salesStart = salesStart;
+        this.salesEnd = salesEnd;
+        this.earlyBirdEnd = salesStart.plusDays(1);
 
         generateSeats();
     }
 
-    //getter method
+    // getter method
     public String getEventId() {
         return this.eventId;
     }
+
     public int getTotalQuantity() {
         return this.totalQuantity;
     }
-    public int getQuantityEarlyBird(){
+
+    public int getQuantityEarlyBird() {
         return this.quantityEarlyBird;
     }
-    public int getQuantityStandard(){
+
+    public int getQuantityStandard() {
         return this.quantityStandard;
     }
-    public int getQuantityVip(){
+
+    public int getQuantityVip() {
         return this.quantityVip;
     }
-    public double getPrice(String typeName){
-        switch(typeName.toLowerCase()) {
-        case "earlybird":
-            return this.priceEarlyBird;
-        case "standard":
-            return this.priceStandard;
-        case "vip":
-             return this.priceVip;
+
+    public double getPrice(String typeName) {
+        switch (typeName.toLowerCase()) {
+            case "earlybird":
+                return this.priceEarlyBird;
+            case "standard":
+                return this.priceStandard;
+            case "vip":
+                return this.priceVip;
         }
         return 0.00;
     }
+
     public String getPerks() {
         return this.perks;
     }
-    public LocalDate getSalesStart(){
+
+    public LocalDate getSalesStart() {
         return this.salesStart;
     }
-    public LocalDate getSalesEnd(){
+
+    public LocalDate getSalesEnd() {
         return this.salesEnd;
     }
-    public LocalDate getEarlyBirdEnd(){
+
+    public LocalDate getEarlyBirdEnd() {
         return this.earlyBirdEnd;
     }
 
-    //setter method
-    public void setTotalQuantity(int totalQuantity,int quantityEarlyBird, int quantityStandard, int quantityVip){
+    // setter method
+    public void setTotalQuantity(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
         this.totalQuantity = totalQuantity;
         this.quantityEarlyBird = quantityEarlyBird;
         this.quantityStandard = quantityStandard;
         this.quantityVip = quantityVip;
     }
-    public void setPriceEarlyBird(double priceEarlyBird){
+
+    public void setPriceEarlyBird(double priceEarlyBird) {
         this.priceEarlyBird = priceEarlyBird;
     }
-    public void setPriceStandard(double priceStandard){
+
+    public void setPriceStandard(double priceStandard) {
         this.priceStandard = priceStandard;
     }
-    public void setPriceVip(double priceVip){
+
+    public void setPriceVip(double priceVip) {
         this.priceVip = priceVip;
     }
+
     public void setPerks(String perks) {
         this.perks = perks;
     }
-    public void setSalesStart(LocalDate salesStart){
+
+    public void setSalesStart(LocalDate salesStart) {
         this.salesStart = salesStart;
     }
-    public void setSalesEnd(LocalDate salesEnd){
+
+    public void setSalesEnd(LocalDate salesEnd) {
         this.salesEnd = salesEnd;
     }
-    public void setEarlyBirdEnd(LocalDate earlybirdEnd){
+
+    public void setEarlyBirdEnd(LocalDate earlybirdEnd) {
         this.earlyBirdEnd = earlybirdEnd;
     }
 
-
-    //check availability of quantity ticket
+    // check availability of quantity ticket
     public boolean isAvailable() {
         return availableQuantity > 0;
     }
 
-    //reduce quantity of ticket left
+    // reduce quantity of ticket left
     public boolean reduceQuantity(String typeName) {
-    switch(typeName.toLowerCase()) {
-        case "earlybird":
-            if(quantityEarlyBird > 0) { quantityEarlyBird--; availableQuantity--; return true; }
-            break;
-        case "standard":
-            if(quantityStandard > 0) { quantityStandard--; availableQuantity--; return true; }
-            break;
-        case "vip":
-            if(quantityVip > 0) { quantityVip--; availableQuantity--; return true; }
-            break;
-    }
-    return false; // no ticket available for that ticket type
+        switch (typeName.toLowerCase()) {
+            case "earlybird":
+                if (quantityEarlyBird > 0) {
+                    quantityEarlyBird--;
+                    availableQuantity--;
+                    return true;
+                }
+                break;
+            case "standard":
+                if (quantityStandard > 0) {
+                    quantityStandard--;
+                    availableQuantity--;
+                    return true;
+                }
+                break;
+            case "vip":
+                if (quantityVip > 0) {
+                    quantityVip--;
+                    availableQuantity--;
+                    return true;
+                }
+                break;
         }
-
-    //validate the quantity set
-    public boolean validationQuantityTicket(){
-        if (totalQuantity<quantityEarlyBird+quantityStandard+quantityVip){
-            System.out.println("Sum of ticket type quantities exceeds totalQuantity. Please reset the quantity of ticket.");
-            return false;}
-        if (totalQuantity>quantityEarlyBird+quantityStandard+quantityVip){
-            System.out.println("Sum of ticket type quantities less than totalQuantity. Please reset the quantity of ticket.");
-            return false;
-        }
-        else{
-            return true;}
-    }
-
-    // validate date set
-    public boolean validateDates(LocalDate salesStart, LocalDate salesEnd, LocalDate earlyBirdEnd) {
-    if (salesStart.isAfter(salesEnd)) {
-        System.out.println("Sales start date must be before sales end date.");
-        return false;
-    }
-    if (earlyBirdEnd.isBefore(salesStart) || earlyBirdEnd.isAfter(salesEnd)) {
-        System.out.println("Early bird end date must be between sales start and sales end dates.");
-        return false;
-    }
-    return true;
-    }
-
-    // validate price
-    public boolean validatePrices() {
-    if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
-        System.out.println("Ticket prices cannot be negative.");
-        return false;
-    }
-    if (priceVip <= priceStandard) {
-        System.out.println("VIP price should be greater than Standard price.");
-        return false;
-    }
-    if (priceStandard <= priceEarlyBird) {
-        System.out.println("Standard price should be greater than Early Bird price.");
-        return false;
-    }
-    return true;
+        return false; // no ticket available for that ticket type
     }
 
     // generate all seat available and store into array list
@@ -181,30 +167,42 @@ public class TicketType {
         standardSeats = new ArrayList<>();
         earlyBirdSeats = new ArrayList<>();
 
-        // VIP rows, start from row A
+        int currentRow = 0;  // Start from row A (index 0)
+        
+        // Generate VIP seats
         for (int i = 0; i < quantityVip; i++) {
-            int rowIndex = i / seatsPerRow;
             int col = (i % seatsPerRow) + 1;
-            char row = (char) ('A' + rowIndex);
-            vipSeats.add(row +""+col);
+            char rowChar = (char) ('A' + currentRow);
+            vipSeats.add(rowChar + "" + col);
+        
+            // Move to next row when current row is full
+            if ((i + 1) % seatsPerRow == 0) {
+                currentRow++;
+            }
         }
-
-        // Standard rows, start from row after VIP
-        int standardStartRow = (quantityVip / seatsPerRow) + 1; // Next row after VIP
+    
+        // Move to next row if VIP didn't fill a complete row
+        if (quantityVip % seatsPerRow != 0) {
+            currentRow++;
+        }
+    
+        // Generate Standard seats
+        int standardStartRow = currentRow;
         for (int i = 0; i < quantityStandard; i++) {
-            int rowIndex = i / seatsPerRow;
             int col = (i % seatsPerRow) + 1;
-            char row = (char) ('A' + standardStartRow + rowIndex);
-            standardSeats.add(row +""+col);
+            char rowChar = (char) ('A' + standardStartRow + (i / seatsPerRow));
+            standardSeats.add(rowChar + "" + col);
         }
-
-        // EarlyBird rows, start after Standard
-        int earlyBirdStartRow = standardStartRow + (quantityStandard / seatsPerRow) + 1;
+    
+        // Calculate next row after Standard
+        int standardRows = (int) Math.ceil((double) quantityStandard / seatsPerRow);
+        int earlyBirdStartRow = standardStartRow + standardRows;
+    
+        // Generate EarlyBird seats
         for (int i = 0; i < quantityEarlyBird; i++) {
-            int rowIndex = i / seatsPerRow;
             int col = (i % seatsPerRow) + 1;
-            char row = (char) ('A' + earlyBirdStartRow + rowIndex);
-            earlyBirdSeats.add(row +""+col);
+            char rowChar = (char) ('A' + earlyBirdStartRow + (i / seatsPerRow));
+            earlyBirdSeats.add(rowChar + "" + col);
         }
     }
 
@@ -212,21 +210,24 @@ public class TicketType {
     public String getSeat(String ticketType) {
         switch (ticketType.toLowerCase()) {
             case "vip":
-                if (!vipSeats.isEmpty()) return vipSeats.remove(0);//check is the list empty? if no, remove the first seat inside the list
+                if (!vipSeats.isEmpty())
+                    return vipSeats.remove(0);// check is the list empty? if no, remove the first seat inside the list
                 break;
             case "standard":
-                if (!standardSeats.isEmpty()) return standardSeats.remove(0);
+                if (!standardSeats.isEmpty())
+                    return standardSeats.remove(0);
                 break;
             case "earlybird":
-                if (!earlyBirdSeats.isEmpty()) return earlyBirdSeats.remove(0);
+                if (!earlyBirdSeats.isEmpty())
+                    return earlyBirdSeats.remove(0);
                 break;
         }
         return null; // no seat available
     }
 
-    //display ticket type detail
-    public void displayTicketType(){
-        
+    // display ticket type detail
+    public String toString() {
+        return eventId+" "+totalQuantity+" "+quantityEarlyBird+" "+quantityStandard+" "+quantityVip+" "+priceEarlyBird+" "+priceStandard+" "+priceVip+" "+perks+" "+salesStart+" "+salesEnd;
     }
 
 }
