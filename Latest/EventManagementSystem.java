@@ -3,6 +3,102 @@ import java.time.format.DateTimeParseException;
 
 public class EventManagementSystem {
 
+    
+    // validate the quantity set
+    public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
+        if (totalQuantity < quantityEarlyBird + quantityStandard + quantityVip) {
+            System.out.println(
+                    "Sum of ticket type quantities exceeds totalQuantity. Please reset the quantity of ticket.");
+            return false;
+        }
+        if (totalQuantity > quantityEarlyBird + quantityStandard + quantityVip) {
+            System.out.println(
+                    "Sum of ticket type quantities less than totalQuantity. Please reset the quantity of ticket.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // validate date set
+    public boolean validationDate(LocalDate salesStart, LocalDate salesEnd, LocalDate earlyBirdEnd) {
+        if (salesStart.isAfter(salesEnd)) {
+            System.out.println("Sales start date must be before sales end date.");
+            return false;
+        }
+        if (earlyBirdEnd.isBefore(salesStart) || earlyBirdEnd.isAfter(salesEnd)) {
+            System.out.println("Early bird end date must be between sales start and sales end dates.");
+            return false;
+        }
+        return true;
+    }
+
+    // validate price
+    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
+        if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
+            System.out.println("Ticket prices cannot be negative.");
+            return false;
+        }
+        if (priceVip <= priceStandard) {
+            System.out.println("VIP price should be greater than Standard price.");
+            return false;
+        }
+        if (priceStandard <= priceEarlyBird) {
+            System.out.println("Standard price should be greater than Early Bird price.");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean validationPerks(String perks) {
+        if (perks == null || perks.trim().isEmpty()) {
+            System.out.println("Error: Perks cannot be empty !");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public LocalDate validationSalesStartDate(String ssdate, LocalDate eventDate) {
+        if (ssdate == null || ssdate.trim().isEmpty()) {
+            System.out.println("Error: Sales Start Date cannot be empty !");
+            return null;
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(ssdate.trim());
+            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
+                System.out.println("Error: Sales Start Date must before event date !");
+                return null;
+            }
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Date format must be YYYY-MM-DD !");
+            return null;
+        }
+    }
+
+    public LocalDate validationSalesEndDate(String sedate, LocalDate salesStartDate, LocalDate eventDate) {
+        if (sedate == null || sedate.trim().isEmpty()) {
+            System.out.println("Error: Sales End Date cannot be empty !");
+            return null;
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(sedate.trim());
+            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
+                System.out.println("Error: Sales End Date must before event date !");
+                return null;
+            }
+            if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)){
+                System.out.println("Error: Sales End Date must after sales start date !");
+                return null; 
+            }
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Date format must be YYYY-MM-DD !");
+            return null;
+        }
+    }
+
     public boolean validationInputEventId(Event[] events, String eventId) {
         for (Event e : events) {
             if (e != null && eventId.equals(e.getEventID())) {
