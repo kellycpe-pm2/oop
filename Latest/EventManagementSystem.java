@@ -2,8 +2,108 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 public class EventManagementSystem {
+        // --------------------------array
+    private static final int MAX_EVENTS = 100;
 
-    
+    private Event[] events = new Event[MAX_EVENTS];
+    private int eventCount = 0;
+
+    // -------------------------- add method ---------------------------
+
+    // add any Event to the array
+    public boolean addEvent(Event event) {
+        if (event == null) {
+            System.out.println("Error: Event cannot be null !");
+            return false;
+        }
+        if (eventCount >= MAX_EVENTS) {
+            System.out.println("Error: Event list is full !");
+            return false;
+        }
+        events[eventCount] = event;
+        eventCount++;
+        System.out.println("Event [" + event.getEventID() + "] added to the system.");
+        return true;
+    }
+
+    // -------------------------- get methods ---------------------------
+
+    // get all events (Concert + Workshop + Conference) combined
+    public Event[] getActiveEvents() {
+        Event[] active = new Event[eventCount];
+        for (int i = 0; i < eventCount; i++) {
+            active[i] = events[i];
+        }
+        return active;
+    }
+
+    // get only Concert events
+    public Concert[] getActiveConcerts() {
+        int count = 0;
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Concert)
+                count++;
+        }
+        Concert[] result = new Concert[count];
+        int j = 0;
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Concert) {
+                result[j++] = (Concert) events[i];
+            }
+        }
+        return result;
+    }
+
+    // get only Workshop events
+    public Workshop[] getActiveWorkshops() {
+        int count = 0;
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Workshop)
+                count++;
+        }
+        Workshop[] result = new Workshop[count];
+        int j = 0;
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Workshop) {
+                result[j++] = (Workshop) events[i];
+            }
+        }
+        return result;
+    }
+
+    // get only Conference events
+    public Conference[] getActiveConferences() {
+        int count = 0;
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Conference)
+                count++;
+        }
+        Conference[] result = new Conference[count];
+        int j = 0;
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Conference) {
+                result[j++] = (Conference) events[i];
+            }
+        }
+        return result;
+    }
+
+    // get a single event by eventID (any type)
+    public Event getEventById(String eventID) {
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] != null && events[i].getEventID().equals(eventID)) {
+                return events[i];
+            }
+        }
+        System.out.println("Error: Event [" + eventID + "] not found !");
+        return null;
+    }
+
+    // get total number of events stored
+    public int getEventCount() {
+        return eventCount;
+    }
+
     // validate the quantity set
     public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
         if (totalQuantity < quantityEarlyBird + quantityStandard + quantityVip) {
