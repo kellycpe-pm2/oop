@@ -34,15 +34,35 @@ public class Workshop extends Event {
         try {
             List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
             if (!lines.isEmpty()) {
-                for (int i = 0; i < lines.size(); i += 5) { // 5 lines per workshop
+                for (int i = 0; i < lines.size(); i += 6) { // 5 lines per workshop
                     String eventID = lines.get(i);
                     String title = lines.get(i + 1);
                     LocalDate date = LocalDate.parse(lines.get(i + 2));
                     String venue = lines.get(i + 3);
                     int maxTickets = Integer.parseInt(lines.get(i + 4));
+                    String stringTicketType = lines.get(i + 5);
 
                     Workshop w = new Workshop(title, date, venue, maxTickets);
                     w.setEventID(eventID); // restore saved ID
+
+                    if (stringTicketType!=null && !stringTicketType.isEmpty()){
+                            String[] parts = stringTicketType.split(" ");
+                            if (parts.length >= 11) {
+                                TicketType tt = new TicketType(
+                                parts[0],  // eventId
+                                Integer.parseInt(parts[1]),  // totalQuantity
+                                Integer.parseInt(parts[2]),  // quantityEarlyBird
+                                Integer.parseInt(parts[3]),  // quantityStandard
+                                Integer.parseInt(parts[4]),  // quantityVip
+                                Double.parseDouble(parts[5]),  // priceEarlyBird
+                                Double.parseDouble(parts[6]),  // priceStandard
+                                Double.parseDouble(parts[7]),  // priceVip
+                                parts[8],  // perks
+                                LocalDate.parse(parts[9]),  // salesStart
+                                LocalDate.parse(parts[10]));  // salesEnd
+                                w.setTicketType(tt);
+                            }
+                        }
                     workshops.add(w);
                 }
             }
@@ -71,6 +91,7 @@ public class Workshop extends Event {
                 writer.write(w.getDate().toString() + "\n");
                 writer.write(w.getVenue() + "\n");
                 writer.write(w.getMaxTickets() + "\n");
+                writer.write(w.getTicketType().toString()+"\n");
             }
         } catch (IOException e) {
             System.out.println("Error storing workshop data: " + e.getMessage());
