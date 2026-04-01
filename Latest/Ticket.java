@@ -1,4 +1,8 @@
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Ticket {
 
@@ -46,6 +50,26 @@ public class Ticket {
         return this.totalAmount;
     }
 
+    public String getTicketType(){
+        return this.ticketType;
+    }
+
+    public String getBookingId(){
+        return this.bookingId;
+    }
+
+    public String getEventId(){
+        return this.eventId;
+    }
+
+    public LocalDate getPurchasedDate(){
+        return this.purchaseDate;
+    }
+
+    public String getTicketId(){
+        return this.ticketId;
+    }
+
     // display ticket details
     public void displayTicketDetails() {
         System.out.println("Ticket ID: " + ticketId);
@@ -57,5 +81,45 @@ public class Ticket {
         System.out.println("Perks: " + tt.getPerks());
         System.out.println("Purchase Date: " + purchaseDate);
 
+    }
+
+    
+    // create Ticket file
+    public void createTicketFile() {
+        try {
+            File ticketFile = new File("Ticket.json");
+            if (ticketFile.createNewFile()) {
+                System.out.println("Please Waiting...");
+                System.out.println("Ticket file created: " + ticketFile.getName());
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating ticket file: " + e.getMessage());
+        }
+    }
+
+    // display all concerts
+    public static void displayAllTicket(List<Ticket> tickets) {
+        System.out.println("=== Ticket History ===");
+        System.out.println("------------------------------------------------------------------");
+        for (Ticket t : tickets) {
+            t.displayTicketDetails();
+        }
+    }
+
+    // store ticket history data to Ticket.json
+    public static void storeTicketData(List<Ticket> tickets) {
+        try (Writer writer = new java.io.FileWriter("Ticket.json")) { // overwrite file
+            for (Ticket t : tickets) {
+                writer.write(t.getEventId() + "\n");
+                writer.write(t.getBookingId() + "\n");
+                writer.write(t.getTicketId() + "\n");
+                writer.write(t.getTicketType() + "\n");
+                writer.write(t.getTotalAmount() + "\n");
+                writer.write(t.getPurchasedDate()+"\n");
+                
+            }
+        } catch (IOException e) {
+            System.out.println("Error storing ticket data: " + e.getMessage());
+        }
     }
 }
