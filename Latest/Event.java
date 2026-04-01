@@ -21,6 +21,7 @@ public abstract class Event {
         this.date = date;
         this.venue = venue;
         this.maxTickets = maxTickets;
+        this.ticketType=null;
     }
 
     // Getters
