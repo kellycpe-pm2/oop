@@ -3,6 +3,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class TestEvent {
+    static TicketType[] ticketTypes = new TicketType[300];
+
     static Scanner scan = new Scanner(System.in);
     static EventManagementSystem ems = new EventManagementSystem();
 
@@ -160,23 +162,84 @@ public class TestEvent {
 
         int maxTix;
         do {
-            System.out.print("Max Tickets      : ");
+            System.out.print("Creating ticket type......");
+            System.out.print("\nMax Ticket (Recommend 150):");
             maxTix = scan.nextInt();
             scan.nextLine();
         } while (!ems.validationMaxTickets(maxTix));
 
+        int qeb;
+        int qsd;
+        int qvip;
+        do{
+            System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
+            qeb = scan.nextInt();
+            scan.nextLine();
+            System.out.print("Quantity Standard (Recommend 60% of total ticket):");
+            qsd = scan.nextInt();
+            scan.nextLine();
+            System.out.print("Quantity Vip (Recommend 20% of total ticket):");
+            qvip = scan.nextInt();
+            scan.nextLine();
+        } while (!ems.validationQuantityTicket(maxTix,qeb,qsd,qvip));
+
+        double peb;
+        double psd;
+        double pvip;
+        do{
+            System.out.print("Price Early Bird (RM):");
+            peb = scan.nextInt();
+            scan.nextLine();
+            System.out.print("Price Standard (RM):");
+            psd = scan.nextInt();
+            scan.nextLine();
+            System.out.print("Price Vip (RM):");
+            pvip = scan.nextInt();
+            scan.nextLine();
+        } while (!ems.validationPrice(peb,psd,pvip));
+
+        String perks;
+        do {
+            System.out.print("Perks Provided: (if no just enter -) ");
+            perks = scan.nextLine();
+        } while (!ems.validationPerks(perks));
+
+        String ssdate;
+        LocalDate salesStartDate;
+        do {
+            System.out.print("Sales Start Date (YYYY-MM-DD) : ");
+            ssdate = scan.nextLine();
+            salesStartDate = ems.validationSalesStartDate(ssdate,parsedDate);
+        } while (salesStartDate == null);
+
+        String sedate;
+        LocalDate salesEndDate;
+        do {
+            System.out.print("Sales End Date (YYYY-MM-DD) : ");
+            sedate = scan.nextLine();
+            salesEndDate = ems.validationSalesEndDate(sedate,salesStartDate,parsedDate);
+        } while (salesEndDate == null);
+        
+        System.out.println("Ticket type created.");
+
         if (type == 1) {
             // Concert
             Concert c = new Concert(title, parsedDate, venue, maxTix);
+            TicketType tt = new TicketType(c.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks, salesStartDate, salesEndDate);
+            c.setTicketType(tt);
             concerts.add(c);
             events[eventCount++] = c;
+            ticketTypes[eventCount]=tt;
             System.out.println("Concert created successfully : " + c.getEventID());
 
         } else if (type == 2) {
             // Workshop
             Workshop w = new Workshop(title, parsedDate, venue, maxTix);
+            TicketType tt = new TicketType(w.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks, salesStartDate, salesEndDate);
+            w.setTicketType(tt);
             workshops.add(w);
             events[eventCount++] = w;
+            ticketTypes[eventCount]=tt;
             System.out.println("Workshop created successfully : " + w.getEventID());
 
         } else {
@@ -203,11 +266,15 @@ public class TestEvent {
             if (numSessions > 0) {
                 conf.autoCreateSessions(topics, times);
             }
+            TicketType tt = new TicketType(conf.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks, salesStartDate, salesEndDate);
+            conf.setTicketType(tt);
             conferences.add(conf);
             events[eventCount++] = conf;
+            ticketTypes[eventCount]=tt;
             System.out.println("Conference created successfully : " + conf.getEventID());
         }
     }
+
 
     // ─────────────────────────────────────────────────────────────────────────
     // REMOVE EVENT
