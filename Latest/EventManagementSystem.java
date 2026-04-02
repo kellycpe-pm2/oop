@@ -2,6 +2,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 public class EventManagementSystem {
+    private static Event [] event =new Event [100];
+    private static User [] user = new User [100];
+    private static Ticket [] ticket = new Ticket[100];
+    private static Payment [] payment = new Payment[100];
+    private static int [] bookingno= new int[Event.getEventCounter()];
+    
 
     public boolean validationInputEventId(Event[] events, String eventId) {
         for (Event e : events) {
@@ -49,6 +55,24 @@ public class EventManagementSystem {
         }
     }
 
+    
+    //----------------------------------------------------------------------------------------
+    //Staff Part
+    //---------------------------------------------------------------------------------------
+
+    
+    
+    //generate Booking No
+    public String generateBookingId(String eventId){
+        // get eventID and then Remove the first character, then convert to int
+        int eventNo = Integer.parseInt(eventId.substring(1));
+        // to increase the booking no  
+        return "B" + String.format("%03d", bookingno[eventNo++];
+    }
+
+    //----------------------------------------------------------------------------------------
+    
+    
     // -------------------------- validation for event ---------------------------
 
     // validate title (must not be empty and at least 3 characters)

@@ -12,6 +12,7 @@ public abstract class Event {
     private static int eventCounter = 1;
 
     private static String generateEventID() {
+        
         return String.format("E%03d", eventCounter++);
     }
 
@@ -46,6 +47,10 @@ public abstract class Event {
 
     public TicketType getTicketType() {
         return ticketType;
+    }
+
+    public static int getEventCounter(){
+        return Event.eventCounter;
     }
 
     // Setters

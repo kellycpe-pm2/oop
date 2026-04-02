@@ -286,11 +286,10 @@ public class User {
 
             return false;
         }
-                //check the database has record or not
-        this.no=0;
+
         for (int i=0; i< no[0] ; i++) {
             if (this.loginUsername.equals(existUser[i].getAccessUsername())) {
-                this.no ++;
+                this.no =i;
                 return true;
             }
         
