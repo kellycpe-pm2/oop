@@ -182,16 +182,26 @@ public class TestUser {
         System.out.println("------------------------------------------------------------");
     }
 
-    public static void accessmenu(User user){
-            if (user.getAccessPassword().equals("12345")) {
-                organizer = new Organizer(user.getAccessUsername(), user.getAccessPassword(), user.getAccessEmail(),user.getAccessContactNo());
-                organizerMenu();
-            }
-            else{
-                attendee = new Attendee(user.getAccessUsername(), user.getAccessPassword(), user.getAccessEmail(),user.getAccessContactNo());
-                attendeeMenu(attendee);
-            }
+public static void accessmenu(User user) {
+    // Check if user is organizer (password "12345")
+    if (user.getAccessPassword().equals("12345")) {
+        organizer = new Organizer(user.getAccessUsername(), user.getAccessPassword(), 
+                                  user.getAccessEmail(), user.getAccessContactNo());
+        organizerMenu();
+    } 
+    // Check if user is a speaker (exists in speakerPool)
+    else if (user.getAccessPassword().equals("54321")) {
+        Speaker speaker = new Speaker(user.getAccessUsername(), user.getAccessPassword(), 
+                                  user.getAccessEmail(), user.getAccessContactNo());
+        speakerMenu(speaker, events);    }  
+    // Otherwise, user is an attendee
+    else {
+        attendee = new Attendee(user.getAccessUsername(), user.getAccessPassword(),
+                                user.getAccessEmail(), user.getAccessContactNo());
+        attendeeMenu(attendee);
     }
+}
+
 
     // load the data from user.json
     public static void readUserData(int[] no, String[] username, String[] password, String[] email,
