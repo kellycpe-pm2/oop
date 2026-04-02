@@ -1,3 +1,9 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
 public class Speaker extends User {
 
     // instance variable
@@ -12,30 +18,37 @@ public class Speaker extends User {
 
     // parameterized constructor
     Speaker(String username, String password, String email, String bio) {
-        super(username, password, email);
-        this.bio[no] = bio;
-        this.no = no;
+        super(username, password, email, null);
+        Speaker.bio[no] = bio;
+        no++;
     }
 
     // ------------------getter-------------------------------
     public String getBio(int no) {
-        return this.bio[no];
+        return Speaker.bio[no];
     }
+
+    public String getBio() {
+    if (no > 0) {
+        return Speaker.bio[no - 1];
+    }
+    return "No bio available";
+}
 
     @Override
     public int getno() {
-        return this.no;
+        return Speaker.no;
     }
 
     // ------------------setter-------------------------------
     public void setBio(String bio) {
-        this.bio[no] = bio;
+        Speaker.bio[no] = bio;
     }
 
     // ------------------toString-------------------------------
     public String toString(int no) {
         return String.format("%-15s %-25s %-30s",
-                getAccessUsername(), this.bio[no]);
+                getAccessUsername(), Speaker.bio[no]);
     }
 
     // ------------------displayInfo-------------------------------
@@ -47,81 +60,70 @@ public class Speaker extends User {
             System.out.println(toString(i));
         }
     }
-
+public void displaySingleInfo() {
+    System.out.println("=== Speaker Info ===");
+    System.out.println("Username: " + getAccessUsername());
+    System.out.println("Email: " + getAccessEmail());
+    System.out.println("Bio: " + (no > 0 ? Speaker.bio[no - 1] : "No bio available"));
+}
     // ------------------method-------------------------------
-    /*
-     * // create speaker file if not exist
-     * public void createSpeakerFile() {
-     * try {
-     * File speakerFile = new File("speaker.json");
-     * if (speakerFile.createNewFile()) {
-     * System.out.println("Please Waiting...");
-     * System.out.println("Speaker file created: " + speakerFile.getName());
-     * }
-     * } catch (IOException e) {
-     * System.out.println("Error creating speaker file: " + e.getMessage());
-     * }
-     * }
-     * 
-     * // load the data from speaker.json
-     * public void readSpeakerData() {
-     * try {
-     * List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
-     * if (lines.isEmpty()) {
-     * no = 0;
-     * } else {
-     * // each record has 4 fields: username, password, email, bio
-     * no = (lines.size() / 4) - 1;
-     * String[][] information = new String[no + 1][4];
-     * 
-     * for (int i = 0; i < lines.size(); i++) {
-     * information[i / 4][i % 4] = lines.get(i);
-     * }
-     * 
-     * for (int i = 0; i <= no; i++) {
-     * setUsername(information[i][0]);
-     * setPassword(information[i][1]);
-     * setEmail(information[i][2]);
-     * this.bio[i] = information[i][3];
-     * }
-     * }
-     * } catch (IOException e) {
-     * createSpeakerFile();
-     * }
-     * }
-     * 
-     * // store speaker data to speaker.json
-     * public void storeSpeakerData() {
-     * try (Writer writer = new java.io.FileWriter("speaker.json", true)) {
-     * if (getUsername(no) != null && getEmail(no) != null && this.bio[no] != null)
-     * {
-     * writer.write(getUsername(no) + "\n");
-     * writer.write(getPassword(no) + "\n");
-     * writer.write(getEmail(no) + "\n");
-     * writer.write(this.bio[no] + "\n");
-     * }
-     * } catch (IOException e) {
-     * System.out.println("Error storing speaker data: " + e.getMessage());
-     * }
-     * }
-     * 
-     * // create a new speaker account
-     * public void createSpeaker(signUp signUpObj, String bio) {
-     * readSpeakerData();
-     * this.no++;
-     * setUsername(signUpObj.getSignUpName());
-     * setPassword(signUpObj.getSignUpPassword());
-     * setEmail(signUpObj.getSignUpEmail());
-     * this.bio[no] = bio;
-     * storeSpeakerData();
-     * }
-     */
+    
+     // Ensure speaker file exists (create if not)
+public static void ensureSpeakerFileExists() {
+    File speakerFile = new File("speaker.json");
+    if (!speakerFile.exists()) {
+        try {
+            if (speakerFile.createNewFile()) {
+                System.out.println("Speaker file created: " + speakerFile.getName());
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating speaker file: " + e.getMessage());
+        }
+    }
+}
+
+// Load speaker data with auto-create
+public static void readSpeakerData() {
+    ensureSpeakerFileExists();  // Make sure file exists first
+    
+    try {
+        List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+        
+        if (lines.isEmpty()) {
+            no = 0;
+        } else {
+            no = (lines.size() / 4);
+            String[][] information = new String[no][4];
+
+            for (int i = 0; i < lines.size(); i++) {
+                information[i / 4][i % 4] = lines.get(i);
+            }
+
+            for (int i = 0; i < no; i++) {
+                Speaker.bio[i] = information[i][3];
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error reading speaker data: " + e.getMessage());
+    }
+}
+
+    // Find speaker by username from speaker array
+    public static Speaker findSpeakerByUsername(String username, Speaker[] speakerArray, int speakerCount) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerArray[i] != null && speakerArray[i].getAccessUsername().equals(username)) {
+                return speakerArray[i];
+            }
+        }
+        return null;
+    }
+   
     // ------------------upload bio-------------------------------
     public boolean uploadBio(String username, String newBio) {
         // readSpeakerData();
         for (int i = 0; i <= no; i++) {
             if (getAccessUsername() != null && getAccessUsername().equals(username)) {
-                this.bio[i] = newBio;
+                Speaker.bio[i] = newBio;
                 // rewriteSpeakerData();
                 System.out.println("Bio updated successfully for: " + username);
                 return true;
@@ -131,57 +133,34 @@ public class Speaker extends User {
         return false;
     }
 
-    // ------------------upload session topic-------------------------------
-    /*
-     * public boolean uploadSessionTopic(String username, Session session, String
-     * newTopic) {
-     * readSpeakerData();
-     * 
-     * // verify the speaker exists
-     * boolean found = false;
-     * for (int i = 0; i <= no; i++) {
-     * if (getUsername(i) != null && getUsername(i).equals(username)) {
-     * found = true;
-     * break;
-     * }
-     * }
-     * if (!found) {
-     * System.out.println("Speaker not found: " + username);
-     * return false;
-     * }
-     * 
-     * // verify this speaker is assigned to the session
-     * Speaker[] assigned = session.getSpeakers();
-     * for (int i = 0; i < session.getSpeakerCount(); i++) {
-     * if (assigned[i] != null && assigned[i].getUsername(0) != null
-     * && assigned[i].getUsername(0).equals(username)) {
-     * session.setTopic(newTopic);
-     * System.out.println("Session [" + session.getSessionID()
-     * + "] topic updated to: \"" + newTopic
-     * + "\" by speaker: " + username);
-     * return true;
-     * }
-     * }
-     * 
-     * System.out.println("Speaker [" + username + "] is not assigned to session ["
-     * + session.getSessionID() + "]. Cannot update topic.");
-     * return false;
-     * }
-     * 
-     * // ------------------rewrite speaker.json-------------------------------
-     * private void rewriteSpeakerData() {
-     * try (Writer writer = new java.io.FileWriter("speaker.json", false)) {
-     * for (int i = 0; i <= no; i++) {
-     * if (getUsername(i) != null) {
-     * writer.write(getUsername(i) + "\n");
-     * writer.write(getPassword(i) + "\n");
-     * writer.write(getEmail(i) + "\n");
-     * writer.write(this.bio[i] + "\n");
-     * }
-     * }
-     * } catch (IOException e) {
-     * System.out.println("Error rewriting speaker data: " + e.getMessage());
-     * }
-     * }
-     */
+
+    // Upload/update session topic
+public boolean uploadSessionTopic(String username, Session session, String newTopic) {
+    // Check if this speaker is assigned to the session
+    Speaker[] assigned = session.getSpeakers();
+    for (int i = 0; i < session.getSpeakerCount(); i++) {
+        if (assigned[i] != null && assigned[i].getAccessUsername().equals(username)) {
+            // Check if speaker has accepted the session
+            String status = session.getSpeakerStatus(username);
+            if ("accepted".equals(status)) {
+                session.setTopic(newTopic);
+                System.out.println("Session [" + session.getSessionID() 
+                    + "] topic updated to: \"" + newTopic
+                    + "\" by speaker: " + username);
+                return true;
+            } else if ("pending".equals(status)) {
+                System.out.println("You need to accept the session first before updating the topic.");
+                return false;
+            } else if ("rejected".equals(status)) {
+                System.out.println("You have rejected this session. Cannot update topic.");
+                return false;
+            }
+        }
+    }
+    System.out.println("Speaker [" + username + "] is not assigned to session ["
+        + session.getSessionID() + "]. Cannot update topic.");
+    return false;
+}
+   
+     
 }
