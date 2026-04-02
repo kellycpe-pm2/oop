@@ -744,3 +744,289 @@ public class TestEvent {
         }
     }
 }
+
+//speaker part
+static void speakerMenu(Speaker loggedInSpeaker, Event[] events) {
+    boolean inMenu = true;
+    
+    while (inMenu) {
+        System.out.println("\n╔══════════════════════════════╗");
+        System.out.println("║       SPEAKER MENU           ║");
+        System.out.println("║  Logged in: " + String.format("%-17s", loggedInSpeaker.getAccessUsername()) + "║");
+        System.out.println("╠══════════════════════════════╣");
+        System.out.println("║  1: View & Respond to        ║");
+        System.out.println("║     Assigned Sessions        ║");
+        System.out.println("║  2: View My Sessions         ║");
+        System.out.println("║  3: Update Session Topic     ║");
+        System.out.println("║  4: Update Bio               ║");
+        System.out.println("║  5: View My Info             ║");
+        System.out.println("║  6: Back to Main Menu        ║");
+        System.out.println("╚══════════════════════════════╝");
+        System.out.print("Enter option: ");
+        int choice = scan.nextInt();
+        scan.nextLine();
+        
+        switch (choice) {
+            case 1:
+                // View assigned sessions and choose to accept/reject
+                manageAssignedSessions(loggedInSpeaker, events);
+                break;
+                
+            case 2:
+                // View all my sessions (with status only)
+                viewMyAssignedSessions(loggedInSpeaker, events);
+                break;
+                
+            case 3:
+                // Update session topic
+                updateSessionTopic(loggedInSpeaker, events);
+                break;
+                
+            case 4:
+                // Update Bio
+                updateSpeakerBio(loggedInSpeaker);
+                break;
+                
+            case 5:
+                // View My Info
+                loggedInSpeaker.displaySingleInfo();
+                break;
+                
+            case 0:
+                inMenu = false;
+                break;
+                
+            default:
+                System.out.println("Invalid option. Try again.");
+        }
+    }
+}
+
+// Manage assigned sessions (accept/reject)
+static void manageAssignedSessions(Speaker speaker, Event[] events) {
+    List<Session> assignedSessions = new ArrayList<>();
+    
+    // Collect all sessions this speaker is assigned to
+    for (Event e : events) {
+        if (e != null && e instanceof Conference) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                Session session = conf.getSessions()[i];
+                if (session.hasSpeaker(speaker.getAccessUsername())) {
+                    assignedSessions.add(session);
+                }
+            }
+        }
+    }
+    
+    if (assignedSessions.isEmpty()) {
+        System.out.println("\nYou are not assigned to any sessions.");
+        return;
+    }
+    
+    boolean continueManaging = true;
+    while (continueManaging) {
+        // Display all assigned sessions with current status
+        System.out.println("\n=== Your Assigned Sessions ===");
+        System.out.println("No. | Session ID | Topic | Time | Status");
+        System.out.println("----------------------------------------");
+        for (int i = 0; i < assignedSessions.size(); i++) {
+            Session s = assignedSessions.get(i);
+            String status = s.getSpeakerStatus(speaker.getAccessUsername());
+            System.out.println((i + 1) + ".   " + s.getSessionID() + "   | " + 
+                               s.getTopic() + " | " + 
+                               s.getTime() + " | " + 
+                               status);
+        }
+        
+        System.out.println("\n0. Back to Main Menu");
+        System.out.print("Select session number to respond (or 0 to exit): ");
+        int choice = scan.nextInt();
+        scan.nextLine();
+        
+        if (choice == 0) {
+            continueManaging = false;
+        } else if (choice >= 1 && choice <= assignedSessions.size()) {
+            Session selectedSession = assignedSessions.get(choice - 1);
+            String currentStatus = selectedSession.getSpeakerStatus(speaker.getAccessUsername());
+            
+            if (!"pending".equals(currentStatus)) {
+                System.out.println("You have already " + currentStatus + " this session.");
+                System.out.println("Press Enter to continue...");
+                scan.nextLine();
+                continue;
+            }
+            
+            // Show session details and ask for response
+            System.out.println("\n=== Session Details ===");
+            System.out.println("Conference: " + getConferenceName(events, selectedSession));
+            System.out.println("Session ID: " + selectedSession.getSessionID());
+            System.out.println("Topic: " + selectedSession.getTopic());
+            System.out.println("Time: " + selectedSession.getTime());
+            System.out.println("\nDo you want to ACCEPT or REJECT this session?");
+            System.out.println("1. ACCEPT");
+            System.out.println("2. REJECT");
+            System.out.print("Enter your choice (1/2): ");
+            int response = scan.nextInt();
+            scan.nextLine();
+            
+            if (response == 1) {
+                selectedSession.acceptInvitation(speaker.getAccessUsername());
+                System.out.println("You have accepted the session: " + selectedSession.getTopic());
+            } else if (response == 2) {
+                System.out.print("Please provide a reason for rejection: ");
+                String reason = scan.nextLine();
+                selectedSession.rejectInvitation(speaker.getAccessUsername(), reason);
+                System.out.println("You have rejected the session: " + selectedSession.getTopic());
+            } else {
+                System.out.println("Invalid choice.");
+            }
+            
+            System.out.println("\nPress Enter to continue...");
+            scan.nextLine();
+        } else {
+            System.out.println("Invalid selection. Please try again.");
+        }
+    }
+}
+
+// View my assigned sessions (view only)
+static void viewMyAssignedSessions(Speaker speaker, Event[] events) {
+    System.out.println("\n=== My Assigned Sessions ===");
+    boolean hasSessions = false;
+    
+    for (Event e : events) {
+        if (e != null && e instanceof Conference) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                Session session = conf.getSessions()[i];
+                if (session.hasSpeaker(speaker.getAccessUsername())) {
+                    hasSessions = true;
+                    String status = session.getSpeakerStatus(speaker.getAccessUsername());
+                    System.out.println("\nConference: " + conf.getTitle());
+                    System.out.println("  Session ID: " + session.getSessionID());
+                    System.out.println("  Topic: " + session.getTopic());
+                    System.out.println("  Time: " + session.getTime());
+                    System.out.println("  Status: " + status);
+                    if ("rejected".equals(status)) {
+                        String reason = session.getRejectionReason(speaker.getAccessUsername());
+                        if (!reason.isEmpty()) {
+                            System.out.println("  Rejection Reason: " + reason);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!hasSessions) {
+        System.out.println("You are not assigned to any sessions.");
+    }
+}
+
+// View editable sessions (accepted sessions only)
+static void viewEditableSessions(Speaker speaker, Event[] events) {
+    System.out.println("\n=== Sessions You Can Edit (Accepted) ===");
+    boolean hasEditable = false;
+    int count = 0;
+    
+    for (Event e : events) {
+        if (e != null && e instanceof Conference) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                Session session = conf.getSessions()[i];
+                if (session.hasSpeaker(speaker.getAccessUsername())) {
+                    String status = session.getSpeakerStatus(speaker.getAccessUsername());
+                    if ("accepted".equals(status)) {
+                        hasEditable = true;
+                        count++;
+                        System.out.println("\n" + count + ". Conference: " + conf.getTitle());
+                        System.out.println("   Session ID: " + session.getSessionID());
+                        System.out.println("   Current Topic: " + session.getTopic());
+                        System.out.println("   Time: " + session.getTime());
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!hasEditable) {
+        System.out.println("You have no accepted sessions to edit.");
+        System.out.println("Note: You must accept a session first before you can update its topic.");
+    }
+}
+
+// Update session topic
+static void updateSessionTopic(Speaker speaker, Event[] events) {
+    viewEditableSessions(speaker, events);
+    
+    System.out.print("\nEnter Session ID to update topic: ");
+    String sessionId = scan.nextLine();
+    
+    // Find the session
+    Session targetSession = null;
+    for (Event e : events) {
+        if (e != null && e instanceof Conference) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                Session s = conf.getSessions()[i];
+                if (s.getSessionID().equals(sessionId)) {
+                    targetSession = s;
+                    break;
+                }
+            }
+        }
+        if (targetSession != null) break;
+    }
+    
+    if (targetSession == null) {
+        System.out.println("Session not found!");
+        return;
+    }
+    
+    System.out.print("Enter new topic: ");
+    String newTopic = scan.nextLine();
+    
+    speaker.uploadSessionTopic(speaker.getAccessUsername(), targetSession, newTopic);
+}
+
+// Update speaker bio
+static void updateSpeakerBio(Speaker speaker) {
+    System.out.println("\n--- Update Your Bio ---");
+    System.out.println("Current Bio: " + speaker.getBio());
+    System.out.print("Enter new bio: ");
+    String newBio = scan.nextLine();
+    
+    if (newBio != null && !newBio.trim().isEmpty()) {
+        boolean success = speaker.uploadBio(speaker.getAccessUsername(), newBio);
+        if (success) {
+            System.out.println("Bio updated successfully!");
+        } else {
+            System.out.println("Failed to update bio.");
+        }
+    } else {
+        System.out.println("Bio cannot be empty. Update cancelled.");
+    }
+}
+// Helper method to get conference name
+static String getConferenceName(Event[] events, Session session) {
+    for (Event e : events) {
+        if (e != null && e instanceof Conference) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                if (conf.getSessions()[i] == session) {
+                    return conf.getTitle();
+                }
+            }
+        }
+    }
+    return "Unknown Conference";
+}
+
+// Display single speaker info
+static void displaySpeakerInfo(Speaker speaker) {
+    System.out.println("\n=== Speaker Info ===");
+    System.out.println("Username: " + speaker.getAccessUsername());
+    System.out.println("Email: " + speaker.getAccessEmail());
+    System.out.println("Bio: " + speaker.getBio());
+}
