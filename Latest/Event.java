@@ -12,6 +12,7 @@ public abstract class Event {
     private static int eventCounter = 1;
 
     private static String generateEventID() {
+        
         return String.format("E%03d", eventCounter++);
     }
 
@@ -21,7 +22,6 @@ public abstract class Event {
         this.date = date;
         this.venue = venue;
         this.maxTickets = maxTickets;
-        this.ticketType=null;
     }
 
     // Getters
@@ -47,6 +47,10 @@ public abstract class Event {
 
     public TicketType getTicketType() {
         return ticketType;
+    }
+
+    public static int getEventCounter(){
+        return Event.eventCounter;
     }
 
     // Setters
@@ -81,5 +85,12 @@ public abstract class Event {
     public String toString() {
         return String.format("%-6s %-20s %-12s %-20s %-8d",
                 eventID, title, date, venue, maxTickets);
+    }
+        public boolean equals(Object o) {
+        if (o instanceof Event) {
+            Event e = (Event) o;
+            return this.eventID.equals(e.eventID);
+        }
+        return false; // the object does not belong to Event
     }
 }
