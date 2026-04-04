@@ -104,4 +104,11 @@ public class Workshop extends Event {
     public String toString() {
         return super.toString();
     }
+        public boolean equals(Object o) {
+        if (o instanceof Workshop) {
+            Workshop w = (Workshop) o;
+            return this.getEventID().equals(w.getEventID());
+        }
+        return false; // the object does not belong to Workshop
+    }
 }
