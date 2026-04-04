@@ -86,4 +86,11 @@ public abstract class Event {
         return String.format("%-6s %-20s %-12s %-20s %-8d",
                 eventID, title, date, venue, maxTickets);
     }
+        public boolean equals(Object o) {
+        if (o instanceof Event) {
+            Event e = (Event) o;
+            return this.eventID.equals(e.eventID);
+        }
+        return false; // the object does not belong to Event
+    }
 }
