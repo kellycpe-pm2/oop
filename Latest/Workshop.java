@@ -11,6 +11,29 @@ public class Workshop extends Event {
 
     public Workshop(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
+        appendToFile(); // auto-save to Workshop.json on creation
+    }
+
+    // Private constructor used only when loading from file — skips auto-save
+    private Workshop(String title, LocalDate date, String venue, int maxTickets, boolean fromFile) {
+        super(title, date, venue, maxTickets);
+    }
+
+    // Appends this workshop's data to Workshop.json
+    private void appendToFile() {
+        try {
+            File workshopFile = new File("Workshop.json");
+            workshopFile.createNewFile(); // creates file if it doesn't exist
+            try (Writer writer = new java.io.FileWriter(workshopFile, true)) { // true = append mode
+                writer.write(getEventID() + "\n");
+                writer.write(getTitle() + "\n");
+                writer.write(getDate().toString() + "\n");
+                writer.write(getVenue() + "\n");
+                writer.write(getMaxTickets() + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Error auto-saving workshop data: " + e.getMessage());
+        }
     }
 
     // create Workshop file
@@ -41,7 +64,7 @@ public class Workshop extends Event {
                     String venue = lines.get(i + 3);
                     int maxTickets = Integer.parseInt(lines.get(i + 4));
 
-                    Workshop w = new Workshop(title, date, venue, maxTickets);
+                    Workshop w = new Workshop(title, date, venue, maxTickets, true); // fromFile=true skips auto-save
                     w.setEventID(eventID); // restore saved ID
                     workshops.add(w);
                 }
@@ -104,7 +127,8 @@ public class Workshop extends Event {
     public String toString() {
         return super.toString();
     }
-        public boolean equals(Object o) {
+
+    public boolean equals(Object o) {
         if (o instanceof Workshop) {
             Workshop w = (Workshop) o;
             return this.getEventID().equals(w.getEventID());
