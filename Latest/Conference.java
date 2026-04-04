@@ -211,4 +211,11 @@ public class Conference extends Event {
     public String toString() {
         return super.toString();
     }
+        public boolean equals(Object o) {
+        if (o instanceof Conference) {
+            Conference c = (Conference) o;
+            return this.getEventID().equals(c.getEventID());
+        }
+        return false; // the object does not belong to Conference
+    }
 }
