@@ -2,31 +2,82 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 public class EventManagementSystem {
-    private static Event [] event =new Event [100];
     private static User [] user = new User [100];
     private static Ticket [] ticket = new Ticket[100];
     private static Payment [] payment = new Payment[100];
     private static int [] bookingno= new int[Event.getEventCounter()];
-    
+        // ── 2D array: events[TYPE][index]
+    // events[CONCERT][...] → Concert objects
+    // events[WORKSHOP][...] → Workshop objects
+    // events[CONFERENCE][...] → Conference objects
+    private static final int CONCERT = 0;
+    private static final int WORKSHOP = 1;
+    private static final int CONFERENCE = 2;
 
-    public boolean validationInputEventId(Event[] events, String eventId) {
-        for (Event e : events) {
-            if (e != null && eventId.equals(e.getEventID())) {
-                return true;
+    private static final int MAX_EVENTS = 100;
+
+    private Event[][] events = new Event[3][MAX_EVENTS];
+    private int[] eventCount = new int[3]; // count per type
+    
+//get methods for Events
+// Get all events across every type (flat array)
+    public Event[] getActiveEvents() {
+        int total = eventCount[CONCERT] + eventCount[WORKSHOP] + eventCount[CONFERENCE];
+        Event[] active = new Event[total];
+        int idx = 0;
+        for (int type = 0; type < 3; type++) {
+            for (int i = 0; i < eventCount[type]; i++) {
+                active[idx++] = events[type][i];
             }
         }
-        return false;
+        return active;
     }
 
-    public Event findEventById(Event[] events, String eventId) {
-        for (Event e : events) {
-            if (e != null && e.getEventID().equals(eventId)) {
-                return e;
+    // Get only Concert events
+    public Concert[] getActiveConcerts() {
+        Concert[] result = new Concert[eventCount[CONCERT]];
+        for (int i = 0; i < eventCount[CONCERT]; i++) {
+            result[i] = (Concert) events[CONCERT][i];
+        }
+        return result;
+    }
+
+    // Get only Workshop events
+    public Workshop[] getActiveWorkshops() {
+        Workshop[] result = new Workshop[eventCount[WORKSHOP]];
+        for (int i = 0; i < eventCount[WORKSHOP]; i++) {
+            result[i] = (Workshop) events[WORKSHOP][i];
+        }
+        return result;
+    }
+
+    // Get only Conference events
+    public Conference[] getActiveConferences() {
+        Conference[] result = new Conference[eventCount[CONFERENCE]];
+        for (int i = 0; i < eventCount[CONFERENCE]; i++) {
+            result[i] = (Conference) events[CONFERENCE][i];
+        }
+        return result;
+    }
+
+    // Get a single event by eventID (searches all types)
+    public Event getEventById(String eventID) {
+        for (int type = 0; type < 3; type++) {
+            for (int i = 0; i < eventCount[type]; i++) {
+                if (events[type][i] != null && events[type][i].getEventID().equals(eventID)) {
+                    return events[type][i];
+                }
             }
         }
+        System.out.println("Error: Event [" + eventID + "] not found !");
         return null;
     }
 
+    // Total number of events across all types
+    public int getEventCount() {
+        return eventCount[CONCERT] + eventCount[WORKSHOP] + eventCount[CONFERENCE];
+    }
+//------------------------------------------------------------------------Get event end here
     public boolean validationInputTicketType(int choice) {
         if (choice == 1 || choice == 2 || choice == 3) {
             return true;
@@ -156,72 +207,92 @@ public class EventManagementSystem {
         }
         return true;
     }
+        public boolean validationInputEventId(Event[] events, String eventId) {
+        for (Event e : events) {
+            if (e != null && eventId.equals(e.getEventID())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // -------------------------- create event ---------------------------
 
+     // Creates a Concert and stores it in events[CONCERT][]
     public Concert createConcert(String title, String date, String venue, int maxTickets) {
-        if (!validationTitle(title)) {
+        if (!validationTitle(title))
             return null;
-        }
         LocalDate parsedDate = validationDate(date);
-        if (parsedDate == null) {
+        if (parsedDate == null)
+            return null;
+        if (!validationVenue(venue))
+            return null;
+        if (!validationMaxTickets(maxTickets))
+            return null;
+        if (eventCount[CONCERT] >= MAX_EVENTS) {
+            System.out.println("Error: Concert list is full !");
             return null;
         }
-        if (!validationVenue(venue)) {
-            return null;
-        }
-        if (!validationMaxTickets(maxTickets)) {
-            return null;
-        }
+
         Concert c = new Concert(title, parsedDate, venue, maxTickets);
-        System.out.println("Concert created successfully : " + c.getEventID());
+        events[CONCERT][eventCount[CONCERT]] = c;
+        eventCount[CONCERT]++;
+        System.out.println("Concert created and stored successfully : " + c.getEventID());
         return c;
     }
 
+    // Creates a Workshop and stores it in events[WORKSHOP][]
     public Workshop createWorkshop(String title, String date, String venue, int maxTickets) {
-        if (!validationTitle(title)) {
+        if (!validationTitle(title))
             return null;
-        }
         LocalDate parsedDate = validationDate(date);
-        if (parsedDate == null) {
+        if (parsedDate == null)
+            return null;
+        if (!validationVenue(venue))
+            return null;
+        if (!validationMaxTickets(maxTickets))
+            return null;
+        if (eventCount[WORKSHOP] >= MAX_EVENTS) {
+            System.out.println("Error: Workshop list is full !");
             return null;
         }
-        if (!validationVenue(venue)) {
-            return null;
-        }
-        if (!validationMaxTickets(maxTickets)) {
-            return null;
-        }
+
         Workshop w = new Workshop(title, parsedDate, venue, maxTickets);
-        System.out.println("Workshop created successfully : " + w.getEventID());
+        events[WORKSHOP][eventCount[WORKSHOP]] = w;
+        eventCount[WORKSHOP]++;
+        System.out.println("Workshop created and stored successfully : " + w.getEventID());
         return w;
     }
 
-    public Conference createConference(String title, String date, String venue, int maxTickets, String[] sessionTopics,
-            String[] sessionTimes) {
-        if (!validationTitle(title)) {
+    // Creates a Conference (with optional sessions) and stores it in
+    // events[CONFERENCE][]
+    public Conference createConference(String title, String date, String venue, int maxTickets,
+            String[] sessionTopics, String[] sessionTimes) {
+        if (!validationTitle(title))
             return null;
-        }
         LocalDate parsedDate = validationDate(date);
-        if (parsedDate == null) {
+        if (parsedDate == null)
+            return null;
+        if (!validationVenue(venue))
+            return null;
+        if (!validationMaxTickets(maxTickets))
+            return null;
+        if (eventCount[CONFERENCE] >= MAX_EVENTS) {
+            System.out.println("Error: Conference list is full !");
             return null;
         }
-        if (!validationVenue(venue)) {
-            return null;
-        }
-        if (!validationMaxTickets(maxTickets)) {
-            return null;
-        }
+
         Conference conf = new Conference(title, parsedDate, venue, maxTickets);
-        // auto-create sessions if provided
         if (sessionTopics != null && sessionTimes != null) {
             conf.autoCreateSessions(sessionTopics, sessionTimes);
         }
-        System.out.println("Conference created successfully : " + conf.getEventID());
+        events[CONFERENCE][eventCount[CONFERENCE]] = conf;
+        eventCount[CONFERENCE]++;
+        System.out.println("Conference created and stored successfully : " + conf.getEventID());
         return conf;
     }
 
-    // overload — create conference without sessions
+    // Overload — create Conference without sessions
     public Conference createConference(String title, String date, String venue, int maxTickets) {
         return createConference(title, date, venue, maxTickets, null, null);
     }
