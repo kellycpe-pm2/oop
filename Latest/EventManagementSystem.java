@@ -118,7 +118,7 @@ public class EventManagementSystem {
         // get eventID and then Remove the first character, then convert to int
         int eventNo = Integer.parseInt(eventId.substring(1));
         // to increase the booking no  
-        return "B" + String.format("%03d", bookingno[eventNo++];
+        return "B" + String.format("%03d", bookingno[eventNo++]);
     }
 
     //----------------------------------------------------------------------------------------
