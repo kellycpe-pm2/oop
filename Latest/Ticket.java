@@ -11,18 +11,22 @@ public class Ticket {
     private TicketType tt;
     private String ticketId;
     private String bookingId;
+    private boolean status;
     private String eventId;
     private String seatNo;
     private double totalAmount;
+    private String buyerName;
     private String ticketType;
     String perks;
     private LocalDate purchaseDate;
 
     // constructor
-    public Ticket(TicketType tt, String ticketType, String bookingId, String eventId) {
+    public Ticket(TicketType tt, String buyerName, String ticketType, String bookingId, String eventId) {
         this.tt = tt;
+        this.buyerName =buyerName;
         this.ticketType = ticketType;
         this.bookingId = bookingId;
+        this.status=true;
         this.eventId = eventId;
         this.purchaseDate = LocalDate.now();
         countTicket++;
@@ -30,12 +34,15 @@ public class Ticket {
         this.totalAmount=tt.getPrice(ticketType);
         this.seatNo=tt.getSeat(ticketType);
         this.perks=tt.getPerks();
+    
         tt.reduceQuantity(ticketType);
     }
 
-    public Ticket(String ticketId, String bookingId, String eventId, String ticketType, double totalAmount, String seatNo, String perks, LocalDate purchaseDate) {
+    public Ticket(String ticketId, String bookingId,String buyerName, String eventId, String ticketType, double totalAmount, String seatNo, String perks, LocalDate purchaseDate) {
         this.ticketId = ticketId;
         this.bookingId = bookingId;
+        this.status=true;
+        this.buyerName=buyerName;
         this.eventId = eventId;
         this.ticketType = ticketType;
         this.totalAmount = totalAmount;
@@ -67,6 +74,12 @@ public class Ticket {
         return this.totalAmount;
     }
 
+    public String getBuyerName(){
+        return this.buyerName;
+    }
+    public boolean getStatus(){
+        return this.status;
+    }
     public String getSeatNum(){
         return this.seatNo;
     }
@@ -93,6 +106,10 @@ public class Ticket {
 
     public String getPerks(){
         return this.perks;
+    }
+
+    public void setStatus(boolean status){
+        this.status=status;
     }
 
     // display ticket details
@@ -137,6 +154,8 @@ public class Ticket {
             for (Ticket t : tickets) {
                 writer.write(t.getEventId() + "\n");
                 writer.write(t.getBookingId() + "\n");
+                writer.write(t.getBuyerName()+"\n");
+                writer.write(t.getStatus()+"\n")
                 writer.write(t.getTicketId() + "\n");
                 writer.write(t.getTicketType() + "\n");
                 writer.write(t.getTotalAmount() + "\n");
@@ -156,4 +175,22 @@ public class Ticket {
         }
         return null;
     }
+
+    public String toString(){
+                return String.format(
+                             "║═══════════════════════════════════════════════════════════║\n"+
+                             "║                                                           ║\n"+
+                             "║                                                           ║\n"+
+                             "║          Name           :  %-31s║\n"+
+                             "║          Email          :  %-31s║\n"+
+                             "║          Contact Number :  %-31s║\n"+
+                             "║                                                           ║\n"+
+                             "║                                                           ║\n"+
+                             "╚═══════════════════════════════════════════════════════════╝\n"+
+                             "               Press Enter Key To Continue...", this.buyerName,bookingId,contactNo);
+    
+    }
+
+
+    
 }

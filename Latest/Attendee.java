@@ -8,5 +8,14 @@ public class Attendee extends User{
         super(username, password, email, contactNo);
     }
 
+
+    public boolean foundAttendee(User user){
+
+        if (this == user){
+            return true;
+
+        }
+            return false;
+    }
 }
 
