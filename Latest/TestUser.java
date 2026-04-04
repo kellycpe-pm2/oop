@@ -31,53 +31,49 @@ public class TestUser {
     static Organizer organizer;
     static Attendee attendee;
 
+ 
     public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
         // data store for user
-        String[] username = new String[100];
-        String[] password = new String[100];
-        String[] email = new String[100];
-        String[] contactNo = new String[100];
-        User [] alluser = new User[100];
+
+        User [][] alluser = new User[4][100];
         // no set as array to pass the value and change the value (only reference
         // variable will be affect)
-        int[] no = { 0 };
+        int[] no = { 0 ,0 ,0 , 0};
+        
         // no is from 0 to 99
         // load data
 
-        readUserData(no, username, password, email, contactNo,alluser);
+        readUserData(no,alluser);
+        
         boolean active = true;
         while (active) {
-            try{
+           
                 int option = displayAccessInterface();
                 User user = new User();
             
                 switch (option) {
                     case 1:
                     // login
-                        if (!displayLoginInterface(user, username, password,alluser,no)){
+                        if (!displayLoginInterface(user, alluser, no)){
                             break;
                         }
-
                     // set the access user
-                        user.loginUser(email, contactNo);
-
-                        accessmenu(user);
+                        accessmenu(user, alluser);
                         break;
 
                     case 2:
                     // signup
 
-                        displaySignUpInterface(username, user);
+                        displaySignUpInterface( user,alluser);
                     // set the access user
                         user.signUpUser();
 
                     // create and store data
-                        createAccount(no, username, password, email, contactNo, user,alluser);
+                        createAccount(no,user,alluser);
                         storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
                         user.getSignUpContactNo());
 
-                        accessmenu(user);
+                        accessmenu(user, alluser);
                         break;
                     case 0:
                         System.out.println("GoodBye!");
@@ -86,11 +82,7 @@ public class TestUser {
                     default :
                         System.out.println("Error: Please Select The Correct Number");
 
-                }
-
-            }catch(Exception e){
-                    System.out.println("Error: Please Select The Correct Number");
-
+                
             }
 
 
@@ -113,15 +105,15 @@ public class TestUser {
             System.out.print("Enter Your Option:\t");
             option = scan.nextInt();
 
-            if (option > 2 || option < 0) {
+            if (option > 3 || option < 0) {
                 System.out.println("Input Error: Please Select 1 or 2 !");
             }
 
-        } while (option > 2 || option < 0);
+        } while (option > 3 || option < 0);
         return option;
     }
 
-    public static boolean displayLoginInterface(User user, String[] checkname, String[] checkpwd, User [] alluser,int [] no) {
+    public static boolean displayLoginInterface(User user, User [][] alluser,int [] no) {
         Scanner scan = new Scanner(System.in);
         int logincount =0;
 
@@ -142,16 +134,17 @@ public class TestUser {
             System.out.print("\nPlease enter your Password: ");
             String password = scan.nextLine();
             user.setLoginPassword(password);
-
-        } while (!user.validationLoginPwd(checkpwd));
+            
+        } while (!user.validationLoginPwd(alluser));
 
         System.out.println("------------------------------------------------------------");
         return true;
     }
     
 
-    public static void displaySignUpInterface(String[] username, User user) {
+    public static void displaySignUpInterface( User user,User [][] alluser) {
         Scanner scan = new Scanner(System.in);
+
         System.out.println("--------------------------Sign Up--------------------------");
 
         do {
@@ -159,7 +152,7 @@ public class TestUser {
             System.out.print("\nPlease enter your name: ");
             String name = scan.nextLine();
             user.setSignUpName(name);
-        } while (!user.validationName() || !user.validationExist(username));
+        } while (!user.validationName() || !user.validationExist(alluser));
 
         do {
 
@@ -197,43 +190,55 @@ public class TestUser {
         System.out.println("------------------------------------------------------------");
     }
 
-public static void accessmenu(User user) {
+public static void accessmenu( User user, User [] [] alluser) {
     // Check if user is organizer (password "12345")
     if (user.getAccessPassword().equals("12345")) {
-        organizer = new Organizer(user.getAccessUsername(), user.getAccessPassword(), 
-                                  user.getAccessEmail(), user.getAccessContactNo());
+
+        Organizer organizer = (Organizer) alluser[0][user.getno()];
+        
+        System.out.println(organizer.toString());
+        waitForEnter();
         organizerMenu();
     } 
+
+
     // Check if user is a speaker (exists in speakerPool)
     else if (user.getAccessPassword().equals("54321")) {
-        Speaker speaker = new Speaker(user.getAccessUsername(), user.getAccessPassword(), 
-                                  user.getAccessEmail(), user.getAccessContactNo());
+        Speaker speaker = (Speaker) alluser[1][user.getno()];
+        System.out.println(speaker.toString());
+        waitForEnter();
         speakerMenu(speaker, events);    }  
     // Otherwise, user is an attendee
+    else if(user.getAccessPassword().equals("13148")){
+        Staff staff= (Staff)alluser[3][user.getno()];
+        System.out.println(staff.toString());
+        waitForEnter();
+        staffMenu(staff);
+    }
     else {
-        attendee = new Attendee(user.getAccessUsername(), user.getAccessPassword(),
-                                user.getAccessEmail(), user.getAccessContactNo());
+        Attendee attendee = (Attendee) alluser[2][user.getno()];
+        System.out.println(attendee.toString());
+        waitForEnter();
         attendeeMenu(attendee);
     }
 }
 
 
     // load the data from user.json
-    public static void readUserData(int[] no, String[] username, String[] password, String[] email,
-            String[] contactNo,User [] alluser) {
+    public static void readUserData(int[] no,User [][] alluser) {
+        
         // Read user data from the file and populate the arrays
         try {
+
             List<String> lines = Files.readAllLines(Paths.get("user.json"));
             // check the file is empty or not
             if (lines.isEmpty()) {
 
                 // STORE Data
             } else {
-                // get the index of last user
-                no[0] = (lines.size() / 4) - 1;
-                System.out.println(no[0]);
+                int size=(lines.size() / 4);
                 // store data into 2D array
-                String[][] information = new String[no[0] + 1][4];
+                String[][] information = new String[size][4];
 
                 for (int i = 0; i < lines.size(); i += 1) {
 
@@ -258,14 +263,46 @@ public static void accessmenu(User user) {
 
                 }
 
-                for (int i = 0; i < no[0] + 1; i++) {
-                    username[i] = information[i][0];
-                    password[i] = information[i][1];
-                    email[i] = information[i][2];
-                    contactNo[i] = information[i][3];
-                    alluser[i]= new User (information[i][0],information[i][2],information[i][1],information[i][3]);
+                for (int i = 0; i < size ; i++) {
+
+                    String current_pwd=information[i][1];
+                    // to store different user type data
+                    if (current_pwd.equals("12345")){
+                    
+                    // get the no of last user
+                        
+                        alluser[0][no[0]]= new Organizer (information[i][0],information[i][1],information[i][2],information[i][3]);
+                        no[0] ++;
+                    }else if(current_pwd.equals("54321")){
+
+                        
+                        alluser[1][no[1]]= new Speaker (information[i][0],information[i][1],information[i][2],information[i][3]);
+                        no[1] ++;
+
+                    }else if(current_pwd.equals("13148")){
+                        alluser[3][no[3]]= new Staff (information[i][0],information[i][1],information[i][2],information[i][3]);
+                        no[3]++;
+                    }
+                    else{
+
+                        
+                        alluser[2][no[2]]= new Attendee (information[i][0],information[i][1],information[i][2],information[i][3]);
+                        no[2] ++;
+                    }
+                    
                 }
 
+                //get the latest no index for each user type
+                for (int i=0; i<0; i++){
+
+                    //if no any record , do not need to minus
+                    if (no[i]!=0){
+
+                        no[i]--;
+
+                    }
+                }
+                    
             } // create user file
         } catch (IOException e) {
             createUserFile();
@@ -290,15 +327,38 @@ public static void accessmenu(User user) {
         }
     }
 
-    public static void createAccount(int[] no, String[] username, String[] password, String[] email, String[] contactNo,
-            User user,User [] alluser) {
+    public static void createAccount(int[] no, User user,User [] [] alluser) {
 
-        username[no[0]] = user.getSignUpName();
-        password[no[0]] = user.getSignUpPassword();
-        email[no[0]] = user.getSignUpEmail();
-        contactNo[no[0]] = user.getSignUpContactNo();
-        alluser[no[0]]=new User (username[no[0]],email[no[0]] ,password[no[0]],contactNo[no[0]]);
-        no[0]++;
+                String username= user.getSignUpName();
+                String password= user.getSignUpPassword();
+                String email = user.getSignUpEmail();
+                String contactNo = user.getSignUpContactNo();
+        //
+            if (password.equals("12345")){
+
+                        alluser[0][no[0]]= new Organizer (username,password,email,contactNo);
+                        user.setNo(no[0]);
+                        no[0]++;
+                    
+                    }else if(password.equals("54321")){
+
+                        alluser[1][no[1]]= new Speaker(username,password,email,contactNo);
+                        user.setNo(no[1]);
+                        no[1]++;
+                    }else if(password.equals("13148")){
+
+                        alluser[3][no[3]]= new Staff(username,password,email,contactNo);
+                        user.setNo(no[3]);
+                        no[3]++;
+
+                    }else{
+
+                        alluser[2][no[2]]= new Attendee (username,password,email,contactNo);
+                        user.setNo(no[2]);
+                        no[2]++;
+
+                    }
+        
 
     }
 
@@ -308,13 +368,133 @@ public static void accessmenu(User user) {
             File user = new File("user.json");
             if (user.createNewFile()) {
                 System.out.println("Please Waiting...");
-                System.out.println("User file created: " + user.getName());
+                System.out.println("User file created: User.json");
             }
 
         } catch (IOException e) {
             System.out.println("Error creating user file: " + e.getMessage());
         }
     }
+
+    //additional function
+        public static void waitForEnter() {
+            try {
+                System.in.read();  // Reads a single byte
+                System.in.skip(System.in.available());  // Clear buffer
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
+    public static void clearScreen() {
+        try {
+            // Try ANSI escape codes first
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+        } catch (Exception e) {
+            // Fallback to blank lines
+            for (int i = 0; i < 50; i++) {
+                System.out.println();
+            }
+        }
+    }
+
+    //_________________________________________________________________________
+    //Staff Part 
+    //_________________________________________________________________________
+    public static void staffMenu(Staff staff){ 
+        boolean inMenu = true;
+        clearScreen();
+        
+        try{
+           
+            while (inMenu) {
+                System.out.println("\n╔════════════════════════════════════════════════════════════╗");
+                System.out.println("║                      STAFF Menu                            ║");
+                System.out.println("╠════════════════════════════════════════════════════════════╣");
+                System.out.println("║  🎟️  CHECK-IN MENU:                                         ║");
+                System.out.println("║     1. Check-in Attendee by Ticket ID                      ║");
+                System.out.println("║     2. View Today's Check-ins                              ║");
+                System.out.println("║     3. View All Check-in Records                           ║");
+                System.out.println("║     3. View Checked-in vs Pending Attendees                ║");
+                System.out.println("║     4. Search Check-in by Ticket ID                        ║");
+                System.out.println("╠════════════════════════════════════════════════════════════╣");
+                System.out.println("║  📊 REPORT MENU:                                           ║");
+                System.out.println("║     5. View Event Report                                   ║");
+                System.out.println("║     6. View Sales Report                                   ║");
+                System.out.println("║     7. View All Check-ins Report                           ║");
+                System.out.println("╠════════════════════════════════════════════════════════════╣");
+                System.out.println("║  💰 PROFIT MENU:                                           ║");
+                System.out.println("║     8. View Total Profit Report                            ║");
+                System.out.println("║     9. View Profit by Event                                ║");
+                System.out.println("╠════════════════════════════════════════════════════════════╣");
+                System.out.println("║  📁 EXPORT MENU:                                           ║");
+                System.out.println("║     10. Export Check-in Report                             ║");
+                System.out.println("║     11. Export Sales Report                                ║");
+                System.out.println("║     12. Export Event Report                                ║");
+                System.out.println("╠════════════════════════════════════════════════════════════╣");
+                System.out.println("║     0. Exit                                                ║");
+                System.out.println("╚════════════════════════════════════════════════════════════╝");
+                System.out.print("Enter option: ");
+                int choice = scan.nextInt();
+
+                    switch (choice) {
+                        case 1:
+                        checkIn_Attendee();
+                        break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            break;
+                        case 6:
+                            break;
+                        case 7:
+                            break;
+                        case 8:
+                            break;
+                        case 9:
+                            break;
+                        case 10:
+                            break;
+                        case 11:
+                            break;
+                        case 12:
+                            break;
+                        case 0:
+                            inMenu = false;
+                            break;
+                        default:
+                            System.out.println("Invalid option. Try again.");
+                    }
+
+        }
+            }catch(Exception e){
+                System.out.println("Error: Existing Unknown Char. Please Input Correctly!!!");
+                scan.nextLine(); 
+                inMenu= true;
+                waitForEnter();
+            }finally{
+                if (inMenu){
+                        staffMenu(staff);
+
+                }
+
+            }
+    }
+    public static void checkIn_Attendee(){
+        clearScreen();
+
+    System.out.println("\n\t\t╔═══════════════════════════════════════════════════════════╗");
+    System.out.println("\t\t║                   CHECK-IN ATTENDEE                        ║");
+    System.out.println("\t\t╚════════════════════════════════════════════════════════════╝\n\n");
+    System.out.println("\t\t             1. Ticket ID       2. Booking ID");
+    System.out.print("Enter Ticket ID: ");
+                int choice = scan.nextInt();
+    }
+
 
     // ─────────────────────────────────────────────────────────────────────────
     // ORGANIZER MENU
