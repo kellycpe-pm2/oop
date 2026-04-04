@@ -43,7 +43,6 @@ public class User {
         this.email = email;
         this.contactNo=contactNo;
         this.pswd = password;
-        this.contactNo=contactNo;
     }
 
     
@@ -209,7 +208,7 @@ public class User {
        
 
         // check the contact number length 
-        else if(contactNoArray.length!=11){
+        else if(contactNoArray.length!=11&& contactNoArray.length!=10 ){
             System.out.println("Input Error: Please Enter In Format ! ");
             return false;
 
@@ -281,20 +280,25 @@ public class User {
 
     // validation for login
 
-    public boolean validationNoExistName(String[] existUser) {
+    public boolean validationNoExistName(User [] existUser, int [] no) {
+        //check the user input is empty or not
         if (validationEmpty(this.loginUsername)) {
 
             return false;
         }
-        for (int i = 0; i < existUser.length; i++) {
-            if (this.loginUsername.equals(existUser[i])) {
-                this.no = i;
+
+        for (int i=0; i< no[0] ; i++) {
+            if (this.loginUsername.equals(existUser[i].getAccessUsername())) {
+                this.no =i;
                 return true;
             }
+        
         }
+
         System.out.println("Error: The Username Is Not Matched ! ");
 
         return false;
+       
     }
 
     public boolean validationLoginPwd(String[] password) {
