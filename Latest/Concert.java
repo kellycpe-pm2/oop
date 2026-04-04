@@ -11,6 +11,29 @@ public class Concert extends Event {
 
     public Concert(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
+        appendToFile(); // auto-save to Concert.json on creation
+    }
+
+    // Private constructor used only when loading from file — skips auto-save
+    private Concert(String title, LocalDate date, String venue, int maxTickets, boolean fromFile) {
+        super(title, date, venue, maxTickets);
+    }
+
+    // Appends this concert's data to Concert.json
+    private void appendToFile() {
+        try {
+            File concertFile = new File("Concert.json");
+            concertFile.createNewFile(); // creates file if it doesn't exist
+            try (Writer writer = new java.io.FileWriter(concertFile, true)) { // true = append mode
+                writer.write(getEventID() + "\n");
+                writer.write(getTitle() + "\n");
+                writer.write(getDate().toString() + "\n");
+                writer.write(getVenue() + "\n");
+                writer.write(getMaxTickets() + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Error auto-saving concert data: " + e.getMessage());
+        }
     }
 
     // create Concert file
@@ -41,7 +64,7 @@ public class Concert extends Event {
                     String venue = lines.get(i + 3);
                     int maxTickets = Integer.parseInt(lines.get(i + 4));
 
-                    Concert c = new Concert(title, date, venue, maxTickets);
+                    Concert c = new Concert(title, date, venue, maxTickets, true); // fromFile=true skips auto-save
                     c.setEventID(eventID); // restore saved ID
                     concerts.add(c);
                 }
@@ -104,7 +127,8 @@ public class Concert extends Event {
     public String toString() {
         return super.toString();
     }
-        public boolean equals(Object o) {
+
+    public boolean equals(Object o) {
         if (o instanceof Concert) {
             Concert c = (Concert) o;
             return this.getEventID().equals(c.getEventID());
