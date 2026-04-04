@@ -58,13 +58,13 @@ public class TestUser {
                             break;
                         }
                     // set the access user
-                        accessmenu(user, alluser);
+                        accessmenu(user, alluser,no);
                         break;
 
                     case 2:
                     // signup
 
-                        displaySignUpInterface( user,alluser);
+                        displaySignUpInterface( user,alluser,no);
                     // set the access user
                         user.signUpUser();
 
@@ -73,7 +73,7 @@ public class TestUser {
                         storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
                         user.getSignUpContactNo());
 
-                        accessmenu(user, alluser);
+                        accessmenu(user, alluser,no);
                         break;
                     case 0:
                         System.out.println("GoodBye!");
@@ -142,7 +142,7 @@ public class TestUser {
     }
     
 
-    public static void displaySignUpInterface( User user,User [][] alluser) {
+    public static void displaySignUpInterface( User user,User [][] alluser, int [] no) {
         Scanner scan = new Scanner(System.in);
 
         System.out.println("--------------------------Sign Up--------------------------");
@@ -190,7 +190,7 @@ public class TestUser {
         System.out.println("------------------------------------------------------------");
     }
 
-public static void accessmenu( User user, User [] [] alluser) {
+public static void accessmenu( User user, User [] [] alluser, int[] no) {
     // Check if user is organizer (password "12345")
     if (user.getAccessPassword().equals("12345")) {
 
@@ -213,7 +213,7 @@ public static void accessmenu( User user, User [] [] alluser) {
         Staff staff= (Staff)alluser[3][user.getno()];
         System.out.println(staff.toString());
         waitForEnter();
-        staffMenu(staff);
+        staffMenu(staff,alluser,no);
     }
     else {
         Attendee attendee = (Attendee) alluser[2][user.getno()];
@@ -401,7 +401,7 @@ public static void accessmenu( User user, User [] [] alluser) {
     //_________________________________________________________________________
     //Staff Part 
     //_________________________________________________________________________
-    public static void staffMenu(Staff staff){ 
+    public static void staffMenu(Staff staff,User [][] alluser,int [] no){ 
         boolean inMenu = true;
         clearScreen();
         
@@ -439,7 +439,7 @@ public static void accessmenu( User user, User [] [] alluser) {
 
                     switch (choice) {
                         case 1:
-                        checkIn_Attendee();
+                        checkIn_Attendee(alluser,no);
                         break;
                         case 2:
                             break;
@@ -478,21 +478,64 @@ public static void accessmenu( User user, User [] [] alluser) {
                 waitForEnter();
             }finally{
                 if (inMenu){
-                        staffMenu(staff);
+                        staffMenu(staff,alluser,no);
 
                 }
 
             }
     }
-    public static void checkIn_Attendee(){
+    public static void checkIn_Attendee(User[][]alluser, int []no){
+        User current_attendee;
         clearScreen();
+        System.out.println("\n\t\t╔═══════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                   CHECK-IN ATTENDEE                        ║");
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════╝\n\n");
+        System.out.println("\t\t             1. Ticket ID       2. Booking ID");
+        System.out.print("Enter Ticket ID: ");
+        int option = scan.nextInt();
+        
+        // find attendee method
+        switch (option){
+            case 1:
+                System.out.println("Enter ticket ID:");
+                String ticketId=scan.nextLine();
+                for(Ticket ticket: tickets){
+                    //check the ticket availability 
+                    if  (ticket.getTicketId().equals(ticketId)){
+                    //find user
+                        for (int i=0;i<no[2];i++){
+                            if (ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())){
+                                current_attendee=alluser[2][i];
+                            }
+                        }
+                    }else{
+                        System.out.println(" Error: Tickets No Is Not Found !" );
 
-    System.out.println("\n\t\t╔═══════════════════════════════════════════════════════════╗");
-    System.out.println("\t\t║                   CHECK-IN ATTENDEE                        ║");
-    System.out.println("\t\t╚════════════════════════════════════════════════════════════╝\n\n");
-    System.out.println("\t\t             1. Ticket ID       2. Booking ID");
-    System.out.print("Enter Ticket ID: ");
-                int choice = scan.nextInt();
+                    }
+                }
+                break;
+            case 2:
+                System.out.println("Enter Booking ID:");
+                String bookingId=scan.nextLine();
+                for(Ticket ticket: tickets){
+                    //check the ticket availability 
+                    if  (ticket.getBookingId().equals(bookingId)){
+                    //find user
+                        for (int i=0;i<no[2];i++){
+                            if (ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())){
+                                current_attendee=alluser[2][i];
+                            }
+                        }
+                    }else{
+                        System.out.println(" Error: Booking No Is Not Found !" );
+
+                    }
+                }
+                break;
+            default:
+
+        }   
+    
     }
 
 
@@ -1163,7 +1206,7 @@ public static void accessmenu( User user, User [] [] alluser) {
             System.out.println("No events available.");
             return;
         }
-
+        
         // pick event
         String eventId;
         while (true) {
@@ -1239,7 +1282,7 @@ public static void accessmenu( User user, User [] [] alluser) {
         System.out.print(p.toString());
 
         Ticket ticket = ems.purchaseTicket(a, event,tt, ticketType, bookingId);
-
+        
         if (ticket != null) {
             System.out.println("\nPurchase completed successfully!");
             ticket.displayTicketDetails();

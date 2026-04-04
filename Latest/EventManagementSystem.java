@@ -405,15 +405,12 @@ public class EventManagementSystem {
     }
 
 // In EventManagementSystem.java
-    public Ticket purchaseTicket(Attendee attendee, Event event, TicketType tt, String ticketTypeName, String bookingId) {    
-    
+    public Ticket purchaseTicket(Attendee a, Event event, TicketType tt, String ticketTypeName, String bookingId) {    
     if (tt == null) {
         System.out.println("Error: TicketType cannot be null!");
         return null;
     }
-    
-    Ticket ticket = new Ticket(tt, ticketTypeName, bookingId, event.getEventID());
-    
+    Ticket ticket = new Ticket(tt, a.getAccessUsername(),ticketTypeName, bookingId, event.getEventID());
     return ticket;
 }
 }
