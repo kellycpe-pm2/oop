@@ -32,7 +32,7 @@ public class TicketType {
             LocalDate salesEnd) {
         this.eventId = eventId;
         this.totalQuantity = totalQuantity;
-        availableQuantity=totalQuantity;
+        availableQuantity = totalQuantity;
         this.quantityEarlyBird = quantityEarlyBird;
         this.quantityStandard = quantityStandard;
         this.quantityVip = quantityVip;
@@ -96,7 +96,7 @@ public class TicketType {
         return this.earlyBirdEnd;
     }
 
-    public int getAvailableQuantity(){
+    public int getAvailableQuantity() {
         return availableQuantity;
     }
 
@@ -136,17 +136,17 @@ public class TicketType {
         this.earlyBirdEnd = earlybirdEnd;
     }
 
-    //create TicketType file
+    // create TicketType file
     public void createTicektTypeFile() {
         try {
             File ttFile = new File("TicketType.json");
-            if (ttFile.createNewFile()) { 
-                System.out.println("Please Waiting..."); 
-                System.out.println("Ticket Type file created: " + ttFile.getName()); 
-            } 
-        } catch (IOException e) { 
-            System.out.println("Error creating ticket type file: " + e.getMessage()); 
-        } 
+            if (ttFile.createNewFile()) {
+                System.out.println("Please Waiting...");
+                System.out.println("Ticket Type file created: " + ttFile.getName());
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating ticket type file: " + e.getMessage());
+        }
     }
 
     // Reads all ticket type from "TicketType.json"
@@ -169,14 +169,15 @@ public class TicketType {
                     String perks = lines.get(i + 9);
                     LocalDate salesStart = LocalDate.parse(lines.get(i + 10));
                     LocalDate salesEnd = LocalDate.parse(lines.get(i + 11));
-                    LocalDate earlyBirdEnd = LocalDate.parse(lines.get(i + 12));
+                    // earlyBirdEnd is NOT stored — constructor computes it as
+                    // salesStart.plusDays(1)
 
-                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard, quantityVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
+                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard,
+                            quantityVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
                     ticketTypes.add(tt);
+                    i += 12; // 12 lines per record — must be INSIDE the loop
                 }
-                    // Move to next ticket type: 13 lines per record
-                    i += 13;
-                }
+            }
         } catch (IOException e) {
             System.out.println("Error reading ticket type data: " + e.getMessage());
         }
@@ -186,15 +187,16 @@ public class TicketType {
     // display all ticket type
     public static void displayAllTicketType(List<TicketType> TicketTypes) {
         System.out.println("=== Ticket Type Info ===");
-        System.out.printf("%-8s %-15s %-20s %-10s %-10s", "EventId", "Total Quantity", "Perks", "SalesStart", "SalesEnd");
+        System.out.printf("%-8s %-15s %-20s %-10s %-10s", "EventId", "Total Quantity", "Perks", "SalesStart",
+                "SalesEnd");
         System.out.println("--------------------------------------------------------------------");
         for (TicketType tt : TicketTypes) {
-            System.out.printf("%-8s %-15s %-20s %-10s %-10s", 
-                tt.getEventId(), 
-                tt.getTotalQuantity(), 
-                tt.getPerks(),
-                tt.getSalesStart(),
-                tt.getSalesEnd());
+            System.out.printf("%-8s %-15s %-20s %-10s %-10s",
+                    tt.getEventId(),
+                    tt.getTotalQuantity(),
+                    tt.getPerks(),
+                    tt.getSalesStart(),
+                    tt.getSalesEnd());
         }
     }
 
@@ -219,7 +221,6 @@ public class TicketType {
             System.out.println("Error storing ticket type data: " + e.getMessage());
         }
     }
-
 
     // check availability of quantity ticket
     public boolean isAvailable(String typeName) {
@@ -279,25 +280,25 @@ public class TicketType {
         standardSeats = new ArrayList<>();
         earlyBirdSeats = new ArrayList<>();
 
-        int currentRow = 0;  // Start from row A (index 0)
-        
+        int currentRow = 0; // Start from row A (index 0)
+
         // Generate VIP seats
         for (int i = 0; i < quantityVip; i++) {
             int col = (i % seatsPerRow) + 1;
             char rowChar = (char) ('A' + currentRow);
             vipSeats.add(rowChar + "" + col);
-        
+
             // Move to next row when current row is full
             if ((i + 1) % seatsPerRow == 0) {
                 currentRow++;
             }
         }
-    
+
         // Move to next row if VIP didn't fill a complete row
         if (quantityVip % seatsPerRow != 0) {
             currentRow++;
         }
-    
+
         // Generate Standard seats
         int standardStartRow = currentRow;
         for (int i = 0; i < quantityStandard; i++) {
@@ -305,11 +306,11 @@ public class TicketType {
             char rowChar = (char) ('A' + standardStartRow + (i / seatsPerRow));
             standardSeats.add(rowChar + "" + col);
         }
-    
+
         // Calculate next row after Standard
         int standardRows = (int) Math.ceil((double) quantityStandard / seatsPerRow);
         int earlyBirdStartRow = standardStartRow + standardRows;
-    
+
         // Generate EarlyBird seats
         for (int i = 0; i < quantityEarlyBird; i++) {
             int col = (i % seatsPerRow) + 1;
@@ -348,7 +349,9 @@ public class TicketType {
 
     // display ticket type detail
     public String toString() {
-        return eventId+" "+totalQuantity+" "+quantityEarlyBird+" "+quantityStandard+" "+quantityVip+" "+priceEarlyBird+" "+priceStandard+" "+priceVip+" "+perks+" "+salesStart+" "+salesEnd;
+        return eventId + " " + totalQuantity + " " + quantityEarlyBird + " " + quantityStandard + " " + quantityVip
+                + " " + priceEarlyBird + " " + priceStandard + " " + priceVip + " " + perks + " " + salesStart + " "
+                + salesEnd;
     }
 
 }
