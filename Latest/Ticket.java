@@ -15,18 +15,35 @@ public class Ticket {
     private String seatNo;
     private double totalAmount;
     private String ticketType;
+    String perks;
     private LocalDate purchaseDate;
 
     // constructor
-    public Ticket(TicketType tt,String ticketType, String bookingId, String eventId, LocalDate purchaseDate) {
+    public Ticket(TicketType tt, String ticketType, String bookingId, String eventId) {
         this.tt = tt;
         this.ticketType = ticketType;
         this.bookingId = bookingId;
         this.eventId = eventId;
-        this.purchaseDate = purchaseDate;
-        this.ticketId = "T" + String.format("%05d", countTicket+1);
+        this.purchaseDate = LocalDate.now();
         countTicket++;
+        this.ticketId = "T" + String.format("%05d", countTicket);
+        this.totalAmount=tt.getPrice(ticketType);
+        this.seatNo=tt.getSeat(ticketType);
+        this.perks=tt.getPerks();
+        tt.reduceQuantity(ticketType);
     }
+
+    public Ticket(String ticketId, String bookingId, String eventId, String ticketType, double totalAmount, String seatNo, String perks, LocalDate purchaseDate) {
+        this.ticketId = ticketId;
+        this.bookingId = bookingId;
+        this.eventId = eventId;
+        this.ticketType = ticketType;
+        this.totalAmount = totalAmount;
+        this.seatNo = seatNo;
+        this.perks=perks;
+        this.purchaseDate = purchaseDate;
+    }
+
 
     public boolean validationTicket() {
 
@@ -50,6 +67,10 @@ public class Ticket {
         return this.totalAmount;
     }
 
+    public String getSeatNum(){
+        return this.seatNo;
+    }
+
     public String getTicketType(){
         return this.ticketType;
     }
@@ -68,6 +89,10 @@ public class Ticket {
 
     public String getTicketId(){
         return this.ticketId;
+    }
+
+    public String getPerks(){
+        return this.perks;
     }
 
     // display ticket details
@@ -97,7 +122,7 @@ public class Ticket {
         }
     }
 
-    // display all concerts
+    // display all tickets
     public static void displayAllTicket(List<Ticket> tickets) {
         System.out.println("=== Ticket History ===");
         System.out.println("------------------------------------------------------------------");
@@ -121,5 +146,14 @@ public class Ticket {
         } catch (IOException e) {
             System.out.println("Error storing ticket data: " + e.getMessage());
         }
+    }
+
+    public TicketType findTicketTypeById(TicketType[] ticketTypes, String eventId) {
+        for (TicketType tt : ticketTypes) {
+            if (tt != null && tt.getEventId().equals(eventId)) {
+                return tt;
+            }
+        }
+        return null;
     }
 }
