@@ -8,6 +8,8 @@ public class Staff extends User{
         super(username, password, email, contactNo);
     }
 
-    
+        public String toString(){
+            return super.toString();
+    }
     
 }

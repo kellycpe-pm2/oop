@@ -17,7 +17,7 @@ public class User {
     private String pswd;
     private String email;
     private String contactNo;
-    private int no;
+    private int [] no = new int [2];
 
     // --------------------------Sign Up of Constructor---------------------------
     // default constructor
@@ -38,7 +38,7 @@ public class User {
         this.loginUsername = loginUsername;
     }
 
-     User(String username, String email, String password,String contactNo) {
+     User(String username , String password, String email,String contactNo) {
         this.username =username;
         this.email = email;
         this.contactNo=contactNo;
@@ -83,7 +83,7 @@ public class User {
     }
 
     public int getno() {
-        return this.no;
+        return this.no[1];
     }
 
     // -------------------------- setter---------------------------
@@ -114,6 +114,10 @@ public class User {
     public void setLoginPassword(String loginPassword) {
         this.loginPassword = loginPassword;
     }
+
+    public void setNo(int no){
+        this.no[1]=no;
+    }
     // -------------------------- method---------------------------
 
     // -------------------------Access User------------------------
@@ -125,26 +129,38 @@ public class User {
         pswd = signUpPassword;
     }
 
-    public void loginUser(String[] email,String [] contactNo) {
+    public void loginUser( String email,String  contactNo) {
         username = loginUsername;
-        this.email = email[no];
-        this.contactNo=contactNo[no];
+        this.email = email;
+        this.contactNo=contactNo;
         pswd = loginPassword;
     }
 
     // validation for signup
-    public boolean validationExist(String[] existUser) {
+    public boolean validationExist(User[] [] existUser) {
+        
         if (validationEmpty(this.signUpName)) {
 
             return false;
         }
-        for (int i = 0; i < existUser.length; i++) {
-            if (this.signUpName.equals(existUser[i])) {
-                System.out.println("Error: The Username Has Already Exist ! ");
 
-                return false;
+        if (existUser == null){
+            return false;
+        }
+
+        for (int j=0;j<4;j++){
+           if (existUser[j] == null) {
+                continue;  // Skip null row
+            }
+            for (int i = 0; i < existUser.length; i++) {
+                if (existUser[j][i] != null &&this.signUpName.equals(existUser[j][i].getAccessUsername())) {
+                    System.out.println("Error: The Username Has Already Exist ! ");
+
+                    return false;
+                }
             }
         }
+
         return true;
     }
 
@@ -280,18 +296,27 @@ public class User {
 
     // validation for login
 
-    public boolean validationNoExistName(User [] existUser, int [] no) {
+    public boolean validationNoExistName(User [] [] existUser, int [] no) {
         //check the user input is empty or not
         if (validationEmpty(this.loginUsername)) {
 
             return false;
         }
 
-        for (int i=0; i< no[0] ; i++) {
-            if (this.loginUsername.equals(existUser[i].getAccessUsername())) {
-                this.no =i;
+        for (int i=0; i< 4 ; i++) {
+
+            if (existUser[i] == null) {
+                continue;  // Skip null row
+            }
+            for (int j=0; j< no[i] ; j++) {
+            
+                if (existUser[i][j]!=null&&this.loginUsername.equals(existUser[i][j].getAccessUsername())) {
+                this.no[0] =i;
+                this.no[1]=j;
+                //found user
                 return true;
             }
+        }
         
         }
 
@@ -301,17 +326,36 @@ public class User {
        
     }
 
-    public boolean validationLoginPwd(String[] password) {
+    public boolean validationLoginPwd(User [][] user) {
         if (validationEmpty(this.loginPassword)) {
             return false;
         }
-        if (this.loginPassword.equals(password[this.no])) {
+
+
+        String current_pswd= user[no[0]][no[1]].getAccessPassword();
+        if (this.loginPassword.equals(current_pswd)) {
+            this.pswd=loginPassword;
             return true;
 
         }
         System.out.println("Error: Inccorrect Password ! ");
 
         return false;
+    }
+
+    public String toString(){
+        return String.format("╔═══════════════════════════════════════════════════════════╗\n"+
+                             "║                   Access Successful !!!                   ║\n"+
+                             "║═══════════════════════════════════════════════════════════║\n"+
+                             "║                                                           ║\n"+
+                             "║                                                           ║\n"+
+                             "║          Username       :  %-31s║\n"+
+                             "║          Email          :  %-31s║\n"+
+                             "║          Contact Number :  %-31s║\n"+
+                             "║                                                           ║\n"+
+                             "║                                                           ║\n"+
+                             "╚═══════════════════════════════════════════════════════════╝\n"+
+                             "               Press Enter Key To Continue...", username,email,contactNo);
     }
 
 }
