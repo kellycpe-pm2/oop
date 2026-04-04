@@ -16,6 +16,66 @@ public class Conference extends Event {
         super(title, date, venue, maxTickets);
         this.sessions = new Session[MAX_SESSIONS];
         this.sessionCount = 0;
+        appendToFile(); // auto-save to Conference.json on creation
+    }
+
+    // Private constructor used only when loading from file — skips auto-save and
+    // session updates
+    private Conference(String title, LocalDate date, String venue, int maxTickets, boolean fromFile) {
+        super(title, date, venue, maxTickets);
+        this.sessions = new Session[MAX_SESSIONS];
+        this.sessionCount = 0;
+    }
+
+    // Appends this conference's data (with current sessions) to Conference.json
+    private void appendToFile() {
+        try {
+            File confFile = new File("Conference.json");
+            confFile.createNewFile(); // creates file if it doesn't exist
+            try (Writer writer = new java.io.FileWriter(confFile, true)) { // true = append mode
+                writeConferenceRecord(writer);
+            }
+        } catch (IOException e) {
+            System.out.println("Error auto-saving conference data: " + e.getMessage());
+        }
+    }
+
+    // Rewrites only this conference's record in Conference.json (used after adding
+    // sessions)
+    private void updateInFile() {
+        try {
+            List<Conference> conferences = readConferenceData();
+            // Replace the matching conference with this updated one
+            for (int i = 0; i < conferences.size(); i++) {
+                if (conferences.get(i).getEventID().equals(this.getEventID())) {
+                    conferences.set(i, this);
+                    break;
+                }
+            }
+            storeConferenceData(conferences);
+        } catch (Exception e) {
+            System.out.println("Error updating conference data: " + e.getMessage());
+        }
+    }
+
+    // Helper: writes a single conference record to a Writer
+    private void writeConferenceRecord(Writer writer) throws IOException {
+        writer.write(getEventID() + "\n");
+        writer.write(getTitle() + "\n");
+        writer.write(getDate().toString() + "\n");
+        writer.write(getVenue() + "\n");
+        writer.write(getMaxTickets() + "\n");
+        writer.write(sessionCount + "\n");
+        for (int s = 0; s < sessionCount; s++) {
+            Session session = sessions[s];
+            writer.write(session.getSessionID() + "\n");
+            writer.write(session.getTopic() + "\n");
+            writer.write(session.getTime() + "\n");
+            writer.write(session.getSpeakerCount() + "\n");
+            for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
+                writer.write(session.getSpeakers()[sp].getAccessUsername() + "\n");
+            }
+        }
     }
 
     // Getters
@@ -27,12 +87,25 @@ public class Conference extends Event {
         return sessions;
     }
 
+    // Private method used only when loading from file — adds session without
+    // updating file
+    private Session loadSession(String topic, String time) {
+        if (sessionCount < MAX_SESSIONS) {
+            Session s = new Session(topic, time);
+            sessions[sessionCount] = s;
+            sessionCount++;
+            return s;
+        }
+        return null;
+    }
+
     // Composition — Conference creates and owns its Sessions
     public Session createSession(String topic, String time) {
         if (sessionCount < MAX_SESSIONS) {
             Session s = new Session(topic, time);
             sessions[sessionCount] = s;
             sessionCount++;
+            updateInFile(); // auto-update Conference.json with the new session
             return s;
         }
         System.out.println("Cannot add more sessions. Limit reached.");
@@ -104,7 +177,8 @@ public class Conference extends Event {
                     int maxTickets = Integer.parseInt(lines.get(i++));
                     int storedSessionCount = Integer.parseInt(lines.get(i++));
 
-                    Conference conf = new Conference(title, date, venue, maxTickets);
+                    Conference conf = new Conference(title, date, venue, maxTickets, true); // fromFile=true skips
+                                                                                            // auto-save
                     conf.setEventID(eventID); // restore saved ID
 
                     for (int s = 0; s < storedSessionCount; s++) {
@@ -113,7 +187,7 @@ public class Conference extends Event {
                         String time = lines.get(i++);
                         int speakerCount = Integer.parseInt(lines.get(i++));
 
-                        Session session = conf.createSession(topic, time);
+                        Session session = conf.loadSession(topic, time); // use loadSession to skip file update
                         session.setSessionID(sessionID); // restore saved session ID
 
                         for (int sp = 0; sp < speakerCount; sp++) {
@@ -211,7 +285,8 @@ public class Conference extends Event {
     public String toString() {
         return super.toString();
     }
-        public boolean equals(Object o) {
+
+    public boolean equals(Object o) {
         if (o instanceof Conference) {
             Conference c = (Conference) o;
             return this.getEventID().equals(c.getEventID());
