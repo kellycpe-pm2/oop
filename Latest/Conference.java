@@ -14,20 +14,30 @@ public class Conference extends Event {
 
     public Conference(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
-        this.sessions = new Session[MAX_SESSIONS];
+        this.sessions     = new Session[MAX_SESSIONS];
         this.sessionCount = 0;
     }
 
-    // Getters
-    public int getSessionCount() {
-        return sessionCount;
+    // ======================== EQUALS (search by eventID, Conference-only) ========================
+
+    // Returns true only when the other object is also a Conference with the same eventID.
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Conference) {
+            Conference c = (Conference) o;
+            return this.getEventID().equals(c.getEventID());
+        }
+        return false; // the object does not belong to Conference
     }
 
-    public Session[] getSessions() {
-        return sessions;
-    }
+    // ======================== GETTERS ========================
 
-    // Composition — Conference creates and owns its Sessions
+    public int getSessionCount() { return sessionCount; }
+    public Session[] getSessions() { return sessions;  }
+
+    // ======================== SESSION MANAGEMENT ========================
+
+    // Conference creates and owns its Sessions (Composition)
     public Session createSession(String topic, String time) {
         if (sessionCount < MAX_SESSIONS) {
             Session s = new Session(topic, time);
@@ -39,9 +49,8 @@ public class Conference extends Event {
         return null;
     }
 
-    // auto create multiple sessions at once
     public int autoCreateSessions(String[] topics, String[] times) {
-        int count = Math.min(topics.length, times.length);
+        int count   = Math.min(topics.length, times.length);
         int created = 0;
         for (int i = 0; i < count; i++) {
             if (createSession(topics[i], times[i]) != null) {
@@ -52,26 +61,26 @@ public class Conference extends Event {
         return created;
     }
 
-    // remove a session from this conference by sessionID
     public boolean removeSession(String sessionID) {
         for (int i = 0; i < sessionCount; i++) {
             if (sessions[i].getSessionID().equals(sessionID)) {
-                // shift remaining sessions left
                 for (int j = i; j < sessionCount - 1; j++) {
                     sessions[j] = sessions[j + 1];
                 }
                 sessions[sessionCount - 1] = null;
                 sessionCount--;
-                System.out.println(
-                        "Session [" + sessionID + "] removed from conference [" + getEventID() + "] successfully.");
+                System.out.println("Session [" + sessionID + "] removed from conference ["
+                        + getEventID() + "] successfully.");
                 return true;
             }
         }
-        System.out.println("Error: Session [" + sessionID + "] not found in conference [" + getEventID() + "] !");
+        System.out.println("Error: Session [" + sessionID + "] not found in conference ["
+                + getEventID() + "] !");
         return false;
     }
 
-    // create Conference file
+    // ======================== FILE OPERATIONS ========================
+
     public void createConferenceFile() {
         try {
             File confFile = new File("Conference.json");
@@ -84,12 +93,9 @@ public class Conference extends Event {
         }
     }
 
-    // Reads all conferences from "Conference.json" and returns them as a list of
-    // Conference objects
     // Lines per record:
-    // eventID, title, date, venue, maxTickets, sessionCount
-    // then for each session: sessionID, topic, time, speakerCount, [speakerUsername
-    // x speakerCount]
+    // eventID, title, date, venue, maxTickets, sessionCount, ticketType
+    // then per session: sessionID, topic, time, speakerCount, [speakerUsername x speakerCount]
     public static List<Conference> readConferenceData() {
         List<Conference> conferences = new ArrayList<>();
         try {
@@ -97,30 +103,49 @@ public class Conference extends Event {
             if (!lines.isEmpty()) {
                 int i = 0;
                 while (i < lines.size()) {
-                    String eventID = lines.get(i++);
-                    String title = lines.get(i++);
-                    LocalDate date = LocalDate.parse(lines.get(i++));
-                    String venue = lines.get(i++);
-                    int maxTickets = Integer.parseInt(lines.get(i++));
-                    int storedSessionCount = Integer.parseInt(lines.get(i++));
+                    String eventID            = lines.get(i++);
+                    String title              = lines.get(i++);
+                    LocalDate date            = LocalDate.parse(lines.get(i++));
+                    String venue              = lines.get(i++);
+                    int maxTickets            = Integer.parseInt(lines.get(i++));
+                    int storedSessionCount    = Integer.parseInt(lines.get(i++));
+                    String stringTicketType   = lines.get(i++);
 
                     Conference conf = new Conference(title, date, venue, maxTickets);
-                    conf.setEventID(eventID); // restore saved ID
+                    conf.setEventID(eventID);
 
                     for (int s = 0; s < storedSessionCount; s++) {
-                        String sessionID = lines.get(i++);
-                        String topic = lines.get(i++);
-                        String time = lines.get(i++);
-                        int speakerCount = Integer.parseInt(lines.get(i++));
+                        String sessionID   = lines.get(i++);
+                        String topic       = lines.get(i++);
+                        String time        = lines.get(i++);
+                        int speakerCount   = Integer.parseInt(lines.get(i++));
 
                         Session session = conf.createSession(topic, time);
-                        session.setSessionID(sessionID); // restore saved session ID
+                        session.setSessionID(sessionID);
 
                         for (int sp = 0; sp < speakerCount; sp++) {
                             String speakerUsername = lines.get(i++);
-                            // restore speaker as a shell object with username only
                             Speaker speaker = new Speaker(speakerUsername, "", "", "");
                             session.addSpeaker(speaker);
+                        }
+                    }
+
+                    if (stringTicketType != null && !stringTicketType.isEmpty()) {
+                        String[] parts = stringTicketType.split(" ");
+                        if (parts.length >= 11) {
+                            TicketType tt = new TicketType(
+                                parts[0],
+                                Integer.parseInt(parts[1]),
+                                Integer.parseInt(parts[2]),
+                                Integer.parseInt(parts[3]),
+                                Integer.parseInt(parts[4]),
+                                Double.parseDouble(parts[5]),
+                                Double.parseDouble(parts[6]),
+                                Double.parseDouble(parts[7]),
+                                parts[8],
+                                LocalDate.parse(parts[9]),
+                                LocalDate.parse(parts[10]));
+                            conf.setTicketType(tt);
                         }
                     }
                     conferences.add(conf);
@@ -132,7 +157,6 @@ public class Conference extends Event {
         return conferences;
     }
 
-    // display all conferences
     public static void displayAllConferences(List<Conference> conferences) {
         System.out.println("=== Conference Info ===");
         System.out.printf("%-6s %-20s %-12s %-20s %-8s%n", "ID", "Title", "Date", "Venue", "MaxTix");
@@ -143,24 +167,24 @@ public class Conference extends Event {
         }
     }
 
-    // store conference data to Conference.json
     public static void storeConferenceData(List<Conference> conferences) {
-        try (Writer writer = new java.io.FileWriter("Conference.json")) { // overwrite file
+        try (Writer writer = new java.io.FileWriter("Conference.json")) {
             for (Conference conf : conferences) {
-                writer.write(conf.getEventID() + "\n");
-                writer.write(conf.getTitle() + "\n");
-                writer.write(conf.getDate().toString() + "\n");
-                writer.write(conf.getVenue() + "\n");
-                writer.write(conf.getMaxTickets() + "\n");
-                writer.write(conf.getSessionCount() + "\n");
+                writer.write(conf.getEventID()              + "\n");
+                writer.write(conf.getTitle()                + "\n");
+                writer.write(conf.getDate().toString()      + "\n");
+                writer.write(conf.getVenue()                + "\n");
+                writer.write(conf.getMaxTickets()           + "\n");
+                writer.write(conf.getSessionCount()         + "\n");
+                // write empty line when no ticket type has been set yet
+                writer.write((conf.getTicketType() != null ? conf.getTicketType().toString() : "") + "\n");
 
                 for (int s = 0; s < conf.getSessionCount(); s++) {
                     Session session = conf.getSessions()[s];
-                    writer.write(session.getSessionID() + "\n");
-                    writer.write(session.getTopic() + "\n");
-                    writer.write(session.getTime() + "\n");
-                    writer.write(session.getSpeakerCount() + "\n");
-
+                    writer.write(session.getSessionID()  + "\n");
+                    writer.write(session.getTopic()      + "\n");
+                    writer.write(session.getTime()       + "\n");
+                    writer.write(session.getSpeakerCount()+ "\n");
                     for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
                         writer.write(session.getSpeakers()[sp].getAccessUsername() + "\n");
                     }
@@ -171,7 +195,6 @@ public class Conference extends Event {
         }
     }
 
-    // remove a conference by eventID from the list and update Conference.json
     public static boolean removeConference(List<Conference> conferences, String eventID) {
         for (int i = 0; i < conferences.size(); i++) {
             if (conferences.get(i).getEventID().equals(eventID)) {
@@ -185,7 +208,8 @@ public class Conference extends Event {
         return false;
     }
 
-    // Display all sessions and their speakers
+    // ======================== DISPLAY ========================
+
     public void displaySessions() {
         System.out.println("  Sessions for Conference: " + getTitle());
         if (sessionCount == 0) {
@@ -210,12 +234,5 @@ public class Conference extends Event {
     @Override
     public String toString() {
         return super.toString();
-    }
-        public boolean equals(Object o) {
-        if (o instanceof Conference) {
-            Conference c = (Conference) o;
-            return this.getEventID().equals(c.getEventID());
-        }
-        return false; // the object does not belong to Conference
     }
 }
