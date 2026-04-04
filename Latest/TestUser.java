@@ -42,6 +42,7 @@ public class TestUser {
         // load data
 
         readUserData(no, alluser);
+        loadAllEvents(); // load all events and ticket types from files on startup
 
         boolean active = true;
         while (active) {
@@ -1153,11 +1154,13 @@ public class TestUser {
         concerts.clear();
         workshops.clear();
         conferences.clear();
+        ticketTypes.clear();
         eventCount = 0;
 
         concerts = Concert.readConcertData();
         workshops = Workshop.readWorkshopData();
         conferences = Conference.readConferenceData();
+        ticketTypes = TicketType.readTicektTypeData(); // load ticket types so purchase works
 
         for (Concert c : concerts) {
             events[eventCount++] = c;
