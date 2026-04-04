@@ -103,7 +103,6 @@ public class Conference extends Event {
                     String venue = lines.get(i++);
                     int maxTickets = Integer.parseInt(lines.get(i++));
                     int storedSessionCount = Integer.parseInt(lines.get(i++));
-                    String stringTicketType = lines.get(i++);
 
                     Conference conf = new Conference(title, date, venue, maxTickets);
                     conf.setEventID(eventID); // restore saved ID
@@ -123,25 +122,6 @@ public class Conference extends Event {
                             Speaker speaker = new Speaker(speakerUsername, "", "", "");
                             session.addSpeaker(speaker);
                         }
-                    }
-                    
-                    if (stringTicketType!=null && !stringTicketType.isEmpty()){
-                            String[] parts = stringTicketType.split(" ");
-                            if (parts.length >= 11) {
-                                TicketType tt = new TicketType(
-                                parts[0],  // eventId
-                                Integer.parseInt(parts[1]),  // totalQuantity
-                                Integer.parseInt(parts[2]),  // quantityEarlyBird
-                                Integer.parseInt(parts[3]),  // quantityStandard
-                                Integer.parseInt(parts[4]),  // quantityVip
-                                Double.parseDouble(parts[5]),  // priceEarlyBird
-                                Double.parseDouble(parts[6]),  // priceStandard
-                                Double.parseDouble(parts[7]),  // priceVip
-                                parts[8],  // perks
-                                LocalDate.parse(parts[9]),  // salesStart
-                                LocalDate.parse(parts[10]));  // salesEnd
-                                conf.setTicketType(tt);
-                            }
                     }
                     conferences.add(conf);
                 }
@@ -173,7 +153,6 @@ public class Conference extends Event {
                 writer.write(conf.getVenue() + "\n");
                 writer.write(conf.getMaxTickets() + "\n");
                 writer.write(conf.getSessionCount() + "\n");
-                writer.write(conf.getTicketType().toString()+"\n");
 
                 for (int s = 0; s < conf.getSessionCount(); s++) {
                     Session session = conf.getSessions()[s];
@@ -231,5 +210,12 @@ public class Conference extends Event {
     @Override
     public String toString() {
         return super.toString();
+    }
+        public boolean equals(Object o) {
+        if (o instanceof Conference) {
+            Conference c = (Conference) o;
+            return this.getEventID().equals(c.getEventID());
+        }
+        return false; // the object does not belong to Conference
     }
 }
