@@ -104,4 +104,11 @@ public class Concert extends Event {
     public String toString() {
         return super.toString();
     }
+        public boolean equals(Object o) {
+        if (o instanceof Concert) {
+            Concert c = (Concert) o;
+            return this.getEventID().equals(c.getEventID());
+        }
+        return false; // the object does not belong to Concert
+    }
 }
