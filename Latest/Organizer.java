@@ -32,20 +32,8 @@ public class Organizer extends User {
         this.contactNo = contactNo;
     }
 
-    // ------------------toString-------------------------------
-    public String toString(int no) {
-        return String.format("%-15s",
-                getAccessUsername());
-    }
-
-    // ------------------displayInfo-------------------------------
-    public void displayInfo() {
-        System.out.println("=== Organizer Info ===");
-        System.out.printf("%-15s %-25s %-15s%n", "Username", "Email", "Contact No");
-        System.out.println("----------------------------------------------------");
-        for (int i = 0; i <= no; i++) {
-            System.out.println(toString(i));
-        }
-    }
+         public String toString(){
+        return super.toString();
+     }
 
 }

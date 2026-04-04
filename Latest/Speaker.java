@@ -16,9 +16,14 @@ public class Speaker extends User {
         super();
     }
 
+
+    Speaker(String username, String password, String email, String contactno) {
+        super(username, password, email, contactno);
+        no++;
+    }
     // parameterized constructor
-    Speaker(String username, String password, String email, String bio) {
-        super(username, password, email, null);
+    Speaker(String username, String password, String email, String contactno,String bio) {
+        super(username, password, email, contactno);
         Speaker.bio[no] = bio;
         no++;
     }
@@ -162,5 +167,7 @@ public boolean uploadSessionTopic(String username, Session session, String newTo
     return false;
 }
    
-     
+     public String toString(){
+        return super.toString();
+     }
 }

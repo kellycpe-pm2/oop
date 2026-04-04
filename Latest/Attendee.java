@@ -97,5 +97,9 @@ public class Attendee extends User{
         System.out.println("----------------------------");
     }
     }
+
+    public String toString(){
+        return super.toString();
+    }
 }
 
