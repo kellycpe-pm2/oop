@@ -21,6 +21,7 @@ public class TicketType {
     private LocalDate salesStart;
     private LocalDate salesEnd;
     private LocalDate earlyBirdEnd;
+    private int [] total_ticket_type=new int [3];
 
     private List<String> vipSeats;
     private List<String> standardSeats;
@@ -29,7 +30,7 @@ public class TicketType {
     // constructor
     public TicketType(String eventId, int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip,
             double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart,
-            LocalDate salesEnd) {
+            LocalDate salesEnd, int totalearlyBird,int totalsandrand,int totalvip) {
         this.eventId = eventId;
         this.totalQuantity = totalQuantity;
         availableQuantity = totalQuantity;
@@ -43,6 +44,9 @@ public class TicketType {
         this.salesStart = salesStart;
         this.salesEnd = salesEnd;
         this.earlyBirdEnd = salesStart.plusDays(1);
+        this.total_ticket_type[0]=totalearlyBird;// u edit and dont forget store into the json file
+        this.total_ticket_type[1]=totalsandrand;// this too
+        this.total_ticket_type[2]=totalvip;//this also
 
         generateSeats();
     }
@@ -100,6 +104,10 @@ public class TicketType {
         return availableQuantity;
     }
 
+    // i add this
+public int [] getTotalTicketType(){
+    return total_ticket_type;
+}
     // setter method
     public void setTotalQuantity(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
         this.totalQuantity = totalQuantity;
@@ -173,7 +181,7 @@ public class TicketType {
                     // salesStart.plusDays(1)
 
                     TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard,
-                            quantityVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
+                            quantityVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd,quantityEarlyBird,quantityStandard,quantityVip);
                     ticketTypes.add(tt);
                     i += 12; // 12 lines per record — must be INSIDE the loop
                 }
@@ -339,6 +347,7 @@ public class TicketType {
     }
 
     public static TicketType findTicketTypeById(List<TicketType> tt, String eventId) {
+        
         for (TicketType t : tt) {
             if (t != null && t.getEventId().equals(eventId)) {
                 return t;
@@ -346,6 +355,9 @@ public class TicketType {
         }
         return null;
     }
+
+
+
 
     // display ticket type detail
     public String toString() {

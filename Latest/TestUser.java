@@ -1,11 +1,16 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+
+import javax.swing.text.View;
 
 public class TestUser {
     static Scanner scan = new Scanner(System.in);
@@ -29,8 +34,8 @@ public class TestUser {
 
     static Organizer organizer;
     static Attendee attendee;
-
-    public static void main(String[] args) {
+    
+        public static void main(String[] args) {
         // data store for user
 
         User[][] alluser = new User[4][100];
@@ -46,7 +51,6 @@ public class TestUser {
 
         boolean active = true;
         while (active) {
-
             int option = displayAccessInterface();
             User user = new User();
 
@@ -373,7 +377,7 @@ public class TestUser {
     // additional function
     public static void waitForEnter() {
         try {
-            System.in.read(); // Reads a single byte
+            scan.nextLine(); // Reads a single byte
             System.in.skip(System.in.available()); // Clear buffer
         } catch (Exception e) {
             e.printStackTrace();
@@ -408,24 +412,18 @@ public class TestUser {
                 System.out.println("╠════════════════════════════════════════════════════════════╣");
                 System.out.println("║  🎟️  CHECK-IN MENU:                                         ║");
                 System.out.println("║     1. Check-in Attendee by Ticket ID                      ║");
-                System.out.println("║     2. View Today's Check-ins                              ║");
-                System.out.println("║     3. View All Check-in Records                           ║");
-                System.out.println("║     3. View Checked-in vs Pending Attendees                ║");
-                System.out.println("║     4. Search Check-in by Ticket ID                        ║");
+                System.out.println("║     2. View Check-in List                                  ║");
+                System.out.println("║     3. View Pending Attendees List                         ║");
                 System.out.println("╠════════════════════════════════════════════════════════════╣");
                 System.out.println("║  📊 REPORT MENU:                                           ║");
-                System.out.println("║     5. View Event Report                                   ║");
-                System.out.println("║     6. View Sales Report                                   ║");
-                System.out.println("║     7. View All Check-ins Report                           ║");
-                System.out.println("╠════════════════════════════════════════════════════════════╣");
-                System.out.println("║  💰 PROFIT MENU:                                           ║");
-                System.out.println("║     8. View Total Profit Report                            ║");
-                System.out.println("║     9. View Profit by Event                                ║");
+                System.out.println("║     4. View Event Report                                   ║");
+                System.out.println("║     5. View Sales Report                                   ║");
+                System.out.println("║     6. View All Check-ins Report                           ║");
                 System.out.println("╠════════════════════════════════════════════════════════════╣");
                 System.out.println("║  📁 EXPORT MENU:                                           ║");
-                System.out.println("║     10. Export Check-in Report                             ║");
-                System.out.println("║     11. Export Sales Report                                ║");
-                System.out.println("║     12. Export Event Report                                ║");
+                System.out.println("║     7. Export Check-in Report                              ║");
+                System.out.println("║     8. Export Sales Report                                 ║");
+                System.out.println("║     9. Export Event Report                                 ║");
                 System.out.println("╠════════════════════════════════════════════════════════════╣");
                 System.out.println("║     0. Exit                                                ║");
                 System.out.println("╚════════════════════════════════════════════════════════════╝");
@@ -437,27 +435,29 @@ public class TestUser {
                         checkIn_Attendee(alluser, no);
                         break;
                     case 2:
+                        view_checkin(alluser);
                         break;
                     case 3:
+                        view_pending_attendee_list(alluser);
                         break;
                     case 4:
+                    event_report();
                         break;
                     case 5:
+                    sale_report();
                         break;
                     case 6:
+                        all_check_in_report(alluser);
                         break;
                     case 7:
+                     exportCheckInReportToFile(alluser);
                         break;
-                    case 8:
-                        break;
+                    case 8:                        
+                        exportSalesReportToFile();
+                    break;
                     case 9:
-                        break;
-                    case 10:
-                        break;
-                    case 11:
-                        break;
-                    case 12:
-                        break;
+                        exportEventReportToFile();
+                    break;
                     case 0:
                         inMenu = false;
                         break;
@@ -480,61 +480,1041 @@ public class TestUser {
         }
     }
 
+
     public static void checkIn_Attendee(User[][] alluser, int[] no) {
-        User current_attendee;
+        Scanner scan = new Scanner(System.in);
+        User current_attendee = null;
+        Ticket currentTicket = null;
+        boolean search = true;
+    
         clearScreen();
-        System.out.println("\n\t\t╔═══════════════════════════════════════════════════════════╗");
+        System.out.println("\n\t\t╔════════════════════════════════════════════════════════════╗");
         System.out.println("\t\t║                   CHECK-IN ATTENDEE                        ║");
         System.out.println("\t\t╚════════════════════════════════════════════════════════════╝\n\n");
-        System.out.println("\t\t             1. Ticket ID       2. Booking ID");
-        System.out.print("Enter Ticket ID: ");
-        int option = scan.nextInt();
-
-        // find attendee method
+        System.out.println("\t\t        1. Ticket ID       2. Booking ID      0. Exit");
+    
+        int option = 0;
+    
+        // Get valid option
+        try {
+        do {
+            System.out.print("\n\t\tEnter Your Option: ");
+            option = scan.nextInt();
+            scan.nextLine();
+        } while (option > 2 || option < 0);
+        } catch (Exception e) {
+            System.out.println("\t\tError: Invalid Character!!! Please enter number.");
+            scan.nextLine(); // Clear buffer
+            checkIn_Attendee(alluser, no);
+            return;
+    }
+    
+        if (option == 0) {
+            return; // Exit
+    }
+    
+        // Process based on option
         switch (option) {
             case 1:
-                System.out.println("Enter ticket ID:");
+                System.out.print("\n\t\tEnter Ticket ID: ");
                 String ticketId = scan.nextLine();
-                for (Ticket ticket : tickets) {
-                    // check the ticket availability
-                    if (ticket.getTicketId().equals(ticketId)) {
-                        // find user
-                        for (int i = 0; i < no[2]; i++) {
-                            if (ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())) {
-                                current_attendee = alluser[2][i];
-                            }
+                boolean ticketFound = false;
+            
+            for (Ticket ticket : tickets) {
+                if (ticket.getTicketId().equals(ticketId)) {
+                    ticketFound = true;
+
+                    
+                    // Find attendee by buyer name
+                    for (int i = 0; i < no[2]; i++) {
+                        if (alluser[2][i] != null && 
+                            ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())) {
+                            current_attendee = alluser[2][i];
+                            currentTicket = ticket;
+                            search = false;
+                            break;
                         }
-                    } else {
-                        System.out.println(" Error: Tickets No Is Not Found !");
-
                     }
+                    
+                    if (current_attendee == null) {
+                        System.out.println("\t\tERROR: Attendee Information Not Found!");
+                        waitForEnter();
+                        checkIn_Attendee(alluser, no);
+                        return;
+                    }
+                    break;
                 }
-                break;
-            case 2:
-                System.out.println("Enter Booking ID:");
-                String bookingId = scan.nextLine();
-                for (Ticket ticket : tickets) {
-                    // check the ticket availability
-                    if (ticket.getBookingId().equals(bookingId)) {
-                        // find user
-                        for (int i = 0; i < no[2]; i++) {
-                            if (ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())) {
-                                current_attendee = alluser[2][i];
-                            }
+            }
+            
+            if (!ticketFound) {
+                System.out.println("\t\tERROR: Ticket ID Not Found!");
+                waitForEnter();
+                checkIn_Attendee(alluser, no);
+                return;
+            }
+            break;
+            
+        case 2:
+            System.out.print("\n\t\tEnter Booking ID: ");
+            String bookingId = scan.nextLine();
+            boolean bookingFound = false;
+            
+            for (Ticket ticket : tickets) {
+                if (ticket.getBookingId().equals(bookingId)) {
+                    bookingFound = true;
+                    currentTicket = ticket;
+                    // Find attendee by buyer name
+                    for (int i = 0; i < no[2]; i++) {
+                        if (alluser[2][i] != null && 
+                            ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())) {
+                            current_attendee = alluser[2][i];
+                            search = false;
+                            break;
                         }
-                    } else {
-                        System.out.println(" Error: Booking No Is Not Found !");
-
                     }
-                }
-                break;
-            default:
+                    
+                    if (current_attendee == null) {
 
+                        System.out.println("\t\tERROR: Attendee Information Not Found!");
+                        waitForEnter();
+                        checkIn_Attendee(alluser, no);
+                        return;
+                    }
+                    break;
+                }
+            }
+            
+            if (!bookingFound) {
+                System.out.println("\t\tERROR: Booking ID Not Found!");
+                waitForEnter();
+                checkIn_Attendee(alluser, no);
+                return;
+            }
+            break;
+    }
+
+            // Check if already checked in
+        if (!currentTicket.getStatus()) {
+            System.out.println("\n\t\t╔════════════════════════════════════════════════════════════╗");
+            System.out.println("\t\t║                  ❌ ALREADY CHECKED IN!                     ║");
+            System.out.println("\t\t╚════════════════════════════════════════════════════════════╝");
+            waitForEnter();
+            checkIn_Attendee(alluser, no);
+            return;
         }
+        
+       System.out.printf(
+        "╔════════════════════════════════════════════════════════════╗\n" +
+        "║                      CHECK-IN DETAILS                      ║\n" +
+        "╠════════════════════════════════════════════════════════════╣\n" +
+        "║          Name           :  %-31s ║\n" +
+        "║          Email          :  %-31s ║\n" +
+        "║          Contact No     :  %-31s ║\n" +
+        "║          Booking ID     :  %-31s ║\n" +
+        "║          Ticket ID      :  %-31s ║\n" +
+        "║          Ticket Type    :  %-31s ║\n" +
+        "║          Seat No        :  %-31s ║\n" +
+        "║          Status         :  %-31s ║\n" +
+        "║          Purchase Date  :  %-31s ║\n" +
+        "╚════════════════════════════════════════════════════════════╝\n",
+        current_attendee.getAccessUsername(),
+        current_attendee.getAccessEmail(),
+        current_attendee.getAccessContactNo(),
+        currentTicket.getBookingId(),
+        currentTicket.getTicketId(),
+        currentTicket.getTicketType(),
+        currentTicket.getSeatNum(),
+        status_ToString(currentTicket.getStatus()),
+        currentTicket.getPurchasedDate()
+    ); 
+
+
+    System.out.println("\n     Press Enter Key To Continue");
+        waitForEnter();
+        System.out.println("\n\t\t╔════════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                   CONFIRM CHECK-IN                         ║");
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════╝\n\n");
+        System.out.println("\t\t          1. Yes                        0. No");
+        
+        
+
+        try {
+        do {
+            System.out.print("\n\t\tEnter Your Option: ");
+            option = scan.nextInt();
+            scan.nextLine();
+        } while (option > 2 || option < 0);
+        } catch (Exception e) {
+            System.out.println("\t\tError: Invalid Character!!! Please enter number.");
+            scan.nextLine(); // Clear buffer
+            checkIn_Attendee(alluser, no);
+            return;
+    }
+
+
+    
+        if (option == 1) {
+            currentTicket.setStatus(false);
+            Staff.increase_CheckIn_Couter();
+            checkIn_Attendee(alluser, no); // Exit
+    }else{
+        return;
+    }
+
 
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+
+    public static void view_checkin(User [] []alluser){
+        System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                           CHECK-IN LIST                                        ║");
+        System.out.printf("\t\t║                               %-48s ║\n",LocalDate.now());
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
+        if (Staff.getCheckin_Couter()==0) {
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                         ⚠️ NO CHECK-INS TODAY                                  │");
+        System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+        return;
+        }else{
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                            CHECKED-IN LIST                         │");
+        System.out.println("\t\t\t├────┬────────────────────┬─────────────────────┬──────────┬─────────┤");
+        System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
+        System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");    
+        int no=1;
+
+        for (Ticket ticket : tickets){
+            if (ticket !=null){
+            
+                if (alluser[2].length==0){
+                    System.out.println("ERROR: No Any Attendee Resgister The System !!!");
+                    return;
+                }
+            if(!ticket.getStatus()){
+                for(User user : alluser[2]){
+                    if (ticket.getBuyerName().equals(user.getAccessUsername())){
+                        System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
+                        no++,
+                        ticket.getBuyerName(),
+                        user.getAccessEmail(),
+                        ticket.getTicketId(),
+                        status_ToString(ticket.getStatus()));
+                        break;
+                    }
+                
+                }
+            }
+
+        
+
+
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────┘");
+            System.out.println("\n\n\t\t\t Press Enter Key To Return Menu");
+            waitForEnter();
+            waitForEnter();
+        }
+        }
+    }
+
+
+    }
+
+    public static void view_pending_attendee_list(User[][]alluser){
+       System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                           PENDING ATTENDEES LIST                               ║");
+        System.out.printf("\t\t║                               %-48s ║\n",LocalDate.now());
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
+        if (tickets.size()==0) {
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                  NO ANY EVENT                                  │");
+        System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+        return;
+        }else{
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                     PENDING ATTENDEES LIST                         │");
+        System.out.println("\t\t\t├────┬────────────────────┬─────────────────────┬──────────┬─────────┤");
+        System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
+          
+        int no=1;
+
+        for (Ticket ticket : tickets){
+            if (ticket !=null){
+            
+                if (alluser[2].length==0){
+                    System.out.println("ERROR: No Any Attendee Resgister The System !!!");
+                    return;
+                }
+            if(ticket.getStatus()){
+                for(User user : alluser[2]){
+                    if (ticket.getBuyerName().equals(user.getAccessUsername())){
+                        System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤"); 
+                        System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
+                        no++,
+                        ticket.getBuyerName(),
+                        user.getAccessEmail(),
+                        ticket.getTicketId(),
+                        status_ToString(ticket.getStatus()));
+                        break;
+                    }
+                
+                }
+            }
+
+        
+
+
+            
+        }
+        }
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────┘");
+            System.out.println("\n\n\t\t\t\t Press Enter Key To Return Menu");
+            waitForEnter();
+            waitForEnter();
+    }
+
+    }
+
+
+    public static void all_check_in_report(User [][]alluser){
+       System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                              ALL CHECK-INS REPORT                              ║");
+        System.out.printf("\t\t║                              Generated :%-38s ║\n",LocalDate.now());
+        System.out.printf("\t\t║                               Total Check-ins : %-30s ║\n",tickets.size());
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
+        if (tickets.size()==0) {
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                  NO ANY BUYER                                  │");
+        System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+        return;
+        }else{
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                       ALL CHECK-INS REPORT                         │");
+        System.out.println("\t\t\t├────┬────────────────────┬─────────────────────┬──────────┬─────────┤");
+        System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");   
+        int no=1;
+
+        for (Ticket ticket : tickets){
+            if (ticket !=null){
+            
+                if (alluser[2].length==0){
+                    System.out.println("ERROR: No Any Attendee Resgister The System !!!");
+                    return;
+                }
+                for(User user : alluser[2]){
+                    if (ticket.getBuyerName().equals(user.getAccessUsername())){
+                        System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤"); 
+                        System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
+                        no++,
+                        ticket.getBuyerName(),
+                        user.getAccessEmail(),
+                        ticket.getTicketId(),
+                        status_ToString(ticket.getStatus()));
+                        break;
+                    }
+                
+                }
+            
+
+            }
+        }
+
+
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────┘");
+            System.out.println("\n\n\t\t\t\t Press Enter Key To Mone On To Next Page");
+            waitForEnter();
+            waitForEnter();
+            
+            int checkinRate = (Staff.getCheckin_Couter() * 100) / tickets.size();
+            String rateText = checkinRate + "%";
+            System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+            System.out.println("\t\t\t│                                 CHECK-IN STATISTICS                            │");
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘"); 
+            System.out.println("\t\t\t│                                                                                │");
+            System.out.println("\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Total Check-ins          :             %-32d │\n",Staff.getCheckin_Couter());
+            System.out.println("\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Total Attendees          :             %-32d │\n",tickets.size());
+            System.out.println("\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Check-in Rate            :             %-32s │\n", rateText);
+            System.out.println("\t\t\t│                                                                                │");
+            System.out.println("\t\t\t│                                                                                │");
+            System.out.println("\t\t\t│                                 Check-in Rate                                  │");
+            System.out.println("\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
+            System.out.print("\t\t\t|            │ ");
+            int displaybar=(int)(double)checkinRate/100*59;
+            for (int i=0; i<59;i++){
+                if(displaybar>=i){
+                    System.out.print("█");
+                }else{
+                    System.out.print("░");
+                }
+                    
+
+                }
+            
+
+            
+            System.out.println("  │    │");
+            System.out.println("\t\t\t│            └──────────────────────────────────────────────────────────────┘    │");
+            System.out.println("\t\t\t│                                                                                │ ");
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+
+                waitForEnter();
+                waitForEnter();
+                System.out.println("\t\t\tPlease Press Enter Key to Return Back Menu.");
+   
+
+
+        
+        }
+    
+
+    }
+
+    public static void event_report(){
+       System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                                    EVENT REPORT                               ║");
+        System.out.printf("\t\t║                              Generated    :%-35s ║\n",LocalDate.now());
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
+        
+        System.out.println("\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                              Event List                                         │");
+        System.out.println("\t\t\t├────────────┬────────────────────┬───────────────────┬────────────┬──────────────┤");
+        System.out.println("\t\t\t│ Event ID   │      Title         │        Venue      │    Date    │      Type    │");
+
+
+
+        if (events.length==0){
+
+        
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                  NO ANY EVENT                                  │");
+        System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+    }else{        
+        String type= "Conference";
+        for(Conference conference : conferences){
+                    if (conference!=null){
+                        System.out.println("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤"); 
+                        System.out.printf("\t\t\t│ %-2s │ %-18s │ %-19s │ %-8s │ %-8s│\n",
+                        conference.getEventID(),
+                        conference.getTitle(),
+                        conference.getVenue(),
+                        conference.getDate(),
+                        type);
+                        
+                    }else{
+                        break;
+                    }
+        }
+         type= "Workshop";
+        for(Workshop workshop : workshops){
+                    if (workshop!=null){
+                        System.out.println("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤"); 
+                        System.out.printf("\t\t\t│ %-12s │ %-16s │ %-18s │ %-8s │ %-11s│\n",
+                        workshop.getEventID(),
+                        workshop.getTitle(),
+                        workshop.getVenue(),
+                        workshop.getDate(),
+                        type);
+                        
+                    }else{
+                        break;
+                    }
+        }
+         type= "Concert";
+        for(Concert concert : concerts){
+                    if (concert!=null){
+                        System.out.println("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤"); 
+                        System.out.printf("\t\t\t│ %-10s │ %-18s │ %-17s │ %-8s │ %-13s│\n",
+                        concert.getEventID(),
+                        concert.getTitle(),
+                        concert.getVenue(),
+                        concert.getDate(),
+                        type);
+                        
+                    }else{
+                        break;
+                    }
+        }
+        
+        
+            System.out.println("\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
+
+            System.out.print("\n\t\t\tEnter Event ID : ");
+            
+            scan.nextLine();
+            String eventId=scan.nextLine();
+
+            Event current_event=ems.findEventById(events, eventId); 
+            if (current_event!=null){
+                System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+                System.out.println("\t\t\t│                                 EVENT INFORMATION                              │");
+                System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘"); 
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Event ID                 :             %-32s │\n",current_event.getEventID());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Event Name               :             %-32s │\n",current_event.getTitle());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Date                     :             %-32s │\n", current_event.getDate());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Venue                    :             %-32s |\n", current_event.getVenue());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Max Capacity             :             %-32d |\n",current_event.getMaxTickets());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+
+                waitForEnter();
+                waitForEnter();
+                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+                
+                TicketType current_TicketType= TicketType.findTicketTypeById(ticketTypes, eventId);
+                int [] tol= current_TicketType.getTotalTicketType(); 
+                // Early Bird
+            int totalEarly = tol[0];
+            int soldEarly = totalEarly - current_TicketType.getQuantityEarlyBird();
+            int availableEarly = current_TicketType.getQuantityEarlyBird();
+            double revenueEarly = soldEarly * current_TicketType.getPrice("earlybird");
+
+// Standard
+            int totalStandard = tol[1];
+            int soldStandard = totalStandard - current_TicketType.getQuantityStandard();
+            int availableStandard = current_TicketType.getQuantityEarlyBird();
+            double revenueStandard = soldStandard * current_TicketType.getPrice("standard");
+
+// VIP
+           int totalVip = tol[2];
+           int soldVip = totalVip - current_TicketType.getQuantityVip();
+           int availableVip = current_TicketType.getQuantityVip();
+        double revenueVip = soldVip * current_TicketType.getPrice("vip");
+
+// Print table
+        System.out.println("\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                 Tickets Sales                                   │");
+        System.out.println("\t\t\t├─────────────────────────────────────────────────────────────────────────────────┤");
+        System.out.println("\t\t\t│ Ticket Type        │ Total        │ Sold         │ Available    │ Revenue       │");
+        System.out.println("\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
+
+        System.out.printf("\t\t\t│ Early Bird         │ %-12f │ %-12f │ %-12d │ RM %-10.2f │\n", 
+        totalEarly, soldEarly, availableEarly, revenueEarly);
+
+        System.out.printf("\t\t\t│ Standard           │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n", 
+        totalStandard, soldStandard, availableStandard, revenueStandard);
+
+        System.out.printf("\t\t\t│ VIP                │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n", 
+        totalVip, soldVip, availableVip, revenueVip);
+
+        System.out.println("\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
+
+        int totalAll = totalEarly + totalStandard + totalVip;
+        int soldAll = soldEarly + soldStandard + soldVip;
+        int availableAll = availableEarly + availableStandard + availableVip;
+        double revenueAll = revenueEarly + revenueStandard + revenueVip;
+
+        System.out.printf("\t\t\t│ TOTAL              │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n", 
+        totalAll, soldAll, availableAll, revenueAll);
+        System.out.println("\t\t\t└────────────────────┴──────────────┴──────────────┴──────────────┴───────────────┘");
+
+                waitForEnter();
+                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+                
+                
+        int total_ticket_checkin=0;
+        for (Ticket ticket:tickets){
+                    if(ticket.getEventId().equals(eventId)){
+                        if(!ticket.getStatus()){
+                            total_ticket_checkin++;
+
+                        }
+                    }
+                }
+
+        double checkinRate = (soldAll > 0) ? (double) total_ticket_checkin / soldAll * 100 : 0;
+        String rateText = checkinRate + "%";
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                 CHECK-IN STATISTICS                            │");
+        System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘"); 
+        System.out.println("\t\t\t│                                                                                │");
+        System.out.println("\t\t\t│                                                                                │");
+        System.out.printf("\t\t\t│        Total Check-ins          :             %-32d │\n",total_ticket_checkin);
+        System.out.println("\t\t\t│                                                                                │");
+        System.out.printf("\t\t\t│        Total Attendees          :             %-32d │\n",soldAll);
+        System.out.println("\t\t\t│                                                                                │");
+        System.out.printf("\t\t\t│        Check-in Rate            :             %-32s │\n", rateText);
+        System.out.println("\t\t\t│                                                                                │");
+        System.out.println("\t\t\t│                                                                                │");
+        System.out.println("\t\t\t│                                 Check-in Rate                                  │");
+        System.out.println("\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
+        System.out.print("\t\t\t|            │ ");
+        
+        int displaybar=(int)(double)checkinRate/100*59;
+        for (int i=0; i<59;i++){
+                if(displaybar>=i){
+                    System.out.print("█");
+                }else{
+                    System.out.print("░");
+                }
+                    
+
+                }
+            
+
+            
+            System.out.println("  │    │");
+            System.out.println("\t\t\t│            └──────────────────────────────────────────────────────────────┘    │");
+            System.out.println("\t\t\t│                                                                                │ ");
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+
+                waitForEnter();
+                waitForEnter();
+                System.out.println("\t\t\tPlease Press Enter Key to Return Back Menu.");
+
+
+        
+
+            }else{
+                System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+                System.out.println("\t\t\t│                                  NO FOUND                                      │");
+                System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+            }
+    }
+
+
+
+    }     
+
+    public static void sale_report(){
+        
+       System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("\t\t║                                     SALES REPORT                                ║");
+        System.out.printf("\t\t║                              Generated    :%-35s ║\n",LocalDate.now());
+        System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
+        
+        System.out.println("\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                              Event List                                         │");
+        System.out.println("\t\t\t├────────────┬────────────────────┬───────────────────┬────────────┬──────────────┤");
+        System.out.println("\t\t\t│ Event ID   │      Title         │        Venue      │    Date    │      Type    │");
+
+
+
+        if (events.length==0){
+
+        
+        System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                  NO ANY EVENT                                  │");
+        System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+    }else{        
+        String type= "Conference";
+        for(Conference conference : conferences){
+                    if (conference!=null){
+                        System.out.println("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤"); 
+                        System.out.printf("\t\t\t│ %-2s │ %-18s │ %-19s │ %-8s │ %-8s│\n",
+                        conference.getEventID(),
+                        conference.getTitle(),
+                        conference.getVenue(),
+                        conference.getDate(),
+                        type);
+                        
+                    }else{
+                        break;
+                    }
+        }
+         type= "Workshop";
+        for(Workshop workshop : workshops){
+                    if (workshop!=null){
+                        System.out.println("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤"); 
+                        System.out.printf("\t\t\t│ %-12s │ %-16s │ %-18s │ %-8s │ %-11s│\n",
+                        workshop.getEventID(),
+                        workshop.getTitle(),
+                        workshop.getVenue(),
+                        workshop.getDate(),
+                        type);
+                        
+                    }else{
+                        break;
+                    }
+        }
+         type= "Concert";
+        for(Concert concert : concerts){
+                    if (concert!=null){
+                        System.out.println("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤"); 
+                        System.out.printf("\t\t\t│ %-10s │ %-18s │ %-17s │ %-8s │ %-13s│\n",
+                        concert.getEventID(),
+                        concert.getTitle(),
+                        concert.getVenue(),
+                        concert.getDate(),
+                        type);
+                        
+                    }else{
+                        break;
+                    }
+        }
+        
+        
+            System.out.println("\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
+
+            System.out.print("\n\t\t\tEnter Event ID : ");
+            
+            scan.nextLine();
+            String eventId=scan.nextLine();
+
+            Event current_event=ems.findEventById(events, eventId); 
+            if (current_event!=null){
+                System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+                System.out.println("\t\t\t│                                 EVENT INFORMATION                              │");
+                System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘"); 
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Event ID                 :             %-32s │\n",current_event.getEventID());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Event Name               :             %-32s │\n",current_event.getTitle());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Date                     :             %-32s │\n", current_event.getDate());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Venue                    :             %-32s |\n", current_event.getVenue());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.printf("\t\t\t│        Max Capacity             :             %-32d |\n",current_event.getMaxTickets());
+                System.out.println("\t\t\t│                                                                                │");
+                System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+
+                waitForEnter();
+                waitForEnter();
+                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+                
+                TicketType current_TicketType= TicketType.findTicketTypeById(ticketTypes, eventId);
+                int [] tol= current_TicketType.getTotalTicketType(); 
+                // Early Bird
+            double totalEarly = tol[0]*current_TicketType.getPrice("earlybird");
+            double soldEarly = totalEarly - current_TicketType.getQuantityEarlyBird()*current_TicketType.getPrice("earlybird");
+            double availableEarly = (double)current_TicketType.getQuantityEarlyBird()*current_TicketType.getPrice("earlybird");
+            double revenueEarly = soldEarly;
+
+// Standard
+            double totalStandard = tol[1]*current_TicketType.getPrice("standard");
+            double soldStandard = totalStandard - (current_TicketType.getQuantityStandard())*current_TicketType.getPrice("standard");
+            double availableStandard = current_TicketType.getQuantityEarlyBird()*current_TicketType.getPrice("standard");
+            double revenueStandard = soldStandard ;
+
+// VIP
+           double totalVip = tol[2]* current_TicketType.getPrice("vip");
+           double soldVip = totalVip - current_TicketType.getQuantityVip()* current_TicketType.getPrice("vip");
+           double availableVip = current_TicketType.getQuantityVip()*current_TicketType.getPrice("vip");
+        double revenueVip = soldVip ;
+
+// Print table
+        System.out.println("\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
+        System.out.println("\t\t\t│                                 Tickets Sales                                   │");
+        System.out.println("\t\t\t├─────────────────────────────────────────────────────────────────────────────────┤");
+        System.out.println("\t\t\t│ Ticket Type        │ Total        │ Sold         │ Available    │ Revenue       │");
+        System.out.println("\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
+
+        System.out.printf("\t\t\t│ Early Bird         │ RM %-9.2f │ RM %-9.2f │ RM %-9.2f │ RM %-10.2f │\n", 
+        totalEarly, soldEarly, availableEarly, revenueEarly);
+
+        System.out.printf("\t\t\t│ Standard           │ RM %-9.2f │ RM %-9.2f │ RM %-9.2f │ RM %-10.2f │\n", 
+        totalStandard, soldStandard, availableStandard, revenueStandard);
+
+        System.out.printf("\t\t\t│ VIP                │ RM %-9.2f │ RM %-9.2f │ RM %-9.2f │ RM %-10.2f │\n", 
+        totalVip, soldVip, availableVip, revenueVip);
+
+        System.out.println("\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
+
+        double totalAll = totalEarly + totalStandard + totalVip;
+        double soldAll = soldEarly + soldStandard + soldVip;
+        double availableAll = availableEarly + availableStandard + availableVip;
+        double revenueAll = revenueEarly + revenueStandard + revenueVip;
+
+        System.out.printf("\t\t\t│ TOTAL              │ RM %-9.2f │ RM %-9.2f │ RM %-9.2f │ RM %-10.2f │\n", 
+        totalAll, soldAll, availableAll, revenueAll);
+        System.out.println("\t\t\t└────────────────────┴──────────────┴──────────────┴──────────────┴───────────────┘");
+
+                waitForEnter();
+                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+
+            }else{
+                System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+                System.out.println("\t\t\t│                                  NO FOUND                                      │");
+                System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+            }
+    
+
+
+
+    }     
+
+    }
+
+    public static String status_ToString(boolean status){
+        if (status){
+            return "Pending";
+        }else{
+            return "Confirm";
+        }
+    } 
+
+    public static void exportCheckInReportToFile(User[][] alluser) {
+    try {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String filename = "CheckIn_Report_" + timestamp + ".txt";
+        FileWriter writer = new FileWriter(filename);
+        
+        writer.write("\t\t╔════════════════════════════════════════════════════════════════════════════════╗\n");
+        writer.write("\t\t║                           CHECK-IN REPORT                                      ║\n");
+        writer.write("\t\t╠════════════════════════════════════════════════════════════════════════════════╣\n");
+        writer.write("\t\t║  Generated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "                                      ║\n");
+        writer.write("\t\t╠════════════════════════════════════════════════════════════════════════════════╣\n");
+        writer.write("\t\t║                                                                                ║\n");
+        writer.write("\t\t║  ┌──────────────────────────────────────────────────────────────────────────┐ ║\n");
+        writer.write("\t\t║  │                          CHECK-IN HISTORY                                │ ║\n");
+        writer.write("\t\t║  ├────┬────────────────────┬─────────────────────┬──────────────┬───────────┤ ║\n");
+        writer.write("\t\t║  │ No │ Name               │ Email               │ Ticket ID    │ Status    │ ║\n");
+        writer.write("\t\t║  ├────┼────────────────────┼─────────────────────┼──────────────┼───────────┤ ║\n");
+        
+        int no = 1;
+        for (Ticket ticket : tickets) {
+            if (ticket != null) {
+                for (User user : alluser[2]) {
+                    if (user != null && ticket.getBuyerName().equals(user.getAccessUsername())) {
+                        writer.write(String.format("\t\t║  %2d │ %-18s │ %-19s │ %-12s │ %-8s │ ║\n",
+                            no++, ticket.getBuyerName(), user.getAccessEmail(), 
+                            ticket.getTicketId(), status_ToString(ticket.getStatus())));
+                        break;
+                    }
+                }
+            }
+        }
+        
+        writer.write("\t\t║  └────┴────────────────────┴─────────────────────┴──────────────┴───────────┘ ║\n");
+        writer.write("\t\t║                                                                                ║\n");
+        writer.write("\t\t╚════════════════════════════════════════════════════════════════════════════════╝\n");
+        
+        writer.close();
+        System.out.println("\n\t\t Check-in Report exported successfully!");
+        System.out.println("\t\t   File: " + filename);
+    } catch (IOException e) {
+        System.out.println("\t\t Error exporting check-in report: " + e.getMessage());
+    }
+    waitForEnter();
+}
+
+    public static void exportSalesReportToFile() {
+
+    try {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String filename = "Sales_Report_" + timestamp + ".txt";
+        FileWriter writer = new FileWriter(filename);
+        
+        writer.write("\t\t╔════════════════════════════════════════════════════════════════════════════════╗\n");
+        writer.write("\t\t║                                SALES REPORT                                    ║\n");
+        writer.write("\t\t╠════════════════════════════════════════════════════════════════════════════════╣\n");
+        writer.write("\t\t║  Generated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "                                      ║\n");
+        writer.write("\t\t╠════════════════════════════════════════════════════════════════════════════════╣\n");
+        writer.write("\t\t║                                                                                ║\n");
+        writer.write("\t\t║  ┌──────────────────────────────────────────────────────────────────────────┐ ║\n");
+        writer.write("\t\t║  │                           REVENUE BREAKDOWN                               │ ║\n");
+        writer.write("\t\t║  ├────────────────────┬──────────────┬───────────────────────────────────────┤ ║\n");
+        writer.write("\t\t║  │ Ticket Type        │ Sold         │ Revenue                               │ ║\n");
+        writer.write("\t\t║  ├────────────────────┼──────────────┼───────────────────────────────────────┤ ║\n");
+        
+        // Calculate totals
+        int earlyBirdSold = 0, standardSold = 0, vipSold = 0;
+        double earlyBirdRevenue = 0, standardRevenue = 0, vipRevenue = 0;
+        
+        for (Ticket ticket : tickets) {
+            if (ticket != null) {
+                switch (ticket.getTicketType().toLowerCase()) {
+                    case "earlybird":
+                        earlyBirdSold++;
+                        earlyBirdRevenue += ticket.getTotalAmount();
+                        break;
+                    case "standard":
+                        standardSold++;
+                        standardRevenue += ticket.getTotalAmount();
+                        break;
+                    case "vip":
+                        vipSold++;
+                        vipRevenue += ticket.getTotalAmount();
+                        break;
+                }
+            }
+        }
+        
+        writer.write(String.format("\t\t║  │ Early Bird         │ %-12d │ RM %-40.2f ║\n", earlyBirdSold, earlyBirdRevenue));
+        writer.write(String.format("\t\t║  │ Standard           │ %-12d │ RM %-40.2f ║\n", standardSold, standardRevenue));
+        writer.write(String.format("\t\t║  │ VIP                │ %-12d │ RM %-40.2f ║\n", vipSold, vipRevenue));
+        
+        double totalRevenue = earlyBirdRevenue + standardRevenue + vipRevenue;
+        int totalSold = earlyBirdSold + standardSold + vipSold;
+        
+        writer.write("\t\t║  ├────────────────────┼──────────────┼───────────────────────────────────────┤ ║\n");
+        writer.write(String.format("\t\t║  │ TOTAL              │ %-12d │ RM %-40.2f ║\n", totalSold, totalRevenue));
+        writer.write("\t\t║  └──────────────────────────────────────────────────────────────────────────┘ ║\n");
+        writer.write("\t\t║                                                                                ║\n");
+        writer.write("\t\t╚════════════════════════════════════════════════════════════════════════════════╝\n");
+        
+        writer.close();
+        System.out.println("\n\t\t✅ Sales Report exported successfully!");
+        System.out.println("\t\t   File: " + filename);
+    } catch (IOException e) {
+        System.out.println("\t\t❌ Error exporting sales report: " + e.getMessage());
+    }
+    waitForEnter();
+}
+    
+    public static void exportEventReportToFile() {
+    scan.nextLine();
+    System.out.print("\n\t\tEnter Event ID to export: ");
+    String eventId = scan.nextLine();
+    
+    Event current_event = ems.findEventById(events, eventId);
+    if (current_event == null) {
+        System.out.println("\t\t Event not found!");
+        waitForEnter();
+        return;
+    }
+    
+    try {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String filename = "Event_Report_" + eventId + "_" + timestamp + ".txt";
+        FileWriter writer = new FileWriter(filename);
+        
+        writer.write("\t\t╔════════════════════════════════════════════════════════════════════════════════╗\n");
+        writer.write("\t\t║                                EVENT REPORT                                    ║\n");
+        writer.write("\t\t╠════════════════════════════════════════════════════════════════════════════════╣\n");
+        writer.write("\t\t║                                                                                ║\n");
+        writer.write("\t\t║  ┌──────────────────────────────────────────────────────────────────────────┐ ║\n");
+        writer.write("\t\t║  │                           EVENT INFORMATION                              │ ║\n");
+        writer.write("\t\t║  ├──────────────────────────────────────────────────────────────────────────┤ ║\n");
+        writer.write(String.format("\t\t║  │  Event ID       : %-62s ║\n", current_event.getEventID()));
+        writer.write(String.format("\t\t║  │  Event Name     : %-62s ║\n", current_event.getTitle()));
+        writer.write(String.format("\t\t║  │  Date           : %-62s ║\n", current_event.getDate()));
+        writer.write(String.format("\t\t║  │  Venue          : %-62s ║\n", current_event.getVenue()));
+        writer.write(String.format("\t\t║  │  Max Capacity   : %-62d ║\n", current_event.getMaxTickets()));
+        writer.write("\t\t║  └──────────────────────────────────────────────────────────────────────────┘ ║\n");
+        writer.write("\t\t║                                                                                ║\n");
+        
+        TicketType current_TicketType = TicketType.findTicketTypeById(ticketTypes, eventId);
+        if (ticketTypes != null) {
+            writer.write("\t\t║  ┌──────────────────────────────────────────────────────────────────────────┐ ║\n");
+            writer.write("\t\t║  │                           TICKET SALES                                   │ ║\n");
+            writer.write("\t\t║  ├────────────────────┬──────────────┬──────────────┬───────────────────────┤ ║\n");
+            writer.write("\t\t║  │ Ticket Type        │ Total        │ Sold         │ Revenue               │ ║\n");
+            writer.write("\t\t║  ├────────────────────┼──────────────┼──────────────┼───────────────────────┤ ║\n");
+            
+            int [] tol= current_TicketType.getTotalTicketType(); 
+                // Early Bird
+            int totalEarly = tol[0];
+            int soldEarly = totalEarly - current_TicketType.getQuantityEarlyBird();
+            double revenueEarly = soldEarly*current_TicketType.getPrice("earlybird");
+
+// Standard
+            int totalStandard = tol[1];
+            int soldStandard = totalStandard - current_TicketType.getQuantityStandard();
+            double revenueStandard = soldStandard *current_TicketType.getPrice("standard");
+
+// VIP
+           int totalVip = tol[2];
+        int soldVip = totalVip - current_TicketType.getQuantityVip();
+        double revenueVip = soldVip * current_TicketType.getPrice("vip");
+
+            
+            writer.write(String.format("\t\t║  │ Early Bird         │ %-12d │ %-12d │ RM %-22.2f ║\n", totalEarly, soldEarly, revenueEarly));
+            writer.write(String.format("\t\t║  │ Standard           │ %-12d │ %-12d │ RM %-22.2f ║\n", totalStandard, soldStandard, revenueStandard));
+            writer.write(String.format("\t\t║  │ VIP                │ %-12d │ %-12d │ RM %-22.2f ║\n", totalVip, soldVip, revenueVip));
+            
+            writer.write("\t\t║  ├────────────────────┼──────────────┼──────────────┼───────────────────────┤ ║\n");
+            writer.write(String.format("\t\t║  │ TOTAL              │ %-12d │ %-12d │ RM %-22.2f ║\n", 
+                (totalEarly + totalStandard + totalVip), 
+                (soldEarly + soldStandard + soldVip), 
+                (revenueEarly + revenueStandard + revenueVip)));
+            writer.write("\t\t║  └──────────────────────────────────────────────────────────────────────────┘ ║\n");
+        }
+        
+        writer.write("\t\t║                                                                                ║\n");
+        writer.write("\t\t╚════════════════════════════════════════════════════════════════════════════════╝\n");
+        
+        writer.close();
+        System.out.println("\n\t\t Event Report exported successfully!");
+        System.out.println("\t\t   File: " + filename);
+    } catch (IOException e) {
+        System.out.println("\t\t Error exporting event report: " + e.getMessage());
+    }
+    waitForEnter();
+}
+
+    public static void exportAllReportsToCSV() {
+    try {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        
+        // Export Check-in CSV
+        String checkinFilename = "CheckIn_Report_" + timestamp + ".csv";
+        FileWriter checkinWriter = new FileWriter(checkinFilename);
+        checkinWriter.write("Name,Email,Ticket ID,Status\n");
+        
+        for (Ticket ticket : tickets) {
+            if (ticket != null) {
+                checkinWriter.write(String.format("%s,%s,%s,%s\n",
+                    ticket.getBuyerName(), "", ticket.getTicketId(), status_ToString(ticket.getStatus())));
+            }
+        }
+        checkinWriter.close();
+        
+        // Export Sales CSV
+        String salesFilename = "Sales_Report_" + timestamp + ".csv";
+        FileWriter salesWriter = new FileWriter(salesFilename);
+        salesWriter.write("Event ID,Event Name,Ticket Type,Sold,Revenue\n");
+        
+        int earlyBirdSold = 0, standardSold = 0, vipSold = 0;
+        double earlyBirdRevenue = 0, standardRevenue = 0, vipRevenue = 0;
+        
+        for (Ticket ticket : tickets) {
+            if (ticket != null) {
+                switch (ticket.getTicketType().toLowerCase()) {
+                    case "earlybird":
+                        earlyBirdSold++;
+                        earlyBirdRevenue += ticket.getTotalAmount();
+                        break;
+                    case "standard":
+                        standardSold++;
+                        standardRevenue += ticket.getTotalAmount();
+                        break;
+                    case "vip":
+                        vipSold++;
+                        vipRevenue += ticket.getTotalAmount();
+                        break;
+                }
+            }
+        }
+        
+        salesWriter.write(String.format("ALL,ALL,Early Bird,%d,%.2f\n", earlyBirdSold, earlyBirdRevenue));
+        salesWriter.write(String.format("ALL,ALL,Standard,%d,%.2f\n", standardSold, standardRevenue));
+        salesWriter.write(String.format("ALL,ALL,VIP,%d,%.2f\n", vipSold, vipRevenue));
+        salesWriter.close();
+        
+        // Export Event CSV
+        String eventFilename = "Event_Report_" + timestamp + ".csv";
+        FileWriter eventWriter = new FileWriter(eventFilename);
+        eventWriter.write("Event ID,Event Name,Date,Venue,Max Capacity\n");
+        
+        for (Event event : events) {
+            if (event != null) {
+                eventWriter.write(String.format("%s,%s,%s,%s,%d\n",
+                    event.getEventID(), event.getTitle(), event.getDate(), 
+                    event.getVenue(), event.getMaxTickets()));
+            }
+        }
+        eventWriter.close();
+        
+        System.out.println("\n\t\t✅ All Reports exported successfully!");
+        System.out.println("\t\t   Check-in Report: " + checkinFilename);
+        System.out.println("\t\t   Sales Report: " + salesFilename);
+        System.out.println("\t\t   Event Report: " + eventFilename);
+    } catch (IOException e) {
+        System.out.println("\t\t❌ Error exporting reports: " + e.getMessage());
+    }
+    waitForEnter();
+}
+// ─────────────────────────────────────────────────────────────────────────
     // ORGANIZER MENU
     // ─────────────────────────────────────────────────────────────────────────
     static void organizerMenu() {
@@ -687,7 +1667,7 @@ public class TestUser {
             // Concert
             Concert c = new Concert(title, parsedDate, venue, maxTix);
             TicketType tt = new TicketType(c.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks,
-                    salesStartDate, salesEndDate);
+                    salesStartDate, salesEndDate,qeb,qsd,qvip);
             ticketTypes.add(tt);
             concerts.add(c);
             events[eventCount++] = c;
@@ -697,7 +1677,7 @@ public class TestUser {
             // Workshop
             Workshop w = new Workshop(title, parsedDate, venue, maxTix);
             TicketType tt = new TicketType(w.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks,
-                    salesStartDate, salesEndDate);
+                    salesStartDate, salesEndDate,qeb,qsd,qvip);
             ticketTypes.add(tt);
             workshops.add(w);
             events[eventCount++] = w;
@@ -725,7 +1705,7 @@ public class TestUser {
 
             Conference conf = new Conference(title, parsedDate, venue, maxTix);
             TicketType tt = new TicketType(conf.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks,
-                    salesStartDate, salesEndDate);
+                    salesStartDate, salesEndDate,qeb,qsd,qvip);
             ticketTypes.add(tt);
             if (numSessions > 0) {
                 conf.autoCreateSessions(topics, times);
@@ -1161,7 +2141,6 @@ public class TestUser {
         workshops = Workshop.readWorkshopData();
         conferences = Conference.readConferenceData();
         ticketTypes = TicketType.readTicektTypeData(); // load ticket types so purchase works
-
         for (Concert c : concerts) {
             events[eventCount++] = c;
         }
@@ -1231,6 +2210,7 @@ public class TestUser {
         }
 
         Event event = ems.findEventById(events, eventId);
+        
         TicketType tt = TicketType.findTicketTypeById(ticketTypes, eventId);
 
         if (tt == null) {
