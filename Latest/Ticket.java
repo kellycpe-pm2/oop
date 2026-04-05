@@ -155,10 +155,11 @@ public class Ticket {
                 writer.write(t.getEventId() + "\n");
                 writer.write(t.getBookingId() + "\n");
                 writer.write(t.getBuyerName()+"\n");
-                writer.write(t.getStatus()+"\n")
+                writer.write(t.getStatus()+"\n");
                 writer.write(t.getTicketId() + "\n");
                 writer.write(t.getTicketType() + "\n");
                 writer.write(t.getTotalAmount() + "\n");
+                writer.write(t.getSeatNum()+"\n");
                 writer.write(t.getPurchasedDate()+"\n");
                 
             }
@@ -182,12 +183,11 @@ public class Ticket {
                              "║                                                           ║\n"+
                              "║                                                           ║\n"+
                              "║          Name           :  %-31s║\n"+
-                             "║          Email          :  %-31s║\n"+
-                             "║          Contact Number :  %-31s║\n"+
-                             "║                                                           ║\n"+
-                             "║                                                           ║\n"+
-                             "╚═══════════════════════════════════════════════════════════╝\n"+
-                             "               Press Enter Key To Continue...", this.buyerName,bookingId,contactNo);
+                             "║          Booking ID     :  %-31s║\n"+
+                             "║          Ticket ID      :  %-31s║\n"+
+                             "║          Ticket Type    :  %-31s║\n"+
+                             "║          Seat No        :  %-31s║\n"
+                             + this.buyerName,this.bookingId,this.ticketId,this.ticketType,this.seatNo);
     
     }
 
