@@ -30,7 +30,8 @@ public class Ticket {
         this.status=status;
         this.eventId = eventId;
         this.purchaseDate = LocalDate.now();
-        this.ticketId = "T" + String.format("%05d", ticketCount++);
+        this.ticketId = "T" + String.format("%05d", ticketCount);
+        ticketCount++;
         this.totalAmount=tt.getPrice(ticketType);
         this.seatNo=tt.getSeat(ticketType);
         this.perks=tt.getPerks();
@@ -117,6 +118,7 @@ public class Ticket {
 
     // display ticket details
     public void displayTicketDetails() {
+        System.out.println("Ticket");
         System.out.println("Ticket ID: " + ticketId);
         System.out.println("Booking ID: " + bookingId);
         System.out.println("Event ID: " + eventId);
