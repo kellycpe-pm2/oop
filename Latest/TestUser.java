@@ -1914,15 +1914,28 @@ public class TestUser {
             return;
         }
 
-        Event e = null;
+        Event e = events[idx];
 
-        e = events[idx];
+        // Show current event details before asking what to change
+        System.out.println();
+        System.out.println("  ┌──────────────────────────────────────────┐");
+        System.out.printf("  │  Current Event Details                   │%n");
+        System.out.println("  ├──────────────────────────────────────────┤");
+        System.out.printf("  │  ID       : %-28s │%n", e.getEventID());
+        System.out.printf("  │  Type     : %-28s │%n", e.getClass().getSimpleName());
+        System.out.printf("  │  Title    : %-28s │%n",
+                e.getTitle().length() > 28 ? e.getTitle().substring(0, 25) + "..." : e.getTitle());
+        System.out.printf("  │  Date     : %-28s │%n", e.getDate());
+        System.out.printf("  │  Venue    : %-28s │%n",
+                e.getVenue().length() > 28 ? e.getVenue().substring(0, 25) + "..." : e.getVenue());
+        System.out.printf("  │  MaxTix   : %-28d │%n", e.getMaxTickets());
+        System.out.println("  └──────────────────────────────────────────┘");
 
-        System.out.println("What to update?");
-        System.out.println("1: Title");
-        System.out.println("2: Date");
-        System.out.println("3: Venue");
-        System.out.println("4: Max Tickets");
+        System.out.println("\n  What to update?");
+        System.out.println("  1: Title");
+        System.out.println("  2: Date");
+        System.out.println("  3: Venue");
+        System.out.println("  4: Max Tickets");
         System.out.print("Enter option: ");
         int field = scan.nextInt();
         scan.nextLine();
@@ -2466,27 +2479,182 @@ public class TestUser {
     // ─────────────────────────────────────────────────────────────────────────
     static void viewAllEvents() {
         if (eventCount == 0) {
-            System.out.println("No events created yet.");
+            System.out.println("\n  No events created yet.");
             return;
         }
-        System.out.println("\n--- All Events ---");
+
+        String divider = "  ╠════╪══════╪══════════════╪══════════════════════╪════════════╪══════════════════════╪════════╣";
+        String top = "  ╔════╦══════╦══════════════╦══════════════════════╦════════════╦══════════════════════╦════════╗";
+        String mid = "  ╟────┼──────┼──────────────┼──────────────────────┼────────────┼──────────────────────┼────────╢";
+        String bot = "  ╚════╧══════╧══════════════╧══════════════════════╧════════════╧══════════════════════╧════════╝";
+
+        System.out.println(
+                "\n  ╔══════════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println(
+                "  ║                                    ALL EVENTS                                        ║");
+        System.out.println(
+                "  ╚══════════════════════════════════════════════════════════════════════════════════════╝");
+        System.out.println(top);
+        System.out.printf("  ║ %-2s │ %-4s │ %-12s │ %-20s │ %-10s │ %-20s │ %-6s ║%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "MaxTix");
+        System.out.println(divider);
 
         for (int i = 0; i < eventCount; i++) {
-            events[i].displayInfo();
-            System.out.println();
+            Event e = events[i];
+            String type = e.getClass().getSimpleName();
+
+            // truncate long fields so columns stay fixed-width
+            String title = e.getTitle().length() > 20 ? e.getTitle().substring(0, 17) + "..." : e.getTitle();
+            String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
+
+            System.out.printf("  ║ %-2d │ %-4s │ %-12s │ %-20s │ %-10s │ %-20s │ %6d ║%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, e.getMaxTickets());
+
+            // show sub-details (sessions / speakers) inline beneath the event row
+            if (e instanceof Conference) {
+                Conference conf = (Conference) e;
+                if (conf.getSessionCount() == 0) {
+                    System.out.printf("  ║    │      │              │  %-52s │        ║%n", "(no sessions)");
+                } else {
+                    for (int s = 0; s < conf.getSessionCount(); s++) {
+                        Session sess = conf.getSessions()[s];
+                        String detail = String.format("  [%s] %s @ %s", sess.getSessionID(), sess.getTopic(),
+                                sess.getTime());
+                        if (detail.length() > 54)
+                            detail = detail.substring(0, 51) + "...";
+                        System.out.printf("  ║    │      │              │  %-52s │        ║%n", detail);
+                    }
+                }
+            } else if (e instanceof Concert) {
+                Concert c = (Concert) e;
+                if (c.getSpeakerCount() == 0) {
+                    System.out.printf("  ║    │      │              │  %-52s │        ║%n", "(no performer assigned)");
+                } else {
+                    // Get all speaker names
+                    String[] speakerNames = new String[c.getSpeakerCount()];
+                    for (int s = 0; s < c.getSpeakerCount(); s++) {
+                        speakerNames[s] = c.getSpeakers()[s].getAccessUsername();
+                    }
+
+                    // Print speakers with wrapping
+                    printWrappedSpeakers(speakerNames, "Performer");
+                }
+            } else if (e instanceof Workshop) {
+                Workshop w = (Workshop) e;
+                if (w.getSpeakerCount() == 0) {
+                    System.out.printf("  ║    │      │              │  %-52s │        ║%n", "(no speaker assigned)");
+                } else {
+                    // Get all speaker names
+                    String[] speakerNames = new String[w.getSpeakerCount()];
+                    for (int s = 0; s < w.getSpeakerCount(); s++) {
+                        speakerNames[s] = w.getSpeakers()[s].getAccessUsername();
+                    }
+
+                    // Print speakers with wrapping
+                    printWrappedSpeakers(speakerNames, "Speaker");
+                }
+            }
+
+            if (i < eventCount - 1)
+                System.out.println(mid);
+        }
+        System.out.println(bot);
+    }
+
+    // Helper method to print wrapped speaker/performer names within the table
+
+    private static void printWrappedSpeakers(String[] speakerNames, String label) {
+        int maxLineLength = 50; // Maximum characters per line inside the bracket
+        String prefix = "  " + label + ": ";
+        int prefixLength = prefix.length();
+
+        // First, combine all speaker names with separator
+        StringBuilder allSpeakers = new StringBuilder();
+        for (int i = 0; i < speakerNames.length; i++) {
+            if (i > 0) {
+                allSpeakers.append(", ");
+            }
+            allSpeakers.append(speakerNames[i]);
         }
 
+        String speakersText = allSpeakers.toString();
+
+        // If text fits in one line, print it directly
+        if (speakersText.length() + prefixLength <= maxLineLength) {
+            System.out.printf("  ║    │      │              │  %-52s │        ║%n", prefix + speakersText);
+            return;
+        }
+
+        // Print first line with label
+        int firstLineMax = maxLineLength - prefixLength;
+        String firstPart = speakersText.substring(0, Math.min(firstLineMax, speakersText.length()));
+        // Try to break at a comma if possible
+        int breakPoint = firstPart.lastIndexOf(", ");
+        if (breakPoint > 0 && breakPoint > firstLineMax / 2) {
+            firstPart = speakersText.substring(0, breakPoint);
+        } else {
+            // If no comma found, just cut at max length
+            if (firstPart.length() == firstLineMax && firstPart.lastIndexOf(" ") > 0) {
+                breakPoint = firstPart.lastIndexOf(" ");
+                firstPart = speakersText.substring(0, breakPoint);
+            }
+        }
+
+        System.out.printf("  ║    │      │              │  %-52s │        ║%n", prefix + firstPart);
+
+        // Print remaining lines with indentation
+        String remaining = speakersText.substring(firstPart.length());
+        if (remaining.startsWith(", ")) {
+            remaining = remaining.substring(2);
+        } else if (remaining.startsWith(" ")) {
+            remaining = remaining.substring(1);
+        }
+
+        String indent = "    ";
+        while (remaining.length() > 0) {
+            int lineMax = maxLineLength - indent.length();
+            String linePart = remaining.substring(0, Math.min(lineMax, remaining.length()));
+
+            // Try to break at a comma for better readability
+            if (linePart.length() == lineMax && linePart.lastIndexOf(", ") > lineMax / 2) {
+                int breakPos = linePart.lastIndexOf(", ");
+                linePart = remaining.substring(0, breakPos);
+                remaining = remaining.substring(breakPos + 2);
+            } else if (linePart.length() == lineMax && linePart.lastIndexOf(" ") > 0) {
+                int breakPos = linePart.lastIndexOf(" ");
+                linePart = remaining.substring(0, breakPos);
+                remaining = remaining.substring(breakPos + 1);
+            } else {
+                remaining = remaining.substring(linePart.length());
+                if (remaining.startsWith(", ")) {
+                    remaining = remaining.substring(2);
+                } else if (remaining.startsWith(" ")) {
+                    remaining = remaining.substring(1);
+                }
+            }
+
+            System.out.printf("  ║    │      │              │  %-52s │        ║%n", indent + linePart);
+        }
     }
 
     // helper: print numbered event list (used by other methods)
     static void listEvents() {
+        System.out.println(
+                "  ┌────┬──────┬──────────────┬──────────────────────┬────────────┬──────────────────────┬────────┐");
+        System.out.printf("  │ %-2s │ %-4s │ %-12s │ %-20s │ %-10s │ %-20s │ %-6s │%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "MaxTix");
+        System.out.println(
+                "  ├────┼──────┼──────────────┼──────────────────────┼────────────┼──────────────────────┼────────┤");
         for (int i = 0; i < eventCount; i++) {
-            System.out.println("  " + (i + 1) + ": [" + events[i].getEventID() + "] "
-                    + events[i].getTitle()
-                    + " (" + events[i].getClass().getSimpleName() + ")"
-                    + " | Date: " + events[i].getDate()
-                    + " | MaxTix: " + events[i].getMaxTickets());
+            Event e = events[i];
+            String type = e.getClass().getSimpleName();
+            String title = e.getTitle().length() > 20 ? e.getTitle().substring(0, 17) + "..." : e.getTitle();
+            String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
+            System.out.printf("  │ %-2d │ %-4s │ %-12s │ %-20s │ %-10s │ %-20s │ %6d │%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, e.getMaxTickets());
         }
+        System.out.println(
+                "  └────┴──────┴──────────────┴──────────────────────┴────────────┴──────────────────────┴────────┘");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
