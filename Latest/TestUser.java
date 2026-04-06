@@ -1723,41 +1723,43 @@ public class TestUser {
             venue = scan.nextLine();
         } while (!ems.validationVenue(venue));
 
-        int maxTix;
+        int qeb = 0;
+        int qsd = 0;
+        int qvip = 0;
+        int maxTix = 0;
         do {
-            System.out.print("Creating ticket type......");
-            System.out.print("\nMax Ticket (Recommend 150):");
-            maxTix = scan.nextInt();
-            scan.nextLine();
-        } while (!ems.validationMaxTickets(maxTix));
-
-        int qeb;
-        int qsd;
-        int qvip;
-        do {
-            System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
-            qeb = scan.nextInt();
-            scan.nextLine();
-            System.out.print("Quantity Standard (Recommend 60% of total ticket):");
-            qsd = scan.nextInt();
-            scan.nextLine();
-            System.out.print("Quantity Vip (Recommend 20% of total ticket):");
-            qvip = scan.nextInt();
-            scan.nextLine();
+            try{
+                System.out.print("\nCreating ticket type......");
+                scan.nextLine();
+                System.out.print("\nMax Ticket (Recommend 150):");
+                maxTix = scan.nextInt();
+                scan.nextLine();
+                System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
+                qeb = scan.nextInt();
+                scan.nextLine();
+                System.out.print("Quantity Standard (Recommend 60% of total ticket):");
+                qsd = scan.nextInt();
+                scan.nextLine();
+                System.out.print("Quantity Vip (Recommend 20% of total ticket):");
+                qvip = scan.nextInt();
+                scan.nextLine();
+            }catch(Exception e){
+                System.out.println("Invalid input. Please retry.");
+            }
         } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
 
-        double peb;
-        double psd;
-        double pvip;
-        do {
-            System.out.print("Price Early Bird (RM):");
-            peb = scan.nextInt();
+        double peb = 0.0;
+        double psd = 0.0;
+        double pvip = 0.0;
+        do{    
+            System.out.print("\nPrice Early Bird (RM):");
+            peb = scan.nextDouble();
             scan.nextLine();
             System.out.print("Price Standard (RM):");
-            psd = scan.nextInt();
+            psd = scan.nextDouble();
             scan.nextLine();
             System.out.print("Price Vip (RM):");
-            pvip = scan.nextInt();
+            pvip = scan.nextDouble();
             scan.nextLine();
         } while (!ems.validationPrice(peb, psd, pvip));
 
@@ -1791,6 +1793,7 @@ public class TestUser {
             TicketType tt = new TicketType(c.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd,
                     pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
+            TicketType.storeTicketTypeData(ticketTypes);
             concerts.add(c);
             events[eventCount++] = c;
             System.out.println("Concert created successfully : " + c.getEventID());
@@ -1809,6 +1812,7 @@ public class TestUser {
             TicketType tt = new TicketType(w.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd,
                     pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
+            TicketType.storeTicketTypeData(ticketTypes);
             workshops.add(w);
             events[eventCount++] = w;
             System.out.println("Workshop created successfully : " + w.getEventID());
@@ -1845,6 +1849,7 @@ public class TestUser {
             TicketType tt = new TicketType(conf.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd,
                     pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
+            TicketType.storeTicketTypeData(ticketTypes);
             if (numSessions > 0) {
                 conf.autoCreateSessions(topics, times);
             }
@@ -2763,8 +2768,6 @@ public class TestUser {
             }
         }
 
-        Event event = ems.findEventById(eventId);
-
         TicketType tt = TicketType.findTicketTypeById(ticketTypes, eventId);
 
         if (tt == null) {
@@ -2799,6 +2802,11 @@ public class TestUser {
             }
             break;
         }
+        
+        if (!ems.validationPurchaseTicket(tt, ticketType)){
+            System.out.println("Sorry, the ticket type is not available for this period.");
+            return;
+        }
 
         // payment
         System.out.println("\nThe total amount = RM " + tt.getPrice(ticketType));
@@ -2822,12 +2830,15 @@ public class TestUser {
         String bookingId = ems.generateBookingId(eventId);
 
         Payment p = new Payment(a, eventId, bookingId, tt.getPrice(ticketType));
+        payments[ticketCount]=p;
         System.out.print(p.toString());
 
-        Ticket ticket = ems.purchaseTicket(a, event, tt, ticketType, bookingId, ticketCount);
+        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, bookingId, ticketCount);
 
         if (ticket != null) {
+            scan.nextLine();
             System.out.println("\nPurchase completed successfully!");
+            scan.nextLine();
             ticket.displayTicketDetails();
             tickets.add(ticket);
             Ticket.storeTicketData(tickets);
