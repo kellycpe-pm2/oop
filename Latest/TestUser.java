@@ -10,14 +10,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-import javax.swing.text.View;
-
 public class TestUser {
     static Scanner scan = new Scanner(System.in);
     static EventManagementSystem ems = new EventManagementSystem();
 
     static List<TicketType> ticketTypes = new java.util.ArrayList<>();
     static List<Ticket> tickets = new java.util.ArrayList<>();
+    static int ticketCount = 0;
 
     // in-memory lists — loaded from / saved to JSON files
     static List<Concert> concerts = new java.util.ArrayList<>();
@@ -48,6 +47,9 @@ public class TestUser {
 
         readUserData(no, alluser);
         loadAllEvents(); // load all events and ticket types from files on startup
+        tickets.clear();
+        tickets=Ticket.readTicketFile();
+        ticketCount=tickets.size();
 
         boolean active = true;
         while (active) {
@@ -969,23 +971,23 @@ public class TestUser {
                 System.out.println("\t\t\tPlease Press Enter Key to Continue.");
                 
                 TicketType current_TicketType= TicketType.findTicketTypeById(ticketTypes, eventId);
-                int [] tol= current_TicketType.getTotalTicketType(); 
+                int [] tol= current_TicketType.getQuantityOfAllTicketType(); 
                 // Early Bird
             int totalEarly = tol[0];
-            int soldEarly = totalEarly - current_TicketType.getQuantityEarlyBird();
-            int availableEarly = current_TicketType.getQuantityEarlyBird();
+            int soldEarly = totalEarly - current_TicketType.getAvailableType("earlybird");
+            int availableEarly = current_TicketType.getAvailableType("earlybird");
             double revenueEarly = soldEarly * current_TicketType.getPrice("earlybird");
 
 // Standard
             int totalStandard = tol[1];
-            int soldStandard = totalStandard - current_TicketType.getQuantityStandard();
-            int availableStandard = current_TicketType.getQuantityEarlyBird();
+            int soldStandard = totalStandard - current_TicketType.getAvailableType("standard");
+            int availableStandard = current_TicketType.getAvailableType("standard");
             double revenueStandard = soldStandard * current_TicketType.getPrice("standard");
 
 // VIP
            int totalVip = tol[2];
-           int soldVip = totalVip - current_TicketType.getQuantityVip();
-           int availableVip = current_TicketType.getQuantityVip();
+           int soldVip = totalVip - current_TicketType.getAvailableType("vip");
+           int availableVip = current_TicketType.getAvailableType("vip");
         double revenueVip = soldVip * current_TicketType.getPrice("vip");
 
 // Print table
@@ -1182,23 +1184,23 @@ public class TestUser {
                 System.out.println("\t\t\tPlease Press Enter Key to Continue.");
                 
                 TicketType current_TicketType= TicketType.findTicketTypeById(ticketTypes, eventId);
-                int [] tol= current_TicketType.getTotalTicketType(); 
+                int [] tol= current_TicketType.getQuantityOfAllTicketType(); 
                 // Early Bird
             double totalEarly = tol[0]*current_TicketType.getPrice("earlybird");
-            double soldEarly = totalEarly - current_TicketType.getQuantityEarlyBird()*current_TicketType.getPrice("earlybird");
-            double availableEarly = (double)current_TicketType.getQuantityEarlyBird()*current_TicketType.getPrice("earlybird");
+            double soldEarly = totalEarly - current_TicketType.getAvailableType("earlybird")*current_TicketType.getPrice("earlybird");
+            double availableEarly = (double)current_TicketType.getAvailableType("earlybird")*current_TicketType.getPrice("earlybird");
             double revenueEarly = soldEarly;
 
 // Standard
             double totalStandard = tol[1]*current_TicketType.getPrice("standard");
-            double soldStandard = totalStandard - (current_TicketType.getQuantityStandard())*current_TicketType.getPrice("standard");
-            double availableStandard = current_TicketType.getQuantityEarlyBird()*current_TicketType.getPrice("standard");
+            double soldStandard = totalStandard - (current_TicketType.getAvailableType("standard"))*current_TicketType.getPrice("standard");
+            double availableStandard = current_TicketType.getAvailableType("standard")*current_TicketType.getPrice("standard");
             double revenueStandard = soldStandard ;
 
 // VIP
            double totalVip = tol[2]* current_TicketType.getPrice("vip");
-           double soldVip = totalVip - current_TicketType.getQuantityVip()* current_TicketType.getPrice("vip");
-           double availableVip = current_TicketType.getQuantityVip()*current_TicketType.getPrice("vip");
+           double soldVip = totalVip - current_TicketType.getAvailableType("vip")* current_TicketType.getPrice("vip");
+           double availableVip = current_TicketType.getAvailableType("vip")*current_TicketType.getPrice("vip");
         double revenueVip = soldVip ;
 
 // Print table
@@ -1401,20 +1403,20 @@ public class TestUser {
             writer.write("\t\t║  │ Ticket Type        │ Total        │ Sold         │ Revenue               │ ║\n");
             writer.write("\t\t║  ├────────────────────┼──────────────┼──────────────┼───────────────────────┤ ║\n");
             
-            int [] tol= current_TicketType.getTotalTicketType(); 
+            int [] tol= current_TicketType.getQuantityOfAllTicketType(); 
                 // Early Bird
             int totalEarly = tol[0];
-            int soldEarly = totalEarly - current_TicketType.getQuantityEarlyBird();
+            int soldEarly = totalEarly - current_TicketType.getAvailableType("earlybird");
             double revenueEarly = soldEarly*current_TicketType.getPrice("earlybird");
 
 // Standard
             int totalStandard = tol[1];
-            int soldStandard = totalStandard - current_TicketType.getQuantityStandard();
+            int soldStandard = totalStandard - current_TicketType.getAvailableType("standard");
             double revenueStandard = soldStandard *current_TicketType.getPrice("standard");
 
 // VIP
            int totalVip = tol[2];
-        int soldVip = totalVip - current_TicketType.getQuantityVip();
+        int soldVip = totalVip - current_TicketType.getAvailableType("vip");
         double revenueVip = soldVip * current_TicketType.getPrice("vip");
 
             
@@ -1666,8 +1668,7 @@ public class TestUser {
         if (type == 1) {
             // Concert
             Concert c = new Concert(title, parsedDate, venue, maxTix);
-            TicketType tt = new TicketType(c.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks,
-                    salesStartDate, salesEndDate,qeb,qsd,qvip);
+            TicketType tt = new TicketType(c.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd, pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
             concerts.add(c);
             events[eventCount++] = c;
@@ -1676,8 +1677,7 @@ public class TestUser {
         } else if (type == 2) {
             // Workshop
             Workshop w = new Workshop(title, parsedDate, venue, maxTix);
-            TicketType tt = new TicketType(w.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks,
-                    salesStartDate, salesEndDate,qeb,qsd,qvip);
+            TicketType tt = new TicketType(w.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd, pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
             workshops.add(w);
             events[eventCount++] = w;
@@ -1704,8 +1704,7 @@ public class TestUser {
             }
 
             Conference conf = new Conference(title, parsedDate, venue, maxTix);
-            TicketType tt = new TicketType(conf.getEventID(), maxTix, qeb, qsd, qvip, peb, psd, pvip, perks,
-                    salesStartDate, salesEndDate,qeb,qsd,qvip);
+            TicketType tt = new TicketType(conf.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd, pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
             if (numSessions > 0) {
                 conf.autoCreateSessions(topics, times);
@@ -2167,6 +2166,7 @@ public class TestUser {
             System.out.println("╠══════════════════════════════╣");
             System.out.println("║  1: View Events              ║");
             System.out.println("║  2: Purchase Ticket          ║");
+            System.out.println("║  3: View History             ║");
             System.out.println("║  0: Back to Main Menu        ║");
             System.out.println("╚══════════════════════════════╝");
             System.out.print("Enter option: ");
@@ -2179,6 +2179,9 @@ public class TestUser {
                     break;
                 case 2:
                     purchaseTicket(attendee);
+                    break;
+                case 3:
+                    viewTicketHistory(attendee);
                     break;
                 case 0:
                     inMenu = false;
@@ -2265,12 +2268,12 @@ public class TestUser {
         System.out.println("Processing payment...");
         System.out.println("Payment Success!");
 
-        String bookingId = ems.generateBookingId(eventId);
+        String bookingId = ems.generateBookingId(ticketCount);
 
         Payment p = new Payment(a, eventId, bookingId, tt.getPrice(ticketType));
         System.out.print(p.toString());
 
-        Ticket ticket = ems.purchaseTicket(a, event, tt, ticketType, bookingId);
+        Ticket ticket = ems.purchaseTicket(a, event, tt, ticketType, bookingId,ticketCount);
 
         if (ticket != null) {
             System.out.println("\nPurchase completed successfully!");
@@ -2282,6 +2285,31 @@ public class TestUser {
             System.out.println("Purchase failed. Please try again.");
         }
     }
+
+static void viewTicketHistory(Attendee attendee) {
+    int count = 0;
+    
+    if (tickets.isEmpty()) {
+        System.out.println("No tickets purchased in the system.");
+        return;
+    }
+    
+    System.out.println("\n--- All Tickets History for " + attendee.getAccessUsername() + " ---");
+    
+    for (Ticket t : tickets) {
+        if (t.getBuyerName().equals(attendee.getAccessUsername())) {
+            t.displayTicketDetails();
+            System.out.println();
+            count++;
+        }
+    }
+    
+    if (count == 0) {
+        System.out.println("No tickets purchased by " + attendee.getAccessUsername() + " yet.");
+    } else {
+        System.out.println("Found " + count + " ticket(s) for " + attendee.getAccessUsername());
+    }
+}
 
     // speaker part
     static void speakerMenu(Speaker loggedInSpeaker, Event[] events) {
