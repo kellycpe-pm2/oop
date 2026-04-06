@@ -9,6 +9,11 @@ import java.util.List;
 
 public class Workshop extends Event {
 
+    // Speaker part
+    private static final int MAX_SPEAKERS = 1;
+    private Speaker[] speakers = new Speaker[MAX_SPEAKERS];
+    private int speakerCount = 0;
+
     public Workshop(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
         appendToFile(); // auto-save to Workshop.json on creation
@@ -19,20 +24,117 @@ public class Workshop extends Event {
         super(title, date, venue, maxTickets);
     }
 
+    // ── Speaker management ──────────────────────────────────────────────────
+
+    public Speaker[] getSpeakers() {
+        return speakers;
+    }
+
+    public int getSpeakerCount() {
+        return speakerCount;
+    }
+
+    // Assign a speaker to this workshop. Returns false if already assigned or full.
+    public boolean assignSpeaker(Speaker speaker) {
+        if (speakerCount >= MAX_SPEAKERS) {
+            System.out.println("Error: Workshop already has the maximum number of speakers.");
+            return false;
+        }
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakers[i].getAccessUsername().equals(speaker.getAccessUsername())) {
+                System.out.println("Error: Speaker [" + speaker.getAccessUsername()
+                        + "] is already assigned to this workshop.");
+                return false;
+            }
+        }
+        speakers[speakerCount++] = speaker;
+        System.out.println("Speaker [" + speaker.getAccessUsername()
+                + "] assigned to workshop [" + getEventID() + "] successfully.");
+        return true;
+    }
+
+    // Remove a speaker from this workshop by username.
+    public boolean removeSpeaker(String username) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakers[i].getAccessUsername().equals(username)) {
+                for (int j = i; j < speakerCount - 1; j++) {
+                    speakers[j] = speakers[j + 1];
+                }
+                speakers[speakerCount - 1] = null;
+                speakerCount--;
+                System.out.println("Speaker [" + username
+                        + "] removed from workshop [" + getEventID() + "] successfully.");
+                return true;
+            }
+        }
+        System.out.println("Error: Speaker [" + username
+                + "] not found in workshop [" + getEventID() + "].");
+        return false;
+    }
+
+    // Replace an existing speaker with a new one (change speaker).
+    public boolean changeSpeaker(String oldUsername, Speaker newSpeaker) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakers[i].getAccessUsername().equals(oldUsername)) {
+                for (int j = 0; j < speakerCount; j++) {
+                    if (j != i && speakers[j].getAccessUsername()
+                            .equals(newSpeaker.getAccessUsername())) {
+                        System.out.println("Error: Speaker [" + newSpeaker.getAccessUsername()
+                                + "] is already assigned to this workshop.");
+                        return false;
+                    }
+                }
+                speakers[i] = newSpeaker;
+                System.out.println("Speaker [" + oldUsername + "] replaced with ["
+                        + newSpeaker.getAccessUsername()
+                        + "] in workshop [" + getEventID() + "] successfully.");
+                return true;
+            }
+        }
+        System.out.println("Error: Speaker [" + oldUsername
+                + "] not found in workshop [" + getEventID() + "].");
+        return false;
+    }
+
+    /** Display speakers assigned to this workshop. */
+    public void displaySpeakers() {
+        System.out.println("  Speakers for Workshop: " + getTitle());
+        if (speakerCount == 0) {
+            System.out.println("    No speakers assigned.");
+        } else {
+            for (int i = 0; i < speakerCount; i++) {
+                System.out.println("    " + (i + 1) + ": " + speakers[i].getAccessUsername());
+            }
+        }
+    }
+
+    // ── File I/O ─────────────────────────────────────────────────────────────
+
     // Appends this workshop's data to Workshop.json
     private void appendToFile() {
         try {
             File workshopFile = new File("Workshop.json");
-            workshopFile.createNewFile(); // creates file if it doesn't exist
-            try (Writer writer = new java.io.FileWriter(workshopFile, true)) { // true = append mode
-                writer.write(getEventID() + "\n");
-                writer.write(getTitle() + "\n");
-                writer.write(getDate().toString() + "\n");
-                writer.write(getVenue() + "\n");
-                writer.write(getMaxTickets() + "\n");
+            workshopFile.createNewFile();
+            try (Writer writer = new java.io.FileWriter(workshopFile, true)) {
+                writeWorkshopRecord(writer);
             }
         } catch (IOException e) {
             System.out.println("Error auto-saving workshop data: " + e.getMessage());
+        }
+    }
+
+    // Helper: writes one workshop record
+    // Format: eventID / title / date / venue / maxTickets / speakerCount /
+    // [username x N]
+    private void writeWorkshopRecord(Writer writer) throws IOException {
+        writer.write(getEventID() + "\n");
+        writer.write(getTitle() + "\n");
+        writer.write(getDate().toString() + "\n");
+        writer.write(getVenue() + "\n");
+        writer.write(getMaxTickets() + "\n");
+        writer.write(speakerCount + "\n");
+        for (int i = 0; i < speakerCount; i++) {
+            writer.write(speakers[i].getAccessUsername() + "\n");
         }
     }
 
@@ -49,23 +151,34 @@ public class Workshop extends Event {
         }
     }
 
-    // Reads all workshops from "Workshop.json" and returns them as a list of
-    // Workshop objects
-    // 5 lines per record: eventID, title, date, venue, maxTickets
+    /**
+     * Reads all workshops from "Workshop.json".
+     * Format per record:
+     * eventID, title, date, venue, maxTickets, speakerCount, [username x
+     * speakerCount]
+     */
     public static List<Workshop> readWorkshopData() {
         List<Workshop> workshops = new ArrayList<>();
         try {
             List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
             if (!lines.isEmpty()) {
-                for (int i = 0; i < lines.size(); i += 5) { // 5 lines per workshop
-                    String eventID = lines.get(i);
-                    String title = lines.get(i + 1);
-                    LocalDate date = LocalDate.parse(lines.get(i + 2));
-                    String venue = lines.get(i + 3);
-                    int maxTickets = Integer.parseInt(lines.get(i + 4));
+                int i = 0;
+                while (i < lines.size()) {
+                    String eventID = lines.get(i++);
+                    String title = lines.get(i++);
+                    LocalDate date = LocalDate.parse(lines.get(i++));
+                    String venue = lines.get(i++);
+                    int maxTickets = Integer.parseInt(lines.get(i++));
+                    int storedSpeakerCount = Integer.parseInt(lines.get(i++));
 
-                    Workshop w = new Workshop(title, date, venue, maxTickets, true); // fromFile=true skips auto-save
-                    w.setEventID(eventID); // restore saved ID
+                    Workshop w = new Workshop(title, date, venue, maxTickets, true);
+                    w.setEventID(eventID);
+
+                    for (int s = 0; s < storedSpeakerCount; s++) {
+                        String username = lines.get(i++);
+                        Speaker sp = new Speaker(username, "", "", "");
+                        w.speakers[w.speakerCount++] = sp;
+                    }
                     workshops.add(w);
                 }
             }
@@ -82,18 +195,15 @@ public class Workshop extends Event {
         System.out.println("--------------------------------------------------------------------");
         for (Workshop w : workshops) {
             System.out.println(w.toString());
+            w.displaySpeakers();
         }
     }
 
     // store workshop data to Workshop.json
     public static void storeWorkshopData(List<Workshop> workshops) {
-        try (Writer writer = new java.io.FileWriter("Workshop.json")) { // overwrite file
+        try (Writer writer = new java.io.FileWriter("Workshop.json")) {
             for (Workshop w : workshops) {
-                writer.write(w.getEventID() + "\n");
-                writer.write(w.getTitle() + "\n");
-                writer.write(w.getDate().toString() + "\n");
-                writer.write(w.getVenue() + "\n");
-                writer.write(w.getMaxTickets() + "\n");
+                w.writeWorkshopRecord(writer);
             }
         } catch (IOException e) {
             System.out.println("Error storing workshop data: " + e.getMessage());
@@ -121,6 +231,7 @@ public class Workshop extends Event {
                 "ID", "Title", "Date", "Venue", "MaxTix");
         System.out.println("--------------------------------------------------------------------");
         System.out.println(this.toString());
+        displaySpeakers();
     }
 
     @Override
@@ -133,6 +244,6 @@ public class Workshop extends Event {
             Workshop w = (Workshop) o;
             return this.getEventID().equals(w.getEventID());
         }
-        return false; // the object does not belong to Workshop
+        return false;
     }
 }
