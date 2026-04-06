@@ -12,31 +12,34 @@ public class TicketType {
     private String perks;
     private int totalQuantity;
     private int availableQuantity;
-    private int quantityEarlyBird;
-    private int quantityStandard;
-    private int quantityVip;
+    private int availableEarlyBird;
+    private int availableStandard;
+    private int availableVip;
     private double priceEarlyBird;
     private double priceStandard;
     private double priceVip;
     private LocalDate salesStart;
     private LocalDate salesEnd;
     private LocalDate earlyBirdEnd;
-    private int [] total_ticket_type=new int [3];
+    private int [] quantityOfAllTicketType=new int [3];
 
     private List<String> vipSeats;
     private List<String> standardSeats;
     private List<String> earlyBirdSeats;
 
     // constructor
-    public TicketType(String eventId, int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip,
+    public TicketType(String eventId, int totalQuantity, int totalearlyBird,int totalsandrand,int totalvip, int availableQuantity, int availableEarlyBird, int availableStandard, int availableVip,
             double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart,
-            LocalDate salesEnd, int totalearlyBird,int totalsandrand,int totalvip) {
+            LocalDate salesEnd) {
         this.eventId = eventId;
         this.totalQuantity = totalQuantity;
-        availableQuantity = totalQuantity;
-        this.quantityEarlyBird = quantityEarlyBird;
-        this.quantityStandard = quantityStandard;
-        this.quantityVip = quantityVip;
+        this.quantityOfAllTicketType[0]=totalearlyBird;
+        this.quantityOfAllTicketType[1]=totalsandrand;
+        this.quantityOfAllTicketType[2]=totalvip;
+        this.availableQuantity = availableQuantity;
+        this.availableEarlyBird = availableEarlyBird;
+        this.availableStandard = availableStandard;
+        this.availableVip = availableVip;
         this.priceEarlyBird = priceEarlyBird;
         this.priceStandard = priceStandard;
         this.priceVip = priceVip;
@@ -44,9 +47,6 @@ public class TicketType {
         this.salesStart = salesStart;
         this.salesEnd = salesEnd;
         this.earlyBirdEnd = salesStart.plusDays(1);
-        this.total_ticket_type[0]=totalearlyBird;// u edit and dont forget store into the json file
-        this.total_ticket_type[1]=totalsandrand;// this too
-        this.total_ticket_type[2]=totalvip;//this also
 
         generateSeats();
     }
@@ -56,20 +56,16 @@ public class TicketType {
         return this.eventId;
     }
 
-    public int getTotalQuantity() {
+    public int getTotalQuantity(){
         return this.totalQuantity;
     }
 
-    public int getQuantityEarlyBird() {
-        return this.quantityEarlyBird;
+    public int [] getQuantityOfAllTicketType() {
+        return quantityOfAllTicketType;
     }
 
-    public int getQuantityStandard() {
-        return this.quantityStandard;
-    }
-
-    public int getQuantityVip() {
-        return this.quantityVip;
+    public int getAvailableQuantity() {
+        return availableQuantity;
     }
 
     public double getPrice(String typeName) {
@@ -100,20 +96,24 @@ public class TicketType {
         return this.earlyBirdEnd;
     }
 
-    public int getAvailableQuantity() {
-        return availableQuantity;
+    public int getAvailableType(String typeName) {
+        switch (typeName.toLowerCase()) {
+            case "earlybird":
+                return this.availableEarlyBird;
+            case "standard":
+                return this.availableStandard;
+            case "vip":
+                return this.availableVip;
+        }
+        return 0;
     }
 
-    // i add this
-public int [] getTotalTicketType(){
-    return total_ticket_type;
-}
     // setter method
     public void setTotalQuantity(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
         this.totalQuantity = totalQuantity;
-        this.quantityEarlyBird = quantityEarlyBird;
-        this.quantityStandard = quantityStandard;
-        this.quantityVip = quantityVip;
+        this.quantityOfAllTicketType[0] = quantityEarlyBird;
+        this.quantityOfAllTicketType[1] = quantityStandard;
+        this.quantityOfAllTicketType[2] = quantityVip;
     }
 
     public void setPriceEarlyBird(double priceEarlyBird) {
@@ -166,25 +166,40 @@ public int [] getTotalTicketType(){
                 int i = 0;
                 while (i < lines.size()) {
                     String eventId = lines.get(i);
-                    int totalQuantity = Integer.parseInt(lines.get(i + 1));
-                    int availableQuantity = Integer.parseInt(lines.get(i + 2));
-                    int quantityEarlyBird = Integer.parseInt(lines.get(i + 3));
-                    int quantityStandard = Integer.parseInt(lines.get(i + 4));
-                    int quantityVip = Integer.parseInt(lines.get(i + 5));
-                    double priceEarlyBird = Double.parseDouble(lines.get(i + 6));
-                    double priceStandard = Double.parseDouble(lines.get(i + 7));
-                    double priceVip = Double.parseDouble(lines.get(i + 8));
-                    String perks = lines.get(i + 9);
-                    LocalDate salesStart = LocalDate.parse(lines.get(i + 10));
-                    LocalDate salesEnd = LocalDate.parse(lines.get(i + 11));
-                    // earlyBirdEnd is NOT stored — constructor computes it as
-                    // salesStart.plusDays(1)
+                    int totalQuantity = (int)Double.parseDouble(lines.get(i + 1));
+                    int quantityEarlyBird = (int)Double.parseDouble(lines.get(i + 2));
+                    int quantityStandard = (int)Double.parseDouble(lines.get(i + 3));
+                    int quantityVip = (int)Double.parseDouble(lines.get(i + 4));
+                    int availableQuantity = (int)Double.parseDouble(lines.get(i + 5));
+                    int availableEarlyBird = (int)Double.parseDouble(lines.get(i + 6));
+                    int availableStandard = (int)Double.parseDouble(lines.get(i + 7));
+                    int availableVip = (int)Double.parseDouble(lines.get(i + 8));
+                    double priceEarlyBird = Double.parseDouble(lines.get(i + 9));
+                    double priceStandard = Double.parseDouble(lines.get(i + 10));
+                    double priceVip = Double.parseDouble(lines.get(i + 11));
+                    String perks = lines.get(i + 12);
+                    LocalDate salesStart = LocalDate.parse(lines.get(i + 13));
+                    LocalDate salesEnd = LocalDate.parse(lines.get(i + 14));
+                    // earlyBirdEnd is NOT stored — constructor computes it as salesStart.plusDays(1)
 
-                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard,
-                            quantityVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd,quantityEarlyBird,quantityStandard,quantityVip);
+                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard, quantityVip, availableQuantity, availableEarlyBird, availableStandard, availableVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
                     ticketTypes.add(tt);
-                    i += 12; // 12 lines per record — must be INSIDE the loop
+
+                    // NEW: Load tickets and remove already sold seats
+                    List<Ticket> allTickets = Ticket.readTicketFile();
+                    for (Ticket ticket : allTickets) {
+                        if (ticket.getEventId().equals(tt.getEventId())) {
+                            // Remove the seat that was already sold
+                            String seatToRemove = ticket.getSeatNum();
+                            tt.removeSeat(ticket.getTicketType(), seatToRemove);
+                        }
+                    }
+
+                    i += 15; // 15 lines per record
                 }
+            }
+            else{
+                System.out.println("There is no ticket type record created.");
             }
         } catch (IOException e) {
             System.out.println("Error reading ticket type data: " + e.getMessage());
@@ -195,16 +210,17 @@ public int [] getTotalTicketType(){
     // display all ticket type
     public static void displayAllTicketType(List<TicketType> TicketTypes) {
         System.out.println("=== Ticket Type Info ===");
-        System.out.printf("%-8s %-15s %-20s %-10s %-10s", "EventId", "Total Quantity", "Perks", "SalesStart",
-                "SalesEnd");
-        System.out.println("--------------------------------------------------------------------");
         for (TicketType tt : TicketTypes) {
-            System.out.printf("%-8s %-15s %-20s %-10s %-10s",
-                    tt.getEventId(),
-                    tt.getTotalQuantity(),
-                    tt.getPerks(),
-                    tt.getSalesStart(),
-                    tt.getSalesEnd());
+            System.out.println("Event Id: "+tt.getEventId());
+            System.out.println("Total Quantity: "+tt.getTotalQuantity());
+            System.out.println("Quantity of Early Bird, Standard, Vip: "+tt.getQuantityOfAllTicketType());
+            System.out.println("Available Quantity: "+tt.getAvailableQuantity());
+            System.out.println("Available Early Bird, Standard, Vip: "+tt.getAvailableType("earlybird")+", "+tt.getAvailableType("standard")+", "+tt.getAvailableType("vip"));
+            System.out.println("Price Early Bird, Standard, Vip: (RM)"+tt.getPrice("earlybird")+", "+tt.getPrice("standard")+", "+tt.getPrice("vip"));
+            System.out.println("Perks: "+tt.getPerks());
+            System.out.println("Date Sales Start: "+tt.getSalesStart());
+            System.out.println("Date Sales End: "+tt.getSalesEnd());
+            System.out.println("Date Early Bird End: "+tt.getSalesStart().plusDays(1));
         }
     }
 
@@ -214,13 +230,16 @@ public int [] getTotalTicketType(){
             for (TicketType tt : TicketTypes) {
                 writer.write(tt.getEventId() + "\n");
                 writer.write(tt.getTotalQuantity() + "\n");
+                writer.write(tt.getQuantityOfAllTicketType()[0] + "\n");
+                writer.write(tt.getQuantityOfAllTicketType()[1] + "\n");
+                writer.write(tt.getQuantityOfAllTicketType()[2] + "\n");
                 writer.write(tt.getAvailableQuantity() + "\n");
-                writer.write(tt.getQuantityEarlyBird() + "\n");
-                writer.write(tt.getQuantityStandard() + "\n");
-                writer.write(tt.getQuantityVip() + "\n");
-                writer.write(tt.getPrice("earlybird") + "\n");
-                writer.write(tt.getPrice("standard") + "\n");
-                writer.write(tt.getPrice("vip") + "\n");
+                writer.write(tt.getAvailableType("earlybird") + "\n");
+                writer.write(tt.getAvailableType("standard") + "\n");
+                writer.write(tt.getAvailableType("vip") + "\n");
+                writer.write(String.format("%.2f", tt.getPrice("earlybird")) + "\n");
+                writer.write(String.format("%.2f", tt.getPrice("standard")) + "\n");
+                writer.write(String.format("%.2f", tt.getPrice("vip")) + "\n"); 
                 writer.write(tt.getPerks() + "\n");
                 writer.write(tt.getSalesStart().toString() + "\n");
                 writer.write(tt.getSalesEnd().toString() + "\n");
@@ -234,17 +253,17 @@ public int [] getTotalTicketType(){
     public boolean isAvailable(String typeName) {
         switch (typeName.toLowerCase()) {
             case "earlybird":
-                if (quantityEarlyBird > 0) {
+                if (availableEarlyBird > 0) {
                     return true;
                 }
                 break;
             case "standard":
-                if (quantityStandard > 0) {
+                if (availableStandard > 0) {
                     return true;
                 }
                 break;
             case "vip":
-                if (quantityVip > 0) {
+                if (availableVip > 0) {
                     return true;
                 }
                 break;
@@ -256,22 +275,22 @@ public int [] getTotalTicketType(){
     public boolean reduceQuantity(String typeName) {
         switch (typeName.toLowerCase()) {
             case "earlybird":
-                if (quantityEarlyBird > 0) {
-                    quantityEarlyBird--;
+                if (availableEarlyBird > 0) {
+                    availableEarlyBird--;
                     availableQuantity--;
                     return true;
                 }
                 break;
             case "standard":
-                if (quantityStandard > 0) {
-                    quantityStandard--;
+                if (availableQuantity > 0) {
+                    availableStandard--;
                     availableQuantity--;
                     return true;
                 }
                 break;
             case "vip":
-                if (quantityVip > 0) {
-                    quantityVip--;
+                if (availableVip > 0) {
+                    availableVip--;
                     availableQuantity--;
                     return true;
                 }
@@ -291,7 +310,7 @@ public int [] getTotalTicketType(){
         int currentRow = 0; // Start from row A (index 0)
 
         // Generate VIP seats
-        for (int i = 0; i < quantityVip; i++) {
+        for (int i = 0; i < quantityOfAllTicketType[2]; i++) {
             int col = (i % seatsPerRow) + 1;
             char rowChar = (char) ('A' + currentRow);
             vipSeats.add(rowChar + "" + col);
@@ -303,24 +322,24 @@ public int [] getTotalTicketType(){
         }
 
         // Move to next row if VIP didn't fill a complete row
-        if (quantityVip % seatsPerRow != 0) {
+        if (quantityOfAllTicketType[2] % seatsPerRow != 0) {
             currentRow++;
         }
 
         // Generate Standard seats
         int standardStartRow = currentRow;
-        for (int i = 0; i < quantityStandard; i++) {
+        for (int i = 0; i < quantityOfAllTicketType[1]; i++) {
             int col = (i % seatsPerRow) + 1;
             char rowChar = (char) ('A' + standardStartRow + (i / seatsPerRow));
             standardSeats.add(rowChar + "" + col);
         }
 
         // Calculate next row after Standard
-        int standardRows = (int) Math.ceil((double) quantityStandard / seatsPerRow);
+        int standardRows = (int) Math.ceil((double) quantityOfAllTicketType[1] / seatsPerRow);
         int earlyBirdStartRow = standardStartRow + standardRows;
 
         // Generate EarlyBird seats
-        for (int i = 0; i < quantityEarlyBird; i++) {
+        for (int i = 0; i < quantityOfAllTicketType[0]; i++) {
             int col = (i % seatsPerRow) + 1;
             char rowChar = (char) ('A' + earlyBirdStartRow + (i / seatsPerRow));
             earlyBirdSeats.add(rowChar + "" + col);
@@ -356,14 +375,18 @@ public int [] getTotalTicketType(){
         return null;
     }
 
-
-
-
-    // display ticket type detail
-    public String toString() {
-        return eventId + " " + totalQuantity + " " + quantityEarlyBird + " " + quantityStandard + " " + quantityVip
-                + " " + priceEarlyBird + " " + priceStandard + " " + priceVip + " " + perks + " " + salesStart + " "
-                + salesEnd;
+    // Remove a specific seat from the available seats list
+    public void removeSeat(String ticketType, String seatNum) {
+        switch (ticketType.toLowerCase()) {
+            case "earlybird":
+                earlyBirdSeats.remove(seatNum);
+                break;
+            case "standard":
+                standardSeats.remove(seatNum);
+                break;
+            case "vip":
+                vipSeats.remove(seatNum);
+                break;
+        }
     }
-
 }
