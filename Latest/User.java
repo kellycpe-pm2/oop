@@ -137,7 +137,7 @@ public class User {
     }
 
     // validation for signup
-    public boolean validationExist(User[] [] existUser) {
+    public boolean validationExist(User [] existUser) {
         
         if (validationEmpty(this.signUpName)) {
 
@@ -148,18 +148,15 @@ public class User {
             return false;
         }
 
-        for (int j=0;j<4;j++){
-           if (existUser[j] == null) {
-                continue;  // Skip null row
-            }
+
             for (int i = 0; i < existUser.length; i++) {
-                if (existUser[j][i] != null &&this.signUpName.equals(existUser[j][i].getAccessUsername())) {
+                if (existUser[i] != null &&this.signUpName.equals(existUser[i].getAccessUsername())) {
                     System.out.println("Error: The Username Has Already Exist ! ");
 
                     return false;
                 }
             }
-        }
+        
 
         return true;
     }
@@ -296,29 +293,24 @@ public class User {
 
     // validation for login
 
-    public boolean validationNoExistName(User [] [] existUser, int [] no) {
+    public boolean validationNoExistName(User [] existUser, int [] no) {
         //check the user input is empty or not
         if (validationEmpty(this.loginUsername)) {
 
             return false;
         }
 
-        for (int i=0; i< 4 ; i++) {
-
-            if (existUser[i] == null) {
-                continue;  // Skip null row
-            }
-            for (int j=0; j< no[i] ; j++) {
+            for (int j=0; j< no[0] ; j++) {
             
-                if (existUser[i][j]!=null&&this.loginUsername.equals(existUser[i][j].getAccessUsername())) {
-                this.no[0] =i;
+                if (existUser[j]!=null&&this.loginUsername.equals(existUser[j].getAccessUsername())) {
+                this.no[0] =j;
                 this.no[1]=j;
                 //found user
                 return true;
             }
         }
         
-        }
+        
 
         System.out.println("Error: The Username Is Not Matched ! ");
 
@@ -326,13 +318,13 @@ public class User {
        
     }
 
-    public boolean validationLoginPwd(User [][] user) {
+    public boolean validationLoginPwd(User [] user) {
         if (validationEmpty(this.loginPassword)) {
             return false;
         }
 
 
-        String current_pswd= user[no[0]][no[1]].getAccessPassword();
+        String current_pswd= user[no[0]].getAccessPassword();
         if (this.loginPassword.equals(current_pswd)) {
             this.pswd=loginPassword;
             return true;
@@ -353,9 +345,14 @@ public class User {
                              "║          Email          :  %-31s║\n"+
                              "║          Contact Number :  %-31s║\n"+
                              "║                                                           ║\n"+
-                             "║                                                           ║\n"+
-                             "╚═══════════════════════════════════════════════════════════╝\n"+
-                             "               Press Enter Key To Continue...", username,email,contactNo);
+                             "║                                                           ║\n", username,email,contactNo);
     }
 
+    public boolean equals(User user) {
+        if (user instanceof User) {
+            return true;
+        } else{ 
+            return false;
+        }
+    }
 }

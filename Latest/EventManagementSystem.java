@@ -1,61 +1,143 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class EventManagementSystem {
-    private static User [] user = new User [100];
-    private static Ticket [] ticket = new Ticket[100];
-    private static Payment [] payment = new Payment[100];
+    private static List<Ticket> tickets = new java.util.ArrayList<>();
+    private static Payment [] payments = new Payment[100];
     private static int bookingno = 0; 
         // ── 2D array: events[TYPE][index]
     // events[CONCERT][...] → Concert objects
     // events[WORKSHOP][...] → Workshop objects
     // events[CONFERENCE][...] → Conference objects
-    private static final int CONCERT = 0;
-    private static final int WORKSHOP = 1;
-    private static final int CONFERENCE = 2;
+    private static final int MAX_EVENTS = 300;
 
-    private static final int MAX_EVENTS = 100;
+    private Event[] events = new Event[MAX_EVENTS];
+    private int eventCount = 0;
 
-    private Event[][] events = new Event[3][MAX_EVENTS];
-    private int[] eventCount = new int[3]; // count per type
+    private static int user_no=0;
+    private User current_user;
+    private  User [] user = new User [400];
+
     
 //get methods for Events
 // Get all events across every type (flat array)
+
+    public EventManagementSystem(User [] user,Event [] events, List<Ticket> tickets, Payment [] payments ){
+        this.user=user;
+        this.events=events;
+        EventManagementSystem.tickets=tickets;
+        EventManagementSystem.payments=payments;
+        this.user_no=countUser_Num();
+    
+    }   
+     public EventManagementSystem(){
+        this(null,null,null,null);
+    }
+
+    //Getter Method
+
+    public Event [] getEvents(){
+        return events;
+    }
+    public User [] getUsers(){
+        return user;
+    }
+    public User getCuurent_User(){
+        return current_user;
+    }
+    public static Payment [] getPayments(){
+        return EventManagementSystem.payments;
+    }
+
+    public static List <Ticket>  getTicket(){
+        return tickets;
+    }
+    
+    public void setCuurent_User(User current_User, int type){
+        switch(type){
+            case 1:
+                this.current_user=(Organizer) current_User;
+            break;
+            case 2:
+                this.current_user=(Speaker) current_User;
+
+            break;
+            case 3:
+                this.current_user=(Staff) current_User;
+
+            break;
+            case 4:
+                this.current_user=(Attendee) current_User;
+            break;
+        }
+        
+    }
+
+    public void setUsers(User [] alluser){
+        this.user=alluser;
+    }
+
+    public void setEvents(Event [] events){
+        this.events=events;
+    }
+
+    public static void setTickets(List<Ticket> tickets){
+        EventManagementSystem.tickets=tickets;
+    }
+
+    public static void setPayment(Payment [] payments){
+        EventManagementSystem.payments=payments;
+    }
+// other method
     public Event[] getActiveEvents() {
-        int total = eventCount[CONCERT] + eventCount[WORKSHOP] + eventCount[CONFERENCE];
+        int total = eventCount;
         Event[] active = new Event[total];
         int idx = 0;
-        for (int type = 0; type < 3; type++) {
-            for (int i = 0; i < eventCount[type]; i++) {
-                active[idx++] = events[type][i];
+            for (int i = 0; i < total; i++) {
+                active[idx++] = events[i];
+            }
+        
+        return active;
+    }
+
+    public int countUser_Num(){
+        for (User current_user: user){
+            if(current_user!=null){
+                user_no++;
             }
         }
-        return active;
+        return user_no++;
     }
 
     // Get only Concert events
     public Concert[] getActiveConcerts() {
-        Concert[] result = new Concert[eventCount[CONCERT]];
-        for (int i = 0; i < eventCount[CONCERT]; i++) {
-            result[i] = (Concert) events[CONCERT][i];
+        Concert[] result = new Concert[eventCount];
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Concert){
+                result[i] = (Concert) events[i];
+            }
         }
         return result;
     }
 
     // Get only Workshop events
     public Workshop[] getActiveWorkshops() {
-        Workshop[] result = new Workshop[eventCount[WORKSHOP]];
-        for (int i = 0; i < eventCount[WORKSHOP]; i++) {
-            result[i] = (Workshop) events[WORKSHOP][i];
-        }
+        Workshop[] result = new Workshop[eventCount];
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Workshop){
+                result[i] = (Workshop) events[i];
+            }        }
         return result;
     }
 
     // Get only Conference events
     public Conference[] getActiveConferences() {
-        Conference[] result = new Conference[eventCount[CONFERENCE]];
-        for (int i = 0; i < eventCount[CONFERENCE]; i++) {
-            result[i] = (Conference) events[CONFERENCE][i];
+        Conference[] result = new Conference[eventCount];
+        for (int i = 0; i < eventCount; i++) {
+            if (events[i] instanceof Conference){
+                result[i] = (Conference) events[i];
+            }        
         }
         return result;
     }
@@ -63,9 +145,9 @@ public class EventManagementSystem {
     // Get a single event by eventID (searches all types)
     public Event getEventById(String eventID) {
         for (int type = 0; type < 3; type++) {
-            for (int i = 0; i < eventCount[type]; i++) {
-                if (events[type][i] != null && events[type][i].getEventID().equals(eventID)) {
-                    return events[type][i];
+            for (int i = 0; i < eventCount; i++) {
+                if (events[i] != null && events[i].getEventID().equals(eventID)) {
+                    return events[i];
                 }
             }
         }
@@ -75,7 +157,7 @@ public class EventManagementSystem {
 
     // Total number of events across all types
     public int getEventCount() {
-        return eventCount[CONCERT] + eventCount[WORKSHOP] + eventCount[CONFERENCE];
+        return eventCount;
     }
 //------------------------------------------------------------------------Get event end here
     public boolean validationInputTicketType(int choice) {
@@ -85,6 +167,14 @@ public class EventManagementSystem {
         return false;
     }
 
+
+    //==================================User part==============================
+    public void addNewUser(User user){
+        int user_idx=user_no-1;
+        this.user[user_idx] =user;
+        user_no++;
+    
+    }
     
     //----------------------------------------------------------------------------------------
     //Staff Part
@@ -93,8 +183,8 @@ public class EventManagementSystem {
     
     
     //generate Booking No
-    public String generateBookingId(int count){
-        return "B" + String.format("%03d", count);
+    public String generateBookingId(String eventId){
+        return "B" + eventId+String.format("%03d", bookingno++);
     }
 
     //----------------------------------------------------------------------------------------
@@ -183,14 +273,16 @@ public class EventManagementSystem {
         }
         return true;
     }
-        public boolean validationInputEventId(Event[] events, String eventId) {
-        for (Event e : events) {
-            if (e != null && eventId.equals(e.getEventID())) {
-                return true;
+        public boolean validationInputEventId(String eventId) {
+            for (Event e : this.events) {
+                if (e != null && eventId.equals(e.getEventID())) {
+                    return true;
+                }
+            
             }
-        }
+
         return false;
-    }
+        }
 
     // -------------------------- create event ---------------------------
 
@@ -205,14 +297,14 @@ public class EventManagementSystem {
             return null;
         if (!validationMaxTickets(maxTickets))
             return null;
-        if (eventCount[CONCERT] >= MAX_EVENTS) {
+        if (eventCount>= MAX_EVENTS) {
             System.out.println("Error: Concert list is full !");
             return null;
         }
 
         Concert c = new Concert(title, parsedDate, venue, maxTickets);
-        events[CONCERT][eventCount[CONCERT]] = c;
-        eventCount[CONCERT]++;
+        events[eventCount]= c;
+        eventCount++;
         System.out.println("Concert created and stored successfully : " + c.getEventID());
         return c;
     }
@@ -228,14 +320,14 @@ public class EventManagementSystem {
             return null;
         if (!validationMaxTickets(maxTickets))
             return null;
-        if (eventCount[WORKSHOP] >= MAX_EVENTS) {
+        if (eventCount >= MAX_EVENTS) {
             System.out.println("Error: Workshop list is full !");
             return null;
         }
 
         Workshop w = new Workshop(title, parsedDate, venue, maxTickets);
-        events[WORKSHOP][eventCount[WORKSHOP]] = w;
-        eventCount[WORKSHOP]++;
+        events[eventCount] = w;
+        eventCount ++;
         System.out.println("Workshop created and stored successfully : " + w.getEventID());
         return w;
     }
@@ -253,7 +345,7 @@ public class EventManagementSystem {
             return null;
         if (!validationMaxTickets(maxTickets))
             return null;
-        if (eventCount[CONFERENCE] >= MAX_EVENTS) {
+        if (eventCount >= MAX_EVENTS) {
             System.out.println("Error: Conference list is full !");
             return null;
         }
@@ -262,8 +354,8 @@ public class EventManagementSystem {
         if (sessionTopics != null && sessionTimes != null) {
             conf.autoCreateSessions(sessionTopics, sessionTimes);
         }
-        events[CONFERENCE][eventCount[CONFERENCE]] = conf;
-        eventCount[CONFERENCE]++;
+        events[eventCount] = conf;
+        eventCount ++;
         System.out.println("Conference created and stored successfully : " + conf.getEventID());
         return conf;
     }
@@ -391,13 +483,15 @@ public class EventManagementSystem {
         }
     }
 
-    public Event findEventById(Event[] events, String eventId) {
-        for (Event e : events) {
-            if (e != null && e.getEventID().equals(eventId)) {
-                return e;
+    public Event findEventById(String eventId) {
+            for (Event e : this.events) {
+                if (e != null && eventId.equals(e.getEventID())) {
+                    return e;
+                }
             }
-        }
+        
         return null;
+
     }
 
 // In EventManagementSystem.java

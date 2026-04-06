@@ -30,11 +30,10 @@ public class Ticket {
         this.status=status;
         this.eventId = eventId;
         this.purchaseDate = LocalDate.now();
-        this.ticketId = "T" + String.format("%05d", ticketCount);
+        this.ticketId = "T" + String.format("%05d", ticketCount++);
         this.totalAmount=tt.getPrice(ticketType);
         this.seatNo=tt.getSeat(ticketType);
         this.perks=tt.getPerks();
-        ticketCount++;
         Ticket.ticketCount=ticketCount;
     
         tt.reduceQuantity(ticketType);
