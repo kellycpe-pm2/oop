@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class TestUser {
     static Scanner scan = new Scanner(System.in);
-    static EventManagementSystem ems = new EventManagementSystem();
+    static EventManagementSystem ems=null;
 
     static List<TicketType> ticketTypes = new java.util.ArrayList<>();
     static List<Ticket> tickets = new java.util.ArrayList<>();
@@ -24,7 +24,7 @@ public class TestUser {
     static List<Conference> conferences = new java.util.ArrayList<>();
 
     // flat array used by attendee ticket purchasing (same pattern as TestUser)
-    static Event[] events = new Event[300];
+    static Event[]events = new Event[300];
     static int eventCount = 0;
 
     // speaker pool
@@ -33,24 +33,27 @@ public class TestUser {
 
     static Organizer organizer;
     static Attendee attendee;
+
+    static Payment [] payments=new Payment[100];
     
         public static void main(String[] args) {
         // data store for user
 
-        User[][] alluser = new User[4][100];
+        User[] alluser = new User[400];
         // no set as array to pass the value and change the value (only reference
         // variable will be affect)
-        int[] no = { 0, 0, 0, 0 };
+        int[] no = { 0};
 
         // no is from 0 to 99
         // load data
-
+        
         readUserData(no, alluser);
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
         tickets=Ticket.readTicketFile();
         ticketCount=tickets.size();
-
+        ems = new EventManagementSystem (alluser,events,tickets,payments);
+        
         boolean active = true;
         while (active) {
             int option = displayAccessInterface();
@@ -77,6 +80,7 @@ public class TestUser {
                     createAccount(no, user, alluser);
                     storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
                             user.getSignUpContactNo());
+                    ems.addNewUser(user);
 
                     accessmenu(user, alluser, no);
                     break;
@@ -95,7 +99,6 @@ public class TestUser {
 
     // to select the method to access the system
     public static int displayAccessInterface() {
-        Scanner scan = new Scanner(System.in);
         int option = 0;
         do {
             System.out.println("------------------------------------------------------------------------------");
@@ -116,7 +119,7 @@ public class TestUser {
         return option;
     }
 
-    public static boolean displayLoginInterface(User user, User[][] alluser, int[] no) {
+    public static boolean displayLoginInterface(User user, User[] alluser, int[] no) {
         Scanner scan = new Scanner(System.in);
         int logincount = 0;
 
@@ -144,7 +147,7 @@ public class TestUser {
         return true;
     }
 
-    public static void displaySignUpInterface(User user, User[][] alluser, int[] no) {
+    public static void displaySignUpInterface(User user, User[] alluser, int[] no) {
         Scanner scan = new Scanner(System.in);
 
         System.out.println("--------------------------Sign Up--------------------------");
@@ -192,11 +195,12 @@ public class TestUser {
         System.out.println("------------------------------------------------------------");
     }
 
-    public static void accessmenu(User user, User[][] alluser, int[] no) {
+    public static void accessmenu(User user, User[] alluser, int[] no) {
         // Check if user is organizer (password "12345")
         if (user.getAccessPassword().equals("12345")) {
 
-            Organizer organizer = (Organizer) alluser[0][user.getno()];
+            Organizer organizer = (Organizer) alluser[user.getno()];
+            ems.setCuurent_User(organizer,1);
 
             System.out.println(organizer.toString());
             waitForEnter();
@@ -205,27 +209,32 @@ public class TestUser {
 
         // Check if user is a speaker (exists in speakerPool)
         else if (user.getAccessPassword().equals("54321")) {
-            Speaker speaker = (Speaker) alluser[1][user.getno()];
+            Speaker speaker = (Speaker) alluser[user.getno()];
+            ems.setCuurent_User(speaker,2);
             System.out.println(speaker.toString());
             waitForEnter();
-            speakerMenu(speaker, events);
+            speakerMenu(speaker);
+            
         }
         // Otherwise, user is an attendee
         else if (user.getAccessPassword().equals("13148")) {
-            Staff staff = (Staff) alluser[3][user.getno()];
+            Staff staff = (Staff) alluser[user.getno()];
             System.out.println(staff.toString());
+            ems.setCuurent_User(staff, 3);
             waitForEnter();
             staffMenu(staff, alluser, no);
         } else {
-            Attendee attendee = (Attendee) alluser[2][user.getno()];
+            Attendee attendee = (Attendee) alluser[user.getno()];
             System.out.println(attendee.toString());
+            ems.setCuurent_User(attendee,4);
+
             waitForEnter();
             attendeeMenu(attendee);
         }
     }
 
     // load the data from user.json
-    public static void readUserData(int[] no, User[][] alluser) {
+    public static void readUserData(int[] no, User[] alluser) {
 
         // Read user data from the file and populate the arrays
         try {
@@ -271,24 +280,24 @@ public class TestUser {
 
                         // get the no of last user
 
-                        alluser[0][no[0]] = new Organizer(information[i][0], information[i][1], information[i][2],
+                        alluser[no[0]] = new Organizer(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
                         no[0]++;
                     } else if (current_pwd.equals("54321")) {
 
-                        alluser[1][no[1]] = new Speaker(information[i][0], information[i][1], information[i][2],
+                        alluser[no[0]] = new Speaker(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
-                        no[1]++;
+                        no[0]++;
 
                     } else if (current_pwd.equals("13148")) {
-                        alluser[3][no[3]] = new Staff(information[i][0], information[i][1], information[i][2],
+                        alluser[no[0]] = new Staff(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
-                        no[3]++;
+                        no[0]++;
                     } else {
 
-                        alluser[2][no[2]] = new Attendee(information[i][0], information[i][1], information[i][2],
+                        alluser[no[0]] = new Attendee(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
-                        no[2]++;
+                        no[0]++;
                     }
 
                 }
@@ -328,35 +337,35 @@ public class TestUser {
         }
     }
 
-    public static void createAccount(int[] no, User user, User[][] alluser) {
+    public static void createAccount(int[] no, User user, User[] alluser) {
 
         String username = user.getSignUpName();
         String password = user.getSignUpPassword();
         String email = user.getSignUpEmail();
         String contactNo = user.getSignUpContactNo();
         //
+
         if (password.equals("12345")) {
 
-            alluser[0][no[0]] = new Organizer(username, password, email, contactNo);
+            alluser[no[0]] = new Organizer(username, password, email, contactNo);
+            user.setNo(no[0]);
+            no[0]++;
+        } else if (password.equals("54321")) {
+
+            alluser[no[0]] = new Speaker(username, password, email, contactNo);
+            user.setNo(no[1]);
+            no[0]++;
+        } else if (password.equals("13148")) {
+
+            alluser[no[0]] = new Staff(username, password, email, contactNo);
             user.setNo(no[0]);
             no[0]++;
 
-        } else if (password.equals("54321")) {
-
-            alluser[1][no[1]] = new Speaker(username, password, email, contactNo);
-            user.setNo(no[1]);
-            no[1]++;
-        } else if (password.equals("13148")) {
-
-            alluser[3][no[3]] = new Staff(username, password, email, contactNo);
-            user.setNo(no[3]);
-            no[3]++;
-
         } else {
 
-            alluser[2][no[2]] = new Attendee(username, password, email, contactNo);
-            user.setNo(no[2]);
-            no[2]++;
+            alluser[no[0]] = new Attendee(username, password, email, contactNo);
+            user.setNo(no[0]);
+            no[0]++;
 
         }
 
@@ -402,7 +411,7 @@ public class TestUser {
     // _________________________________________________________________________
     // Staff Part
     // _________________________________________________________________________
-    public static void staffMenu(Staff staff, User[][] alluser, int[] no) {
+    public static void staffMenu(Staff staff, User[] alluser, int[] no) {
         boolean inMenu = true;
         clearScreen();
 
@@ -443,10 +452,10 @@ public class TestUser {
                         view_pending_attendee_list(alluser);
                         break;
                     case 4:
-                    event_report();
+                        event_report();
                         break;
                     case 5:
-                    sale_report();
+                        sale_report();
                         break;
                     case 6:
                         all_check_in_report(alluser);
@@ -483,8 +492,7 @@ public class TestUser {
     }
 
 
-    public static void checkIn_Attendee(User[][] alluser, int[] no) {
-        Scanner scan = new Scanner(System.in);
+    public static void checkIn_Attendee(User[] alluser, int[] no) {
         User current_attendee = null;
         Ticket currentTicket = null;
         boolean search = true;
@@ -528,10 +536,10 @@ public class TestUser {
 
                     
                     // Find attendee by buyer name
-                    for (int i = 0; i < no[2]; i++) {
-                        if (alluser[2][i] != null && 
-                            ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())) {
-                            current_attendee = alluser[2][i];
+                    for (int i = 0; i < no[0]; i++) {
+                        if (alluser[i] != null && 
+                            ticket.getBuyerName().equals(alluser[i].getAccessUsername())) {
+                            current_attendee = alluser[i];
                             currentTicket = ticket;
                             search = false;
                             break;
@@ -567,9 +575,9 @@ public class TestUser {
                     currentTicket = ticket;
                     // Find attendee by buyer name
                     for (int i = 0; i < no[2]; i++) {
-                        if (alluser[2][i] != null && 
-                            ticket.getBuyerName().equals(alluser[2][i].getAccessUsername())) {
-                            current_attendee = alluser[2][i];
+                        if (alluser[i] != null && 
+                            ticket.getBuyerName().equals(alluser[i].getAccessUsername())) {
+                            current_attendee = alluser[i];
                             search = false;
                             break;
                         }
@@ -667,7 +675,7 @@ public class TestUser {
     }
 
 
-    public static void view_checkin(User [] []alluser){
+    public static void view_checkin(User []alluser){
         System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("\t\t║                           CHECK-IN LIST                                        ║");
         System.out.printf("\t\t║                               %-48s ║\n",LocalDate.now());
@@ -688,12 +696,22 @@ public class TestUser {
         for (Ticket ticket : tickets){
             if (ticket !=null){
             
-                if (alluser[2].length==0){
+                if (alluser.length==0){
+                    for (User user: alluser){
+                        if(! (user instanceof Attendee)){
+                            System.out.println("ERROR: No Any Attendee Resgister The System !!!");
+                            view_pending_attendee_list(alluser);
+                            break;
+                        }
+                    }
                     System.out.println("ERROR: No Any Attendee Resgister The System !!!");
                     return;
                 }
             if(!ticket.getStatus()){
-                for(User user : alluser[2]){
+                for(User user : alluser){
+                    if(! (user instanceof Attendee)){
+                        continue;
+                    }
                     if (ticket.getBuyerName().equals(user.getAccessUsername())){
                         System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
                         no++,
@@ -721,7 +739,7 @@ public class TestUser {
 
     }
 
-    public static void view_pending_attendee_list(User[][]alluser){
+    public static void view_pending_attendee_list(User[]alluser){
        System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("\t\t║                           PENDING ATTENDEES LIST                               ║");
         System.out.printf("\t\t║                               %-48s ║\n",LocalDate.now());
@@ -742,12 +760,22 @@ public class TestUser {
         for (Ticket ticket : tickets){
             if (ticket !=null){
             
-                if (alluser[2].length==0){
+                if (alluser.length==0){
+                    for (User user: alluser){
+                        if(! (user instanceof Attendee)){
+                            System.out.println("ERROR: No Any Attendee Resgister The System !!!");
+                            view_pending_attendee_list(alluser);
+                            break;
+                        }
+                    }
                     System.out.println("ERROR: No Any Attendee Resgister The System !!!");
                     return;
                 }
             if(ticket.getStatus()){
-                for(User user : alluser[2]){
+                for(User user : alluser){
+                    if(! (user instanceof Attendee)){
+                        continue;
+                    }
                     if (ticket.getBuyerName().equals(user.getAccessUsername())){
                         System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤"); 
                         System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
@@ -777,7 +805,7 @@ public class TestUser {
     }
 
 
-    public static void all_check_in_report(User [][]alluser){
+    public static void all_check_in_report(User []alluser){
        System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("\t\t║                              ALL CHECK-INS REPORT                              ║");
         System.out.printf("\t\t║                              Generated :%-38s ║\n",LocalDate.now());
@@ -798,11 +826,21 @@ public class TestUser {
         for (Ticket ticket : tickets){
             if (ticket !=null){
             
-                if (alluser[2].length==0){
+                if (alluser.length==0){
+                    for (User user: alluser){
+                        if(! (user instanceof Attendee)){
+                            System.out.println("ERROR: No Any Attendee Resgister The System !!!");
+                            view_pending_attendee_list(alluser);
+                            break;
+                        }
+                    }
                     System.out.println("ERROR: No Any Attendee Resgister The System !!!");
                     return;
                 }
-                for(User user : alluser[2]){
+                for(User user : alluser){
+                    if(! (user instanceof Attendee)){
+                        continue;
+                    }
                     if (ticket.getBuyerName().equals(user.getAccessUsername())){
                         System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤"); 
                         System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
@@ -947,7 +985,7 @@ public class TestUser {
             scan.nextLine();
             String eventId=scan.nextLine();
 
-            Event current_event=ems.findEventById(events, eventId); 
+            Event current_event=ems.findEventById(eventId); 
             if (current_event!=null){
                 System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
                 System.out.println("\t\t\t│                                 EVENT INFORMATION                              │");
@@ -1160,7 +1198,7 @@ public class TestUser {
             scan.nextLine();
             String eventId=scan.nextLine();
 
-            Event current_event=ems.findEventById(events, eventId); 
+            Event current_event=ems.findEventById( eventId); 
             if (current_event!=null){
                 System.out.println("\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
                 System.out.println("\t\t\t│                                 EVENT INFORMATION                              │");
@@ -1179,29 +1217,29 @@ public class TestUser {
                 System.out.println("\t\t\t│                                                                                │");
                 System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
 
-                waitForEnter();
-                waitForEnter();
-                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
                 
-                TicketType current_TicketType= TicketType.findTicketTypeById(ticketTypes, eventId);
-                int [] tol= current_TicketType.getQuantityOfAllTicketType(); 
+                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+                waitForEnter();
+                
+            TicketType current_TicketType= TicketType.findTicketTypeById(ticketTypes, eventId);
+            int [] tol= current_TicketType.getQuantityOfAllTicketType(); 
                 // Early Bird
-            double totalEarly = tol[0]*current_TicketType.getPrice("earlybird");
-            double soldEarly = totalEarly - current_TicketType.getAvailableType("earlybird")*current_TicketType.getPrice("earlybird");
+            double totalEarly = (double)tol[0]*current_TicketType.getPrice("earlybird");
+            double soldEarly = (totalEarly>0)? totalEarly - current_TicketType.getAvailableType("earlybird")*current_TicketType.getPrice("earlybird") :0;
             double availableEarly = (double)current_TicketType.getAvailableType("earlybird")*current_TicketType.getPrice("earlybird");
             double revenueEarly = soldEarly;
 
-// Standard
-            double totalStandard = tol[1]*current_TicketType.getPrice("standard");
-            double soldStandard = totalStandard - (current_TicketType.getAvailableType("standard"))*current_TicketType.getPrice("standard");
+            // Standard
+            double totalStandard = (double)tol[1]*current_TicketType.getPrice("standard");
+            double soldStandard =  (totalStandard>0) ? totalStandard - (current_TicketType.getAvailableType("standard"))*current_TicketType.getPrice("standard") : 0;
             double availableStandard = current_TicketType.getAvailableType("standard")*current_TicketType.getPrice("standard");
-            double revenueStandard = soldStandard ;
+            double revenueStandard = soldStandard;
 
-// VIP
-           double totalVip = tol[2]* current_TicketType.getPrice("vip");
-           double soldVip = totalVip - current_TicketType.getAvailableType("vip")* current_TicketType.getPrice("vip");
-           double availableVip = current_TicketType.getAvailableType("vip")*current_TicketType.getPrice("vip");
-        double revenueVip = soldVip ;
+            // VIP 
+            double totalVip = (double)tol[2]* current_TicketType.getPrice("vip");
+            double soldVip = (totalVip>0) ? totalVip - current_TicketType.getAvailableType("vip")* current_TicketType.getPrice("vip") : 0;
+            double availableVip = current_TicketType.getAvailableType("vip")*current_TicketType.getPrice("vip");
+            double revenueVip = soldVip;
 
 // Print table
         System.out.println("\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
@@ -1254,7 +1292,7 @@ public class TestUser {
         }
     } 
 
-    public static void exportCheckInReportToFile(User[][] alluser) {
+    public static void exportCheckInReportToFile(User[] alluser) {
     try {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String filename = "CheckIn_Report_" + timestamp + ".txt";
@@ -1275,8 +1313,8 @@ public class TestUser {
         int no = 1;
         for (Ticket ticket : tickets) {
             if (ticket != null) {
-                for (User user : alluser[2]) {
-                    if (user != null && ticket.getBuyerName().equals(user.getAccessUsername())) {
+                for (User user : alluser) {
+                    if (user instanceof Attendee && user != null && ticket.getBuyerName().equals(user.getAccessUsername())) {
                         writer.write(String.format("\t\t║  %2d │ %-18s │ %-19s │ %-12s │ %-8s │ ║\n",
                             no++, ticket.getBuyerName(), user.getAccessEmail(), 
                             ticket.getTicketId(), status_ToString(ticket.getStatus())));
@@ -1368,7 +1406,7 @@ public class TestUser {
     System.out.print("\n\t\tEnter Event ID to export: ");
     String eventId = scan.nextLine();
     
-    Event current_event = ems.findEventById(events, eventId);
+    Event current_event = ems.findEventById(eventId);
     if (current_event == null) {
         System.out.println("\t\t Event not found!");
         waitForEnter();
@@ -1498,13 +1536,15 @@ public class TestUser {
         FileWriter eventWriter = new FileWriter(eventFilename);
         eventWriter.write("Event ID,Event Name,Date,Venue,Max Capacity\n");
         
-        for (Event event : events) {
-            if (event != null) {
-                eventWriter.write(String.format("%s,%s,%s,%s,%d\n",
+            for (Event event : events) {
+                if (event != null) {
+                    eventWriter.write(String.format("%s,%s,%s,%s,%d\n",
                     event.getEventID(), event.getTitle(), event.getDate(), 
                     event.getVenue(), event.getMaxTickets()));
+                }
             }
-        }
+        
+
         eventWriter.close();
         
         System.out.println("\n\t\t✅ All Reports exported successfully!");
@@ -1729,24 +1769,27 @@ public class TestUser {
         String eventID = scan.nextLine();
 
         boolean found = false;
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i].getEventID().equals(eventID)) {
-                if (events[i] instanceof Concert) {
-                    Concert.removeConcert(concerts, eventID);
-                } else if (events[i] instanceof Workshop) {
-                    Workshop.removeWorkshop(workshops, eventID);
-                } else if (events[i] instanceof Conference) {
-                    Conference.removeConference(conferences, eventID);
-                }
+        
+            for (int i = 0; i < eventCount; i++) {
+                if (events[i].getEventID().equals(eventID)) {
+                    if (events[i] instanceof Concert) {
+                       Concert.removeConcert(concerts, eventID);
+                    } else if (events[i] instanceof Workshop) {
+                        Workshop.removeWorkshop(workshops, eventID);
+                    } else if (events[i] instanceof Conference) {
+                        Conference.removeConference(conferences, eventID);
+                    
                 // remove from flat events array
-                for (int j = i; j < eventCount - 1; j++) {
-                    events[j] = events[j + 1];
-                }
-                events[eventCount - 1] = null;
-                eventCount--;
-                found = true;
-                break;
+                    for (int z = i; z < eventCount - 1; z++) {
+                        events[z] = events[z + 1];
+                        }
+                    events[eventCount - 1] = null;
+                    eventCount--;
+                    found = true;
+                    break;
             }
+        }
+        
         }
         if (!found) {
             System.out.println("Error: Event [" + eventID + "] not found !");
@@ -1772,7 +1815,11 @@ public class TestUser {
             return;
         }
 
-        Event e = events[idx];
+        Event e=null;
+        
+        e = events[idx];
+                
+        
         System.out.println("What to update?");
         System.out.println("1: Title");
         System.out.println("2: Date");
@@ -1828,7 +1875,8 @@ public class TestUser {
             default:
                 System.out.println("Invalid option.");
         }
-    }
+    
+}
 
     // ─────────────────────────────────────────────────────────────────────────
     // MANAGE SESSIONS MENU
@@ -2090,22 +2138,27 @@ public class TestUser {
             return;
         }
         System.out.println("\n--- All Events ---");
-        for (int i = 0; i < eventCount; i++) {
-            events[i].displayInfo();
-            System.out.println();
+        
+            for (int i = 0; i < eventCount; i++) {
+                events[i].displayInfo();
+                System.out.println();
         }
+        
+
     }
 
     // helper: print numbered event list (used by other methods)
     static void listEvents() {
-        for (int i = 0; i < eventCount; i++) {
+                for (int i = 0; i < eventCount; i++) {
             System.out.println("  " + (i + 1) + ": [" + events[i].getEventID() + "] "
                     + events[i].getTitle()
                     + " (" + events[i].getClass().getSimpleName() + ")"
                     + " | Date: " + events[i].getDate()
                     + " | MaxTix: " + events[i].getMaxTickets());
+            }
         }
-    }
+
+    
 
     // ─────────────────────────────────────────────────────────────────────────
     // SAVE / LOAD ALL EVENTS
@@ -2205,14 +2258,15 @@ public class TestUser {
             listEvents();
             System.out.print("Enter Event ID: ");
             eventId = scan.nextLine();
-            if (ems.validationInputEventId(events, eventId)) {
+            
+            if (ems.validationInputEventId( eventId)) {
                 break;
             } else {
                 System.out.println("Invalid Event ID. Try again.");
             }
         }
 
-        Event event = ems.findEventById(events, eventId);
+        Event event = ems.findEventById(eventId);
         
         TicketType tt = TicketType.findTicketTypeById(ticketTypes, eventId);
 
@@ -2268,7 +2322,7 @@ public class TestUser {
         System.out.println("Processing payment...");
         System.out.println("Payment Success!");
 
-        String bookingId = ems.generateBookingId(ticketCount);
+        String bookingId = ems.generateBookingId(eventId);
 
         Payment p = new Payment(a, eventId, bookingId, tt.getPrice(ticketType));
         System.out.print(p.toString());
@@ -2312,7 +2366,7 @@ static void viewTicketHistory(Attendee attendee) {
 }
 
     // speaker part
-    static void speakerMenu(Speaker loggedInSpeaker, Event[] events) {
+    static void speakerMenu(Speaker loggedInSpeaker) {
         boolean inMenu = true;
 
         while (inMenu) {
@@ -2335,17 +2389,17 @@ static void viewTicketHistory(Attendee attendee) {
             switch (choice) {
                 case 1:
                     // View assigned sessions and choose to accept/reject
-                    manageAssignedSessions(loggedInSpeaker, events);
+                    manageAssignedSessions(loggedInSpeaker);
                     break;
 
                 case 2:
                     // View all my sessions (with status only)
-                    viewMyAssignedSessions(loggedInSpeaker, events);
+                    viewMyAssignedSessions(loggedInSpeaker);
                     break;
 
                 case 3:
                     // Update session topic
-                    updateSessionTopic(loggedInSpeaker, events);
+                    updateSessionTopic(loggedInSpeaker);
                     break;
 
                 case 4:
@@ -2369,11 +2423,11 @@ static void viewTicketHistory(Attendee attendee) {
     }
 
     // Manage assigned sessions (accept/reject)
-    static void manageAssignedSessions(Speaker speaker, Event[] events) {
+    static void manageAssignedSessions(Speaker speaker) {
         List<Session> assignedSessions = new java.util.ArrayList<>();
 
         // Collect all sessions this speaker is assigned to
-        for (Event e : events) {
+            for (Event e : events) {
             if (e != null && e instanceof Conference) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
@@ -2383,7 +2437,9 @@ static void viewTicketHistory(Attendee attendee) {
                     }
                 }
             }
+        
         }
+
 
         if (assignedSessions.isEmpty()) {
             System.out.println("\nYou are not assigned to any sessions.");
@@ -2425,7 +2481,7 @@ static void viewTicketHistory(Attendee attendee) {
 
                 // Show session details and ask for response
                 System.out.println("\n=== Session Details ===");
-                System.out.println("Conference: " + getConferenceName(events, selectedSession));
+                System.out.println("Conference: " + getConferenceName( selectedSession));
                 System.out.println("Session ID: " + selectedSession.getSessionID());
                 System.out.println("Topic: " + selectedSession.getTopic());
                 System.out.println("Time: " + selectedSession.getTime());
@@ -2457,16 +2513,15 @@ static void viewTicketHistory(Attendee attendee) {
     }
 
     // View my assigned sessions (view only)
-    static void viewMyAssignedSessions(Speaker speaker, Event[] events) {
+    static void viewMyAssignedSessions(Speaker speaker) {
         System.out.println("\n=== My Assigned Sessions ===");
         boolean hasSessions = false;
-
-        for (Event e : events) {
-            if (e != null && e instanceof Conference) {
-                Conference conf = (Conference) e;
-                for (int i = 0; i < conf.getSessionCount(); i++) {
-                    Session session = conf.getSessions()[i];
-                    if (session.hasSpeaker(speaker.getAccessUsername())) {
+            for (Event e : events) {
+                if (e != null && e instanceof Conference) {
+                    Conference conf = (Conference) e;
+                    for (int i = 0; i < conf.getSessionCount(); i++) {
+                     Session session = conf.getSessions()[i];
+                      if (session.hasSpeaker(speaker.getAccessUsername())) {
                         hasSessions = true;
                         String status = session.getSpeakerStatus(speaker.getAccessUsername());
                         System.out.println("\nConference: " + conf.getTitle());
@@ -2480,9 +2535,11 @@ static void viewTicketHistory(Attendee attendee) {
                                 System.out.println("  Rejection Reason: " + reason);
                             }
                         }
-                    }
                 }
+                
             }
+        }
+
         }
 
         if (!hasSessions) {
@@ -2491,12 +2548,11 @@ static void viewTicketHistory(Attendee attendee) {
     }
 
     // View editable sessions (accepted sessions only)
-    static void viewEditableSessions(Speaker speaker, Event[] events) {
+    static void viewEditableSessions(Speaker speaker) {
         System.out.println("\n=== Sessions You Can Edit (Accepted) ===");
         boolean hasEditable = false;
         int count = 0;
-
-        for (Event e : events) {
+            for (Event e : events) {
             if (e != null && e instanceof Conference) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
@@ -2515,6 +2571,8 @@ static void viewTicketHistory(Attendee attendee) {
                 }
             }
         }
+        
+
 
         if (!hasEditable) {
             System.out.println("You have no accepted sessions to edit.");
@@ -2523,29 +2581,31 @@ static void viewTicketHistory(Attendee attendee) {
     }
 
     // Update session topic
-    static void updateSessionTopic(Speaker speaker, Event[] events) {
-        viewEditableSessions(speaker, events);
+    static void updateSessionTopic(Speaker speaker) {
+        viewEditableSessions(speaker);
 
         System.out.print("\nEnter Session ID to update topic: ");
         String sessionId = scan.nextLine();
 
         // Find the session
         Session targetSession = null;
-        for (Event e : events) {
-            if (e != null && e instanceof Conference) {
-                Conference conf = (Conference) e;
-                for (int i = 0; i < conf.getSessionCount(); i++) {
-                    Session s = conf.getSessions()[i];
-                    if (s.getSessionID().equals(sessionId)) {
-                        targetSession = s;
-                        break;
+            for (Event e : events) {
+                if (e != null && e instanceof Conference) {
+                    Conference conf = (Conference) e;
+                    for (int i = 0; i < conf.getSessionCount(); i++) {
+                        Session s = conf.getSessions()[i];
+                        if (s.getSessionID().equals(sessionId)) {
+                            targetSession = s;
+                            break;
+                        }
                     }
                 }
-            }
-            if (targetSession != null)
+                if (targetSession != null)
                 break;
         }
 
+        
+        
         if (targetSession == null) {
             System.out.println("Session not found!");
             return;
@@ -2577,8 +2637,8 @@ static void viewTicketHistory(Attendee attendee) {
     }
 
     // Helper method to get conference name
-    static String getConferenceName(Event[] events, Session session) {
-        for (Event e : events) {
+    static String getConferenceName( Session session) {
+            for (Event e : events) {
             if (e != null && e instanceof Conference) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
@@ -2588,6 +2648,8 @@ static void viewTicketHistory(Attendee attendee) {
                 }
             }
         }
+        
+        
         return "Unknown Conference";
     }
 
