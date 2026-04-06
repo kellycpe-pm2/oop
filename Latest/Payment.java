@@ -23,6 +23,6 @@ public class Payment{
     }
 
     public String toString(){
-        return "\nName: "+name+"\nBooking Id: "+bookingId+"\nEvent Id: "+eventId+"\nPayment Amount: RM"+paymentAmount+"\nPayment Date:"+paymentDate;
+        return "Payment Details\n-------------------------\nName: "+name+"\nBooking Id: "+bookingId+"\nEvent Id: "+eventId+"\nPayment Amount: RM"+paymentAmount+"\nPayment Date:"+paymentDate;
     }
 }
