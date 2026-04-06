@@ -1,18 +1,18 @@
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Payment{
     String name;
     String bookingId;
     String eventId;
     double paymentAmount;
-    LocalDateTime paymentDate;
+    LocalDate paymentDate;
 
     public Payment(Attendee a, String eventId, String bookingId, double paymentAmount){
         name=a.getAccessUsername();
         this.bookingId=bookingId;
         this.eventId=eventId;
         this.paymentAmount=paymentAmount;
-        paymentDate=LocalDateTime.now();
+        paymentDate=LocalDate.now();
     }
 
     public boolean validationPaymentMethod(int method){
