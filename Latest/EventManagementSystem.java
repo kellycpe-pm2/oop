@@ -107,7 +107,7 @@ public class EventManagementSystem {
                 user_no++;
             }
         }
-        return user_no++;
+        return user_no--;
     }
 
     // Get only Concert events
@@ -171,7 +171,7 @@ public class EventManagementSystem {
     //==================================User part==============================
     public void addNewUser(User user){
         int user_idx=user_no-1;
-        this.user[user_idx] =user;
+        this.user[user_no] =user;
         user_no++;
     
     }
@@ -404,21 +404,12 @@ public class EventManagementSystem {
         }
     }
 
-    // validate date set
-    public boolean validationDate(LocalDate salesStart, LocalDate salesEnd, LocalDate earlyBirdEnd) {
-        if (salesStart.isAfter(salesEnd)) {
-            System.out.println("Sales start date must be before sales end date.");
-            return false;
-        }
-        if (earlyBirdEnd.isBefore(salesStart) || earlyBirdEnd.isAfter(salesEnd)) {
-            System.out.println("Early bird end date must be between sales start and sales end dates.");
-            return false;
-        }
-        return true;
-    }
-
     // validate price
     public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
+        if (priceEarlyBird == 0 || priceStandard == 0 || priceVip == 0){
+            System.out.println("Ticket prices cannot be zero.");
+            return false;
+        }
         if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
             System.out.println("Ticket prices cannot be negative.");
             return false;
@@ -454,6 +445,10 @@ public class EventManagementSystem {
                 System.out.println("Error: Sales Start Date must before event date !");
                 return null;
             }
+            else if (parsedDate.isBefore(LocalDate.now())){
+                System.out.println("Error: Sales Start Date must in the future !");
+                return null;
+            }
             return parsedDate;
         } catch (DateTimeParseException e) {
             System.out.println("Error: Date format must be YYYY-MM-DD !");
@@ -472,9 +467,13 @@ public class EventManagementSystem {
                 System.out.println("Error: Sales End Date must before event date !");
                 return null;
             }
-            if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)){
+            else if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)){
                 System.out.println("Error: Sales End Date must after sales start date !");
                 return null; 
+            }
+            else if(parsedDate.isBefore(LocalDate.now())){
+                System.out.println("Error: Sales End Date must in the future !");
+                return null;
             }
             return parsedDate;
         } catch (DateTimeParseException e) {
@@ -495,12 +494,28 @@ public class EventManagementSystem {
     }
 
 // In EventManagementSystem.java
-    public Ticket purchaseTicket(Attendee a, Event event, TicketType tt, String ticketTypeName, String bookingId, int ticketCount) {    
-    if (tt == null) {
-        System.out.println("Error: TicketType cannot be null!");
-        return null;
+    public Ticket purchaseTicket(TicketType tt,String eventId, String ticketTypeName, String bookingId, int ticketCount) {    
+        if (tt == null) {
+            System.out.println("Error: TicketType cannot be null!");
+            return null;
+        }
+        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(),ticketTypeName, bookingId, true, eventId, ticketCount);
+        return ticket;
     }
-    Ticket ticket = new Ticket(tt, a.getAccessUsername(),ticketTypeName, bookingId, true, event.getEventID(), ticketCount);
-    return ticket;
-}
+    public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName){
+        if (LocalDate.now().isAfter(tt.getSalesEnd()) || LocalDate.now().isBefore(tt.getSalesStart())){
+            System.out.println("Error: Ticket cannot be purchased because the sales period haven't start/already over!");
+            return false;
+        }
+        else if (ticketTypeName.toLowerCase().equals("earlybird")){
+            if (LocalDate.now().isAfter(tt.getEarlyBirdEnd())){
+                System.out.println("Error: Early Bird ticket cannot be purchased due to period is over!");
+                return false;
+            }
+            return true;
+        }
+        else{
+            return true;
+        }
+    }
 }
