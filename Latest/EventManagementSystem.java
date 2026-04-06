@@ -93,12 +93,8 @@ public class EventManagementSystem {
     
     
     //generate Booking No
-    public String generateBookingId(String eventId){
-        // get eventID and then Remove the first character, then convert to int
-        int eventNo = Integer.parseInt(eventId.substring(1));
-        // to increase the booking no  
-        bookingno++;
-        return "B" + String.format("%03d", bookingno);
+    public String generateBookingId(int count){
+        return "B" + String.format("%03d", count);
     }
 
     //----------------------------------------------------------------------------------------
@@ -305,7 +301,7 @@ public class EventManagementSystem {
     }
 
 //ticket type part
-        // validate the quantity set
+    // validate the quantity set
     public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
         if (totalQuantity == quantityEarlyBird + quantityStandard + quantityVip) {
             return true;
@@ -405,12 +401,12 @@ public class EventManagementSystem {
     }
 
 // In EventManagementSystem.java
-    public Ticket purchaseTicket(Attendee a, Event event, TicketType tt, String ticketTypeName, String bookingId) {    
+    public Ticket purchaseTicket(Attendee a, Event event, TicketType tt, String ticketTypeName, String bookingId, int ticketCount) {    
     if (tt == null) {
         System.out.println("Error: TicketType cannot be null!");
         return null;
     }
-    Ticket ticket = new Ticket(tt, a.getAccessUsername(),ticketTypeName, bookingId, event.getEventID());
+    Ticket ticket = new Ticket(tt, a.getAccessUsername(),ticketTypeName, bookingId, true, event.getEventID(), ticketCount);
     return ticket;
 }
 }
