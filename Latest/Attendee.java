@@ -13,7 +13,6 @@ public class Attendee extends User{
 
         if (this == user){
             return true;
-
         }
             return false;
     }
