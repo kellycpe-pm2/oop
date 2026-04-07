@@ -48,6 +48,7 @@ public class TestUser {
         // load data
 
         readUserData(no, alluser);
+        loadSpeakersFromUsers(alluser, no[0]); // populate speakerPool from Speaker accounts in user.json
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
         tickets = Ticket.readTicketFile();
@@ -80,7 +81,6 @@ public class TestUser {
                     createAccount(no, user, alluser);
                     storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
                             user.getSignUpContactNo());
-                    ems.addNewUser(user);
 
                     accessmenu(user, alluser, no);
                     break;
@@ -196,38 +196,39 @@ public class TestUser {
     }
 
     public static void accessmenu(User user, User[] alluser, int[] no) {
-        // Check if user is organizer (password "12345")
+        // Find the actual stored user object by username
+        User storedUser = null;
+        for (int i = 0; i < no[0]; i++) {
+            if (alluser[i] != null && alluser[i].getAccessUsername().equals(user.getAccessUsername())) {
+                storedUser = alluser[i];
+                break;
+            }
+        }
+        if (storedUser == null)
+            storedUser = alluser[user.getno()]; // fallback
+
         if (user.getAccessPassword().equals("12345")) {
-
-            Organizer organizer = (Organizer) alluser[user.getno()];
+            Organizer organizer = (Organizer) storedUser;
             ems.setCuurent_User(organizer, 1);
-
             System.out.println(organizer.toString());
             waitForEnter();
             organizerMenu();
-        }
-
-        // Check if user is a speaker (exists in speakerPool)
-        else if (user.getAccessPassword().equals("54321")) {
-            Speaker speaker = (Speaker) alluser[user.getno()];
+        } else if (user.getAccessPassword().equals("54321")) {
+            Speaker speaker = (Speaker) storedUser;
             ems.setCuurent_User(speaker, 2);
             System.out.println(speaker.toString());
             waitForEnter();
             speakerMenu(speaker);
-
-        }
-        // Otherwise, user is an attendee
-        else if (user.getAccessPassword().equals("13148")) {
-            Staff staff = (Staff) alluser[user.getno()];
+        } else if (user.getAccessPassword().equals("13148")) {
+            Staff staff = (Staff) storedUser;
             System.out.println(staff.toString());
             ems.setCuurent_User(staff, 3);
             waitForEnter();
             staffMenu(staff, alluser, no);
         } else {
-            Attendee attendee = (Attendee) alluser[user.getno()];
+            Attendee attendee = (Attendee) storedUser;
             System.out.println(attendee.toString());
             ems.setCuurent_User(attendee, 4);
-
             waitForEnter();
             attendeeMenu(attendee);
         }
@@ -353,7 +354,7 @@ public class TestUser {
         } else if (password.equals("54321")) {
 
             alluser[no[0]] = new Speaker(username, password, email, contactNo);
-            user.setNo(no[1]);
+            user.setNo(no[0]);
             no[0]++;
         } else if (password.equals("13148")) {
 
@@ -1736,7 +1737,7 @@ public class TestUser {
         int qvip = 0;
         int maxTix = 0;
         do {
-            try{
+            try {
                 System.out.print("\nCreating ticket type......");
                 scan.nextLine();
                 System.out.print("\nMax Ticket (Recommend 150):");
@@ -1751,7 +1752,7 @@ public class TestUser {
                 System.out.print("Quantity Vip (Recommend 20% of total ticket):");
                 qvip = scan.nextInt();
                 scan.nextLine();
-            }catch(Exception e){
+            } catch (Exception e) {
                 System.out.println("Invalid input. Please retry.");
             }
         } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
@@ -1759,7 +1760,7 @@ public class TestUser {
         double peb = 0.0;
         double psd = 0.0;
         double pvip = 0.0;
-        do{    
+        do {
             System.out.print("\nPrice Early Bird (RM):");
             peb = scan.nextDouble();
             scan.nextLine();
@@ -2122,16 +2123,15 @@ public class TestUser {
             System.out.println("\n╔══════════════════════════════════╗");
             System.out.println("║        MANAGE SPEAKERS           ║");
             System.out.println("╠══════════════════════════════════╣");
-            System.out.println("║  1: Register Speaker             ║");
-            System.out.println("║  2: Assign Speaker to Conference ║");
+            System.out.println("║  1: Assign Speaker to Conference ║");
             System.out.println("║     Session                      ║");
-            System.out.println("║  3: Remove Speaker from          ║");
+            System.out.println("║  2: Remove Speaker from          ║");
             System.out.println("║     Conference Session           ║");
-            System.out.println("║  4: Update/Remove Speaker in     ║");
+            System.out.println("║  3: Update/Remove Speaker in     ║");
             System.out.println("║     Concert                      ║");
-            System.out.println("║  5: Update/Remove Speaker in     ║");
+            System.out.println("║  4: Update/Remove Speaker in     ║");
             System.out.println("║     Workshop                     ║");
-            System.out.println("║  6: View Speakers                ║");
+            System.out.println("║  5: View Speakers                ║");
             System.out.println("║  0: Back                         ║");
             System.out.println("╚══════════════════════════════════╝");
             System.out.print("Enter option: ");
@@ -2140,21 +2140,18 @@ public class TestUser {
 
             switch (choice) {
                 case 1:
-                    registerSpeaker();
-                    break;
-                case 2:
                     assignSpeakerToConferenceSession();
                     break;
-                case 3:
+                case 2:
                     removeSpeakerFromConferenceSession();
                     break;
-                case 4:
+                case 3:
                     manageConcertSpeakers();
                     break;
-                case 5:
+                case 4:
                     manageWorkshopSpeakers();
                     break;
-                case 6:
+                case 5:
                     viewSpeakers();
                     break;
                 case 0:
@@ -2166,21 +2163,17 @@ public class TestUser {
         }
     }
 
-    // register a new speaker into the pool
-    static void registerSpeaker() {
-        System.out.println("\n--- Register Speaker ---");
-        System.out.print("Username : ");
-        String username = scan.nextLine();
-        System.out.print("Password : ");
-        String password = scan.nextLine();
-        System.out.print("Email    : ");
-        String email = scan.nextLine();
-        System.out.print("Bio      : ");
-        String bio = scan.nextLine();
-
-        Speaker sp = new Speaker(username, password, email, bio);
-        speakerPool[speakerCount++] = sp;
-        System.out.println("Speaker [" + username + "] registered successfully.");
+    // load all Speaker accounts from alluser into speakerPool
+    static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
+        speakerCount = 0;
+        for (int i = 0; i < totalUsers; i++) {
+            if (alluser[i] instanceof Speaker) {
+                speakerPool[speakerCount++] = (Speaker) alluser[i];
+            }
+        }
+        if (speakerCount > 0) {
+            System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
+        }
     }
 
     // ── Conference session speaker management (original, renamed) ─────────────
@@ -2188,7 +2181,7 @@ public class TestUser {
     // assign a speaker from the pool to a conference session
     static void assignSpeakerToConferenceSession() {
         if (speakerCount == 0) {
-            System.out.println("No speakers registered yet. Register a speaker first.");
+            System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
             return;
         }
         Conference conf = selectConference();
@@ -2385,7 +2378,7 @@ public class TestUser {
      */
     static void assignSpeakerToConcertOrWorkshop(Concert concert, Workshop workshop) {
         if (speakerCount == 0) {
-            System.out.println("No speakers registered yet. Register a speaker first.");
+            System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
             return;
         }
         String eventLabel = (concert != null) ? "concert" : "workshop";
@@ -2476,14 +2469,16 @@ public class TestUser {
     // view all registered speakers
     static void viewSpeakers() {
         if (speakerCount == 0) {
-            System.out.println("No speakers registered.");
+            System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
             return;
         }
-        System.out.println("\n--- Registered Speakers ---");
-        System.out.printf("%-5s %-15s%n", "No.", "Username");
-        System.out.println("--------------------");
+        System.out.println("\n--- Available Speakers ---");
+        System.out.printf("%-5s %-15s %-25s%n", "No.", "Username", "Email");
+        System.out.println("--------------------------------------------");
         for (int i = 0; i < speakerCount; i++) {
-            System.out.printf("%-5d %-15s%n", (i + 1), speakerPool[i].getAccessUsername());
+            System.out.printf("%-5d %-15s %-25s%n", (i + 1),
+                    speakerPool[i].getAccessUsername(),
+                    speakerPool[i].getAccessEmail());
         }
     }
 
@@ -2496,20 +2491,22 @@ public class TestUser {
             return;
         }
 
-        String divider = "  ╠════╪══════╪══════════════╪══════════════════════╪════════════╪══════════════════════╪════════╣";
-        String top = "  ╔════╦══════╦══════════════╦══════════════════════╦════════════╦══════════════════════╦════════╗";
-        String mid = "  ╟────┼──────┼──────────────┼──────────────────────┼────────────┼──────────────────────┼────────╢";
-        String bot = "  ╚════╧══════╧══════════════╧══════════════════════╧════════════╧══════════════════════╧════════╝";
+        // Speaker column width = 12; total table width = 101 chars (fits ~102-col
+        // terminal)
+        String divider = "  ╠════╪══════╪════════════╪═════════════════╪════════════╪═════════════════╪══════════════╪════════╣";
+        String top = "  ╔════╦══════╦════════════╦═════════════════╦════════════╦═════════════════╦══════════════╦════════╗";
+        String mid = "  ╟────┼──────┼────────────┼─────────────────┼────────────┼─────────────────┼──────────────┼────────╢";
+        String bot = "  ╚════╧══════╧════════════╧═════════════════╧════════════╧═════════════════╧══════════════╧════════╝";
 
         System.out.println(
-                "\n  ╔══════════════════════════════════════════════════════════════════════════════════════╗");
+                "\n  ╔═════════════════════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println(
-                "  ║                                    ALL EVENTS                                        ║");
+                "  ║                                           ALL EVENTS                                            ║");
         System.out.println(
-                "  ╚══════════════════════════════════════════════════════════════════════════════════════╝");
+                "  ╚═════════════════════════════════════════════════════════════════════════════════════════════════╝");
         System.out.println(top);
-        System.out.printf("  ║ %-2s │ %-4s │ %-12s │ %-20s │ %-10s │ %-20s │ %-6s ║%n",
-                "No", "ID", "Type", "Title", "Date", "Venue", "MaxTix");
+        System.out.printf("  ║ %-2s │ %-4s │ %-10s │ %-15s │ %-10s │ %-15s │ %-12s │ %-6s ║%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "Speaker", "MaxTix");
         System.out.println(divider);
 
         for (int i = 0; i < eventCount; i++) {
@@ -2517,54 +2514,48 @@ public class TestUser {
             String type = e.getClass().getSimpleName();
 
             // truncate long fields so columns stay fixed-width
-            String title = e.getTitle().length() > 20 ? e.getTitle().substring(0, 17) + "..." : e.getTitle();
-            String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
+            String title = e.getTitle().length() > 15 ? e.getTitle().substring(0, 12) + "..." : e.getTitle();
+            String venue = e.getVenue().length() > 15 ? e.getVenue().substring(0, 12) + "..." : e.getVenue();
 
-            System.out.printf("  ║ %-2d │ %-4s │ %-12s │ %-20s │ %-10s │ %-20s │ %6d ║%n",
-                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, e.getMaxTickets());
-
-            // show sub-details (sessions / speakers) inline beneath the event row
-            if (e instanceof Conference) {
-                Conference conf = (Conference) e;
-                if (conf.getSessionCount() == 0) {
-                    System.out.printf("  ║    │      │              │  %-52s │        ║%n", "(no sessions)");
-                } else {
-                    for (int s = 0; s < conf.getSessionCount(); s++) {
-                        Session sess = conf.getSessions()[s];
-                        String detail = String.format("  [%s] %s @ %s", sess.getSessionID(), sess.getTopic(),
-                                sess.getTime());
-                        if (detail.length() > 54)
-                            detail = detail.substring(0, 51) + "...";
-                        System.out.printf("  ║    │      │              │  %-52s │        ║%n", detail);
-                    }
-                }
-            } else if (e instanceof Concert) {
+            // build speaker string for the dedicated column
+            String speakerCol = "";
+            if (e instanceof Concert) {
                 Concert c = (Concert) e;
-                if (c.getSpeakerCount() == 0) {
-                    System.out.printf("  ║    │      │              │  %-52s │        ║%n", "(no performer assigned)");
-                } else {
-                    // Get all speaker names
-                    String[] speakerNames = new String[c.getSpeakerCount()];
-                    for (int s = 0; s < c.getSpeakerCount(); s++) {
-                        speakerNames[s] = c.getSpeakers()[s].getAccessUsername();
-                    }
-
-                    // Print speakers with wrapping
-                    printWrappedSpeakers(speakerNames, "Performer");
+                if (c.getSpeakerCount() > 0) {
+                    speakerCol = c.getSpeakers()[0].getAccessUsername();
                 }
             } else if (e instanceof Workshop) {
                 Workshop w = (Workshop) e;
-                if (w.getSpeakerCount() == 0) {
-                    System.out.printf("  ║    │      │              │  %-52s │        ║%n", "(no speaker assigned)");
-                } else {
-                    // Get all speaker names
-                    String[] speakerNames = new String[w.getSpeakerCount()];
-                    for (int s = 0; s < w.getSpeakerCount(); s++) {
-                        speakerNames[s] = w.getSpeakers()[s].getAccessUsername();
-                    }
+                if (w.getSpeakerCount() > 0) {
+                    speakerCol = w.getSpeakers()[0].getAccessUsername();
+                }
+            }
+            // Conference: speakers belong to individual sessions — leave column empty
+            // Truncate name if too long to avoid breaking column alignment
+            if (speakerCol.length() > 12) {
+                speakerCol = speakerCol.substring(0, 9) + "...";
+            }
 
-                    // Print speakers with wrapping
-                    printWrappedSpeakers(speakerNames, "Speaker");
+            System.out.printf("  ║ %-2d │ %-4s │ %-10s │ %-15s │ %-10s │ %-15s │ %-12s │ %6d ║%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, speakerCol, e.getMaxTickets());
+
+            // Conference: show sessions as sub-rows below the event row
+            // Sub-row spans Title+Date+Venue (45 chars) then leaves Speaker column blank
+            if (e instanceof Conference) {
+                Conference conf = (Conference) e;
+                if (conf.getSessionCount() == 0) {
+                    System.out.printf("  ║    │      │            │  %-45s │              │        ║%n",
+                            "(no sessions)");
+                } else {
+                    for (int s = 0; s < conf.getSessionCount(); s++) {
+                        Session sess = conf.getSessions()[s];
+                        String detail = String.format("  [%s] %s @ %s",
+                                sess.getSessionID(), sess.getTopic(), sess.getTime());
+                        if (detail.length() > 45)
+                            detail = detail.substring(0, 42) + "...";
+                        System.out.printf("  ║    │      │            │  %-45s │              │        ║%n",
+                                detail);
+                    }
                 }
             }
 
@@ -2572,82 +2563,6 @@ public class TestUser {
                 System.out.println(mid);
         }
         System.out.println(bot);
-    }
-
-    // Helper method to print wrapped speaker/performer names within the table
-
-    private static void printWrappedSpeakers(String[] speakerNames, String label) {
-        int maxLineLength = 50; // Maximum characters per line inside the bracket
-        String prefix = "  " + label + ": ";
-        int prefixLength = prefix.length();
-
-        // First, combine all speaker names with separator
-        StringBuilder allSpeakers = new StringBuilder();
-        for (int i = 0; i < speakerNames.length; i++) {
-            if (i > 0) {
-                allSpeakers.append(", ");
-            }
-            allSpeakers.append(speakerNames[i]);
-        }
-
-        String speakersText = allSpeakers.toString();
-
-        // If text fits in one line, print it directly
-        if (speakersText.length() + prefixLength <= maxLineLength) {
-            System.out.printf("  ║    │      │              │  %-52s │        ║%n", prefix + speakersText);
-            return;
-        }
-
-        // Print first line with label
-        int firstLineMax = maxLineLength - prefixLength;
-        String firstPart = speakersText.substring(0, Math.min(firstLineMax, speakersText.length()));
-        // Try to break at a comma if possible
-        int breakPoint = firstPart.lastIndexOf(", ");
-        if (breakPoint > 0 && breakPoint > firstLineMax / 2) {
-            firstPart = speakersText.substring(0, breakPoint);
-        } else {
-            // If no comma found, just cut at max length
-            if (firstPart.length() == firstLineMax && firstPart.lastIndexOf(" ") > 0) {
-                breakPoint = firstPart.lastIndexOf(" ");
-                firstPart = speakersText.substring(0, breakPoint);
-            }
-        }
-
-        System.out.printf("  ║    │      │              │  %-52s │        ║%n", prefix + firstPart);
-
-        // Print remaining lines with indentation
-        String remaining = speakersText.substring(firstPart.length());
-        if (remaining.startsWith(", ")) {
-            remaining = remaining.substring(2);
-        } else if (remaining.startsWith(" ")) {
-            remaining = remaining.substring(1);
-        }
-
-        String indent = "    ";
-        while (remaining.length() > 0) {
-            int lineMax = maxLineLength - indent.length();
-            String linePart = remaining.substring(0, Math.min(lineMax, remaining.length()));
-
-            // Try to break at a comma for better readability
-            if (linePart.length() == lineMax && linePart.lastIndexOf(", ") > lineMax / 2) {
-                int breakPos = linePart.lastIndexOf(", ");
-                linePart = remaining.substring(0, breakPos);
-                remaining = remaining.substring(breakPos + 2);
-            } else if (linePart.length() == lineMax && linePart.lastIndexOf(" ") > 0) {
-                int breakPos = linePart.lastIndexOf(" ");
-                linePart = remaining.substring(0, breakPos);
-                remaining = remaining.substring(breakPos + 1);
-            } else {
-                remaining = remaining.substring(linePart.length());
-                if (remaining.startsWith(", ")) {
-                    remaining = remaining.substring(2);
-                } else if (remaining.startsWith(" ")) {
-                    remaining = remaining.substring(1);
-                }
-            }
-
-            System.out.printf("  ║    │      │              │  %-52s │        ║%n", indent + linePart);
-        }
     }
 
     // helper: print numbered event list (used by other methods)
@@ -2810,8 +2725,8 @@ public class TestUser {
             }
             break;
         }
-        
-        if (!ems.validationPurchaseTicket(tt, ticketType)){
+
+        if (!ems.validationPurchaseTicket(tt, ticketType)) {
             System.out.println("Sorry, the ticket type is not available for this period.");
             return;
         }
@@ -2838,7 +2753,7 @@ public class TestUser {
         String bookingId = ems.generateBookingId(eventId);
 
         Payment p = new Payment(a, eventId, bookingId, tt.getPrice(ticketType));
-        payments[ticketCount]=p;
+        payments[ticketCount] = p;
         System.out.print(p.toString());
 
         Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, bookingId, ticketCount);
@@ -2882,29 +2797,28 @@ public class TestUser {
         }
     }
 
-    static void viewAllTicketType(){
-        if (ticketTypes.isEmpty()){
+    static void viewAllTicketType() {
+        if (ticketTypes.isEmpty()) {
             System.out.println("No ticket type created.");
         }
         System.out.println("\nAll Ticket Type\n-----------------------------");
         TicketType.displayAllTicketType(ticketTypes);
     }
 
-    static void UpdateTicketType(){
-        if (ticketTypes.isEmpty()){
+    static void UpdateTicketType() {
+        if (ticketTypes.isEmpty()) {
             System.out.println("No ticket type created.");
             return;
         }
         viewAllTicketType();
         System.out.println("Enter number of ticket type that you want to update: ");
         int choice = scan.nextInt();
-        if (choice < 0 || choice > ticketTypes.size()){
-            System.out.println("Invalid input. Please retry.");   
+        if (choice < 0 || choice > ticketTypes.size()) {
+            System.out.println("Invalid input. Please retry.");
             return;
-        }
-        else{
-            System.out.println("Ticket Type "+choice+"\n============================");
-            TicketType tt=ticketTypes.get(choice-1);
+        } else {
+            System.out.println("Ticket Type " + choice + "\n============================");
+            TicketType tt = ticketTypes.get(choice - 1);
             System.out.print(tt.toString());
             System.out.println("\n\n1. Quantity of ticket");
             System.out.println("2. Price of ticket");
@@ -2912,41 +2826,41 @@ public class TestUser {
             System.out.println("4. Sales Start Date");
             System.out.println("5. Sales End Date");
             System.out.println("Select which field you want to update: ");
-            int choice1 = scan.nextInt(); 
+            int choice1 = scan.nextInt();
             System.out.print("\nUpdating ticket type......");
-            switch (choice1){
+            switch (choice1) {
                 case 1:
                     int maxTix = 0;
                     int qeb = 0;
                     int qsd = 0;
                     int qvip = 0;
-                        do {
-                            try{
-                                scan.nextLine();
-                                System.out.print("\nMax Ticket (Recommend 150):");
-                                maxTix = scan.nextInt();
-                                scan.nextLine();
-                                System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
-                                qeb = scan.nextInt();
-                                scan.nextLine();
-                                System.out.print("Quantity Standard (Recommend 60% of total ticket):");
-                                qsd = scan.nextInt();
-                                scan.nextLine();
-                                System.out.print("Quantity Vip (Recommend 20% of total ticket):");
-                                qvip = scan.nextInt();
-                                scan.nextLine();
-                            }catch(Exception e){
-                                System.out.println("Invalid input. Please retry.");
-                            }
-                        } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
-                        tt.setTotalQuantity(maxTix, qeb, qsd, qvip);
-                        tt.updateQuantityWithSoldTickets(qeb,qsd,qvip);
+                    do {
+                        try {
+                            scan.nextLine();
+                            System.out.print("\nMax Ticket (Recommend 150):");
+                            maxTix = scan.nextInt();
+                            scan.nextLine();
+                            System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
+                            qeb = scan.nextInt();
+                            scan.nextLine();
+                            System.out.print("Quantity Standard (Recommend 60% of total ticket):");
+                            qsd = scan.nextInt();
+                            scan.nextLine();
+                            System.out.print("Quantity Vip (Recommend 20% of total ticket):");
+                            qvip = scan.nextInt();
+                            scan.nextLine();
+                        } catch (Exception e) {
+                            System.out.println("Invalid input. Please retry.");
+                        }
+                    } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
+                    tt.setTotalQuantity(maxTix, qeb, qsd, qvip);
+                    tt.updateQuantityWithSoldTickets(qeb, qsd, qvip);
                     break;
                 case 2:
                     double peb = 0.0;
                     double psd = 0.0;
                     double pvip = 0.0;
-                    do{    
+                    do {
                         System.out.print("\nPrice Early Bird (RM):");
                         peb = scan.nextDouble();
                         scan.nextLine();
@@ -2957,7 +2871,7 @@ public class TestUser {
                         pvip = scan.nextDouble();
                         scan.nextLine();
                     } while (!ems.validationPrice(peb, psd, pvip));
-                    tt.setPrice(peb,psd,pvip);
+                    tt.setPrice(peb, psd, pvip);
                     break;
                 case 3:
                     String perks;
@@ -2973,7 +2887,8 @@ public class TestUser {
                     do {
                         System.out.print("Sales Start Date (YYYY-MM-DD) : ");
                         ssdate = scan.nextLine();
-                        salesStartDate = ems.validationSalesStartDate(ssdate, ems.findEventById(tt.getEventId()).getDate());
+                        salesStartDate = ems.validationSalesStartDate(ssdate,
+                                ems.findEventById(tt.getEventId()).getDate());
                     } while (salesStartDate == null);
                     tt.setSalesStart(salesStartDate);
                     break;
@@ -2983,8 +2898,9 @@ public class TestUser {
                     do {
                         System.out.print("Sales End Date (YYYY-MM-DD) : ");
                         sedate = scan.nextLine();
-                        salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(), ems.getEventById(tt.getEventId()).getDate());
-                    } while (salesEndDate == null);  
+                        salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(),
+                                ems.getEventById(tt.getEventId()).getDate());
+                    } while (salesEndDate == null);
                     tt.setSalesEnd(salesEndDate);
                     break;
                 default:
