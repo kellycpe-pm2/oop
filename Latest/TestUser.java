@@ -1651,6 +1651,8 @@ public class TestUser {
             System.out.println("║  4: Manage Sessions          ║");
             System.out.println("║  5: Manage Speakers          ║");
             System.out.println("║  6: View All Events          ║");
+            System.out.println("║  7: View All Ticket Type     ║");
+            System.out.println("║  8: Update Ticket Type       ║");
             System.out.println("║  0: Back to Main Menu        ║");
             System.out.println("╚══════════════════════════════╝");
             System.out.print("Enter option: ");
@@ -1675,6 +1677,12 @@ public class TestUser {
                     break;
                 case 6:
                     viewAllEvents();
+                    break;
+                case 7:
+                    viewAllTicketType();
+                    break;
+                case 8:
+                    UpdateTicketType();
                     break;
                 case 0:
                     inMenu = false;
@@ -1765,7 +1773,7 @@ public class TestUser {
 
         String perks;
         do {
-            System.out.print("Perks Provided: (if no just enter -) ");
+            System.out.print("\nPerks Provided: (if no just enter -) ");
             perks = scan.nextLine();
         } while (!ems.validationPerks(perks));
 
@@ -2824,7 +2832,7 @@ public class TestUser {
                 System.out.println("Invalid option. Try again.");
             }
         }
-        System.out.println("Processing payment...");
+        System.out.println("\nProcessing payment...");
         System.out.println("Payment Success!");
 
         String bookingId = ems.generateBookingId(eventId);
@@ -2843,6 +2851,7 @@ public class TestUser {
             tickets.add(ticket);
             Ticket.storeTicketData(tickets);
             TicketType.storeTicketTypeData(ticketTypes); // update available quantity
+            scan.nextLine();
         } else {
             System.out.println("Purchase failed. Please try again.");
         }
@@ -2871,6 +2880,120 @@ public class TestUser {
         } else {
             System.out.println("Found " + count + " ticket(s) for " + attendee.getAccessUsername());
         }
+    }
+
+    static void viewAllTicketType(){
+        if (ticketTypes.isEmpty()){
+            System.out.println("No ticket type created.");
+        }
+        System.out.println("\nAll Ticket Type\n-----------------------------");
+        TicketType.displayAllTicketType(ticketTypes);
+    }
+
+    static void UpdateTicketType(){
+        if (ticketTypes.isEmpty()){
+            System.out.println("No ticket type created.");
+            return;
+        }
+        viewAllTicketType();
+        System.out.println("Enter number of ticket type that you want to update: ");
+        int choice = scan.nextInt();
+        if (choice < 0 || choice > ticketTypes.size()){
+            System.out.println("Invalid input. Please retry.");   
+            return;
+        }
+        else{
+            System.out.println("Ticket Type "+choice+"\n============================");
+            TicketType tt=ticketTypes.get(choice-1);
+            System.out.print(tt.toString());
+            System.out.println("\n\n1. Quantity of ticket");
+            System.out.println("2. Price of ticket");
+            System.out.println("3. Perks");
+            System.out.println("4. Sales Start Date");
+            System.out.println("5. Sales End Date");
+            System.out.println("Select which field you want to update: ");
+            int choice1 = scan.nextInt(); 
+            System.out.print("\nUpdating ticket type......");
+            switch (choice1){
+                case 1:
+                    int maxTix = 0;
+                    int qeb = 0;
+                    int qsd = 0;
+                    int qvip = 0;
+                        do {
+                            try{
+                                scan.nextLine();
+                                System.out.print("\nMax Ticket (Recommend 150):");
+                                maxTix = scan.nextInt();
+                                scan.nextLine();
+                                System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
+                                qeb = scan.nextInt();
+                                scan.nextLine();
+                                System.out.print("Quantity Standard (Recommend 60% of total ticket):");
+                                qsd = scan.nextInt();
+                                scan.nextLine();
+                                System.out.print("Quantity Vip (Recommend 20% of total ticket):");
+                                qvip = scan.nextInt();
+                                scan.nextLine();
+                            }catch(Exception e){
+                                System.out.println("Invalid input. Please retry.");
+                            }
+                        } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
+                        tt.setTotalQuantity(maxTix, qeb, qsd, qvip);
+                        tt.updateQuantityWithSoldTickets(qeb,qsd,qvip);
+                    break;
+                case 2:
+                    double peb = 0.0;
+                    double psd = 0.0;
+                    double pvip = 0.0;
+                    do{    
+                        System.out.print("\nPrice Early Bird (RM):");
+                        peb = scan.nextDouble();
+                        scan.nextLine();
+                        System.out.print("Price Standard (RM):");
+                        psd = scan.nextDouble();
+                        scan.nextLine();
+                        System.out.print("Price Vip (RM):");
+                        pvip = scan.nextDouble();
+                        scan.nextLine();
+                    } while (!ems.validationPrice(peb, psd, pvip));
+                    tt.setPrice(peb,psd,pvip);
+                    break;
+                case 3:
+                    String perks;
+                    do {
+                        System.out.print("\nPerks Provided: (if no just enter -) ");
+                        perks = scan.nextLine();
+                    } while (!ems.validationPerks(perks));
+                    tt.setPerks(perks);
+                    break;
+                case 4:
+                    String ssdate;
+                    LocalDate salesStartDate;
+                    do {
+                        System.out.print("Sales Start Date (YYYY-MM-DD) : ");
+                        ssdate = scan.nextLine();
+                        salesStartDate = ems.validationSalesStartDate(ssdate, ems.findEventById(tt.getEventId()).getDate());
+                    } while (salesStartDate == null);
+                    tt.setSalesStart(salesStartDate);
+                    break;
+                case 5:
+                    String sedate;
+                    LocalDate salesEndDate;
+                    do {
+                        System.out.print("Sales End Date (YYYY-MM-DD) : ");
+                        sedate = scan.nextLine();
+                        salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(), ems.getEventById(tt.getEventId()).getDate());
+                    } while (salesEndDate == null);  
+                    tt.setSalesEnd(salesEndDate);
+                    break;
+                default:
+                    System.out.println("Invalid input. Please retry");
+            }
+            TicketType.storeTicketTypeData(ticketTypes);
+            System.out.println("Update Sucessfully.");
+        }
+
     }
 
     // speaker part
