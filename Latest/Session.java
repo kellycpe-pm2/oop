@@ -188,4 +188,12 @@ public boolean rejectInvitation(String username, String reason) {
         }
         return sb.toString();
     }
+
+        public boolean equals(Object o) {
+        if (o instanceof Session) {
+            Session session = (Session) o;
+            return this.equals(session.getSessionI());
+        }
+        return false; // the object does not belong to Event
+    }
 }

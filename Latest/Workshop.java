@@ -234,11 +234,24 @@ public class Workshop extends Event {
         displaySpeakers();
     }
 
+    public boolean isWorkshop() {
+            return true;
+    }
+
+    public boolean isConcert(){
+        return false;
+    }
+
+    public boolean isConference(){
+        return false;
+    }
+
     @Override
     public String toString() {
         return super.toString();
     }
 
+    
     public boolean equals(Object o) {
         if (o instanceof Workshop) {
             Workshop w = (Workshop) o;

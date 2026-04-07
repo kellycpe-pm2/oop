@@ -59,7 +59,7 @@ public class TestUser {
         while (active) {
             int option = displayAccessInterface();
             User user = new User();
-
+        try{
             switch (option) {
                 case 1:
                     // login
@@ -92,8 +92,11 @@ public class TestUser {
                     System.out.println("Error: Please Select The Correct Number");
 
             }
-
+        }catch ( Exception e){
+            System.out.println("Existing Unknown Character");
+            
         }
+    }
 
     }
 
@@ -1885,11 +1888,11 @@ public class TestUser {
 
         for (int i = 0; i < eventCount; i++) {
             if (events[i].getEventID().equals(eventID)) {
-                if (events[i] instanceof Concert) {
+                if (events[i].isConcert()) {
                     Concert.removeConcert(concerts, eventID);
-                } else if (events[i] instanceof Workshop) {
+                } else if (events[i].isWorkshop()) {
                     Workshop.removeWorkshop(workshops, eventID);
-                } else if (events[i] instanceof Conference) {
+                } else if (events[i].isWorkshop()) {
                     Conference.removeConference(conferences, eventID);
 
                     // remove from flat events array
@@ -2092,7 +2095,7 @@ public class TestUser {
         int count = 0;
         Conference[] confList = new Conference[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Conference) {
+            if (events[i].isConcert()) {
                 confList[count++] = (Conference) events[i];
             }
         }
@@ -2167,7 +2170,7 @@ public class TestUser {
     static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         speakerCount = 0;
         for (int i = 0; i < totalUsers; i++) {
-            if (alluser[i] instanceof Speaker) {
+            if (alluser [i] instanceof Speaker) {
                 speakerPool[speakerCount++] = (Speaker) alluser[i];
             }
         }
@@ -2415,7 +2418,7 @@ public class TestUser {
         int count = 0;
         Concert[] concertList = new Concert[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Concert) {
+            if (events[i].isConcert()) {
                 concertList[count++] = (Concert) events[i];
             }
         }
@@ -2443,7 +2446,7 @@ public class TestUser {
         int count = 0;
         Workshop[] workshopList = new Workshop[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Workshop) {
+            if (events[i].isWorkshop()) {
                 workshopList[count++] = (Workshop) events[i];
             }
         }
@@ -2519,12 +2522,12 @@ public class TestUser {
 
             // build speaker string for the dedicated column
             String speakerCol = "";
-            if (e instanceof Concert) {
+            if (e.isConcert()) {
                 Concert c = (Concert) e;
                 if (c.getSpeakerCount() > 0) {
                     speakerCol = c.getSpeakers()[0].getAccessUsername();
                 }
-            } else if (e instanceof Workshop) {
+            } else if (e.isWorkshop()) {
                 Workshop w = (Workshop) e;
                 if (w.getSpeakerCount() > 0) {
                     speakerCol = w.getSpeakers()[0].getAccessUsername();
@@ -2541,7 +2544,7 @@ public class TestUser {
 
             // Conference: show sessions as sub-rows below the event row
             // Sub-row spans Title+Date+Venue (45 chars) then leaves Speaker column blank
-            if (e instanceof Conference) {
+            if (e.isConference()) {
                 Conference conf = (Conference) e;
                 if (conf.getSessionCount() == 0) {
                     System.out.printf("  ║    │      │            │  %-45s │              │        ║%n",
@@ -2590,11 +2593,11 @@ public class TestUser {
     // ─────────────────────────────────────────────────────────────────────────
     // Auto-save a single event's list to the correct JSON file based on its type
     static void saveEvent(Event e) {
-        if (e instanceof Concert) {
+        if (e.isConcert()){
             Concert.storeConcertData(concerts);
-        } else if (e instanceof Workshop) {
+        } else if (e.isWorkshop()) {
             Workshop.storeWorkshopData(workshops);
-        } else if (e instanceof Conference) {
+        } else if (e.isConference()) {
             Conference.storeConferenceData(conferences);
         }
     }
@@ -2750,13 +2753,11 @@ public class TestUser {
         System.out.println("\nProcessing payment...");
         System.out.println("Payment Success!");
 
-        String bookingId = ems.generateBookingId(eventId);
-
-        Payment p = new Payment(a, eventId, bookingId, tt.getPrice(ticketType));
+        Payment p = new Payment(a, eventId, tt.getPrice(ticketType));
         payments[ticketCount] = p;
         System.out.print(p.toString());
-
-        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, bookingId, ticketCount);
+        String bookingId = p.getBookingId();
+        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType,  bookingId,ticketCount);
 
         if (ticket != null) {
             scan.nextLine();
@@ -2975,7 +2976,7 @@ public class TestUser {
 
         // Collect all sessions this speaker is assigned to
         for (Event e : events) {
-            if (e != null && e instanceof Conference) {
+            if (e != null && e.isConference()) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     Session session = conf.getSessions()[i];
@@ -3063,7 +3064,7 @@ public class TestUser {
         System.out.println("\n=== My Assigned Sessions ===");
         boolean hasSessions = false;
         for (Event e : events) {
-            if (e != null && e instanceof Conference) {
+            if (e != null && e.isConference()) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     Session session = conf.getSessions()[i];
@@ -3099,7 +3100,7 @@ public class TestUser {
         boolean hasEditable = false;
         int count = 0;
         for (Event e : events) {
-            if (e != null && e instanceof Conference) {
+            if (e != null && e.isConference()) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     Session session = conf.getSessions()[i];
@@ -3134,7 +3135,7 @@ public class TestUser {
         // Find the session
         Session targetSession = null;
         for (Event e : events) {
-            if (e != null && e instanceof Conference) {
+            if (e != null && e.isConference()) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     Session s = conf.getSessions()[i];
@@ -3181,7 +3182,7 @@ public class TestUser {
     // Helper method to get conference name
     static String getConferenceName(Session session) {
         for (Event e : events) {
-            if (e != null && e instanceof Conference) {
+            if (e != null && e.isConference()) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     if (conf.getSessions()[i] == session) {

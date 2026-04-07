@@ -5,11 +5,7 @@ import java.util.List;
 public class EventManagementSystem {
     private static List<Ticket> tickets = new java.util.ArrayList<>();
     private static Payment [] payments = new Payment[100];
-    private static int bookingno = 0; 
-        // ── 2D array: events[TYPE][index]
-    // events[CONCERT][...] → Concert objects
-    // events[WORKSHOP][...] → Workshop objects
-    // events[CONFERENCE][...] → Conference objects
+
     private static final int MAX_EVENTS = 300;
 
     private Event[] events = new Event[MAX_EVENTS];
@@ -54,7 +50,7 @@ public class EventManagementSystem {
         return tickets;
     }
     
-    public void setCuurent_User(User current_User, int type){
+    public void setCuurent_User(Object current_User, int type){
         switch(type){
             case 1:
                 this.current_user=(Organizer) current_User;
@@ -106,15 +102,21 @@ public class EventManagementSystem {
             if(current_user!=null){
                 user_no++;
             }
+            
         }
-        return user_no--;
+        if (user_no==0){
+            return 0;
+        }else{
+            return user_no--;
+   
+        }
     }
 
     // Get only Concert events
     public Concert[] getActiveConcerts() {
         Concert[] result = new Concert[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Concert){
+            if (events[i].isConcert()){
                 result[i] = (Concert) events[i];
             }
         }
@@ -125,7 +127,7 @@ public class EventManagementSystem {
     public Workshop[] getActiveWorkshops() {
         Workshop[] result = new Workshop[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Workshop){
+            if (events[i].isWorkshop()){
                 result[i] = (Workshop) events[i];
             }        }
         return result;
@@ -135,7 +137,7 @@ public class EventManagementSystem {
     public Conference[] getActiveConferences() {
         Conference[] result = new Conference[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Conference){
+            if (events[i].isConference()){
                 result[i] = (Conference) events[i];
             }        
         }
@@ -146,7 +148,7 @@ public class EventManagementSystem {
     public Event getEventById(String eventID) {
         for (int type = 0; type < 3; type++) {
             for (int i = 0; i < eventCount; i++) {
-                if (events[i] != null && events[i].getEventID().equals(eventID)) {
+                if (events[i] != null && events[i].equals(eventID)) {
                     return events[i];
                 }
             }
@@ -170,7 +172,6 @@ public class EventManagementSystem {
 
     //==================================User part==============================
     public void addNewUser(User user){
-        int user_idx=user_no-1;
         this.user[user_no] =user;
         user_no++;
     
@@ -182,10 +183,6 @@ public class EventManagementSystem {
 
     
     
-    //generate Booking No
-    public String generateBookingId(String eventId){
-        return "B" + eventId+String.format("%03d", bookingno++);
-    }
 
     //----------------------------------------------------------------------------------------
     
@@ -484,7 +481,7 @@ public class EventManagementSystem {
 
     public Event findEventById(String eventId) {
             for (Event e : this.events) {
-                if (e != null && eventId.equals(e.getEventID())) {
+                if (e != null && e.equals(eventId)) {
                     return e;
                 }
             }
@@ -499,7 +496,7 @@ public class EventManagementSystem {
             System.out.println("Error: TicketType cannot be null!");
             return null;
         }
-        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(),ticketTypeName, bookingId, true, eventId, ticketCount);
+        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(),ticketTypeName, true, eventId, ticketCount,bookingId);
         return ticket;
     }
     public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName){

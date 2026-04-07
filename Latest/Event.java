@@ -80,6 +80,12 @@ public abstract class Event {
 
     // abstract method — subclasses must implement
     public abstract void displayInfo();
+    
+    public abstract boolean isConcert();
+
+    public abstract boolean isConference();
+    
+    public abstract boolean isWorkshop();
 
     @Override
     public String toString() {
@@ -92,5 +98,12 @@ public abstract class Event {
             return this.eventID.equals(e.eventID);
         }
         return false; // the object does not belong to Event
+    }
+
+    public boolean equals(String eventId){
+        if (this.eventID.equals(eventId)){
+            return true;
+        }
+        return false;
     }
 }
