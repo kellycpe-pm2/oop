@@ -9,7 +9,7 @@ public class Speaker extends User {
     // instance variable
     private static String[] bio = new String[100];
     private static int no = 0;
-
+    private final String role="Speaker";
     // ------------------constructor-------------------------------
     // default constructor
     Speaker() {
@@ -17,10 +17,14 @@ public class Speaker extends User {
     }
 
     // parameterized constructor
-    Speaker(String username, String password, String email, String bio) {
-        super(username, password, email, null);
+    Speaker(String username, String password, String email, String contactno,String bio) {
+        super(username, password, email, contactno);
         Speaker.bio[no] = bio;
         no++;
+    }
+    Speaker(String username,String password, String email, String contactno){
+            super(username, password, email, contactno);
+
     }
 
     // ------------------getter-------------------------------
@@ -163,20 +167,36 @@ public boolean uploadSessionTopic(String username, Session session, String newTo
 }
 
 //--------------------------------------------------
-    public boolean equalsClassType(Object o) {
-        if (o instanceof Speaker) {
+
+    public String toString(){
+            int total_bio=no+1;
+            return super.toString()+String.format("║          Position       :  %-31s║\n"+
+                                                  "║          Total Bio      :  %-31d║\n",role,total_bio);
+                                                }
+ 
+    public boolean checkClass(Object o){
+        if(o instanceof Speaker){
             return true;
         }
         return false;
-    }    
+    }
 
 
     public boolean equals(Object o) {
+        if (o==null){
+            return false;
+        }
         if (o instanceof Speaker) {
             Speaker speaker = (Speaker) o;
             return this.getAccessUsername().equals(speaker.getAccessUsername());
         }
         return false; // the object does not belong to Event
     }
-     
+    
+    public boolean equals(String username){
+        if(getAccessUsername().equals(username)){
+            return true;
+        }
+        return false;
+    }
 }

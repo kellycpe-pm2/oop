@@ -272,7 +272,7 @@ public class EventManagementSystem {
     }
         public boolean validationInputEventId(String eventId) {
             for (Event e : this.events) {
-                if (e != null && eventId.equals(e.getEventID())) {
+                if (e != null && e.equals(eventId)) {
                     return true;
                 }
             

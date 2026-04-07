@@ -1,9 +1,8 @@
 public class Organizer extends User {
 
     // instance variable
-    private String contactNo;
     private static int no = 0;
-
+    private final String role="Organizer";
     // ------------------constructor-------------------------------
     // default constructor
     Organizer() {
@@ -17,26 +16,21 @@ public class Organizer extends User {
 
     }
 
-    // ------------------getter-------------------------------
-    public String getContactNo(int no) {
-        return this.contactNo;
-    }
-
     @Override
     public int getno() {
         return Organizer.no;
     }
 
-    // ------------------setter-------------------------------
-    public void setContactNo(String contactNo) {
-        this.contactNo = contactNo;
-    }
 
     // ------------------toString-------------------------------
     public String toString(int no) {
         return String.format("%-15s",
                 getAccessUsername());
     }
+        public String toString(){
+            return super.toString()+String.format("║          Position       :  %-31s║\n",role);
+                                                }
+
 
     // ------------------displayInfo-------------------------------
     public void displayInfo() {
@@ -48,19 +42,28 @@ public class Organizer extends User {
         }
     }
 
-    public boolean equalsClassType(Object o) {
-        if (o instanceof Organizer) {
+    public boolean checkClass(Object o){
+        if(o instanceof User){
             return true;
         }
         return false;
     }
-
     public boolean equals(Object o) {
+       if (o==null){
+            return false;
+        }
         if (o instanceof Organizer) {
             Organizer organizer = (Organizer) o;
             return this.getAccessUsername().equals(organizer.getAccessUsername());
         }
         return false; // the object does not belong to Event
+    }
+
+    public boolean equals(String username){
+        if(getAccessUsername().equals(username)){
+            return true;
+        }
+        return false;
     }
 
 }

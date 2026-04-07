@@ -113,6 +113,7 @@ public class Ticket {
     }
 
     public void setStatus(boolean status){
+        updateTicketStatus(this.ticketId);
         this.status=status;
     }
 
@@ -204,6 +205,30 @@ public class Ticket {
         }
     }
 
+    public static void updateTicketStatus(String ticketId) {
+    try {
+        // Read all lines
+        List<String> lines = Files.readAllLines(Paths.get("Ticket.json"));
+        
+        // Find and update the status line
+        for (int i = 0; i < lines.size(); i++) {
+            // Ticket ID is on lines 0, 10, 20, 30...
+            if (i % 10 == 0 && lines.get(i).equals(ticketId)) {
+                // Status is on the next line (i + 1)
+                lines.set(i + 1, String.valueOf(false));
+                break;
+            }
+        }
+        
+        // Write all lines back
+        Files.write(Paths.get("Ticket.json"), lines);
+        
+    } catch (IOException e) {
+        System.out.println("Error: " + e.getMessage());
+    }
+}
+
+
     public TicketType findTicketTypeById(TicketType[] ticketTypes, String eventId) {
         for (TicketType tt : ticketTypes) {
             if (tt != null && eventId.equals(eventId)) {
@@ -215,25 +240,32 @@ public class Ticket {
 
     public String toString(){
                 return String.format(
-                             "║═══════════════════════════════════════════════════════════║\n"+
-                             "║                                                           ║\n"+
-                             "║                                                           ║\n"+
-                             "║          Name           :  %-31s║\n"+
                              "║          Booking ID     :  %-31s║\n"+
                              "║          Event ID       :  %-31s║\n"+
                              "║          Ticket ID      :  %-31s║\n"+
                              "║          Ticket Type    :  %-31s║\n"+
                              "║          Seat No        :  %-31s║\n"
-                             + this.buyerName,this.bookingId, this.eventId, this.ticketId,this.ticketType,this.seatNo);
+                             ,this.bookingId, this.eventId, this.ticketId,this.ticketType,this.seatNo,this.purchaseDate);
     
     } 
 
 
    public boolean equals(Object o) {
+        if (o==null){
+            return false;
+        }
         if (o instanceof Ticket) {
             Ticket ticket = (Ticket) o;
             return this.ticketId.equals(ticket.getTicketId());
         }
         return false; // the object does not belong to Event
     }
+
+    public boolean equals(String ticketId){
+        if (ticketId.equals(ticketId)){
+            return true;
+        }
+        return false;
+    }
+
 }

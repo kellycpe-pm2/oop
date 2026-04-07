@@ -123,7 +123,7 @@ public String getRejectionReason(String username) {
 // Check if a speaker is assigned to this session
 public boolean hasSpeaker(String username) {
     for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].getAccessUsername().equals(username)) {
+        if (speakers[i] != null && speakers[i].equals(username)) {
             return true;
         }
     }
@@ -133,7 +133,7 @@ public boolean hasSpeaker(String username) {
 // Accept session invitation
 public boolean acceptInvitation(String username) {
     for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].getAccessUsername().equals(username)) {
+        if (speakers[i] != null && speakers[i].equals(username)) {
             if ("pending".equals(speakerStatus[i])) {
                 speakerStatus[i] = "accepted";
                 System.out.println("Speaker [" + username + "] accepted session [" + sessionID + "].");
@@ -154,7 +154,7 @@ public boolean acceptInvitation(String username) {
 // Reject session invitation with reason
 public boolean rejectInvitation(String username, String reason) {
     for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].getAccessUsername().equals(username)) {
+        if (speakers[i] != null && speakers[i].equals(username)) {
             if ("pending".equals(speakerStatus[i])) {
                 speakerStatus[i] = "rejected";
                 rejectionReason[i] = reason;
@@ -189,11 +189,21 @@ public boolean rejectInvitation(String username, String reason) {
         return sb.toString();
     }
 
-        public boolean equals(Object o) {
+    public boolean equals(Object o) {
+        if (o==null){
+            return false;
+        }
         if (o instanceof Session) {
             Session session = (Session) o;
-            return this.equals(session.getSessionI());
+            return this.sessionID.equals(session.getSessionID());
         }
         return false; // the object does not belong to Event
+    }
+    
+    public boolean equals (String sessionID){
+        if(this.sessionID.equals(sessionID)){
+            return true;
+        }
+        return false;
     }
 }

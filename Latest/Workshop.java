@@ -13,7 +13,7 @@ public class Workshop extends Event {
     private static final int MAX_SPEAKERS = 1;
     private Speaker[] speakers = new Speaker[MAX_SPEAKERS];
     private int speakerCount = 0;
-
+    private final String type="Workshop";
     public Workshop(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
         appendToFile(); // auto-save to Workshop.json on creation
@@ -247,12 +247,15 @@ public class Workshop extends Event {
     }
 
     @Override
-    public String toString() {
-        return super.toString();
+   public String toString() {
+        return super.toString()+ String.format("%-14s│\n",type);
     }
 
     
     public boolean equals(Object o) {
+       if (o==null){
+            return false;
+        }
         if (o instanceof Workshop) {
             Workshop w = (Workshop) o;
             return this.getEventID().equals(w.getEventID());

@@ -40,6 +40,9 @@ public class Payment{
     }
 
     public boolean equals(Object o) {
+        if (o==null){
+            return false;
+        }
         if (o instanceof Payment) {
             Payment payment = (Payment) o;
             return this.bookingId.equals(payment.getBookingId());

@@ -23,7 +23,6 @@ public class TestUser {
     static List<Workshop> workshops = new java.util.ArrayList<>();
     static List<Conference> conferences = new java.util.ArrayList<>();
 
-    // flat array used by attendee ticket purchasing (same pattern as TestUser)
     static Event[] events = new Event[300];
     static int eventCount = 0;
 
@@ -35,6 +34,11 @@ public class TestUser {
     static Attendee attendee;
 
     static Payment[] payments = new Payment[100];
+
+    static final String ORGANIZER_PSWD="12345";
+    static final String SPEAKER_PSWD="54321";
+    static final String STAFF_PSWD="13148";
+
 
     public static void main(String[] args) {
         // data store for user
@@ -52,82 +56,103 @@ public class TestUser {
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
         tickets = Ticket.readTicketFile();
+        
+        //check the ticket status
+        Staff.checkTotal_CheckIn(tickets);
+
         ticketCount = tickets.size();
         ems = new EventManagementSystem(alluser, events, tickets, payments);
 
         boolean active = true;
         while (active) {
-            int option = displayAccessInterface();
-            User user = new User();
-        try{
-            switch (option) {
-                case 1:
-                    // login
-                    if (!displayLoginInterface(user, alluser, no)) {
-                        break;
-                    }
-                    // set the access user
-                    accessmenu(user, alluser, no);
-                    break;
+                clearScreen();
+                int option = displayAccessInterface();
+                User user = new User();
+                clearScreen();
 
-                case 2:
+                switch (option) {
+                    case 1:
+                    // login
+                        if (!displayLoginInterface(user, alluser, no)) {
+                            break;
+                        }
+                    // set the access user
+                        accessmenu(user, alluser, no);
+                        break;
+
+                    case 2:
                     // signup
 
-                    displaySignUpInterface(user, alluser, no);
+                        displaySignUpInterface(user, alluser, no);
                     // set the access user
-                    user.signUpUser();
+                        user.signUpUser();
 
-                    // create and store data
-                    createAccount(no, user, alluser);
-                    storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
+                        // create and store data
+                        createAccount(no, user, alluser);
+                        storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
                             user.getSignUpContactNo());
 
-                    accessmenu(user, alluser, no);
-                    break;
-                case 0:
-                    System.out.println("GoodBye!");
-                    active = false;
-                    break;
-                default:
-                    System.out.println("Error: Please Select The Correct Number");
+                        accessmenu(user, alluser, no);
+                        break;
+                    case 0:
+                        System.out.println("            ╭━━━━━━━━╮");
+                        System.out.println("            ┃ ◕‿◕    ┃\t\t\"Good Bye!\" ");
+                        System.out.println("            ┃    ┃   ┃");
+                        System.out.println("            ┃   U    ┃");
+                        System.out.println("            ╰━━━━━━━━╯");
+                        active = false;
+                        break;
+                    default:
+                        System.out.println("Error: Please Select The Correct Number");
 
-            }
-        }catch ( Exception e){
-            System.out.println("Existing Unknown Character");
-            
+                }
         }
-    }
 
     }
 
     // to select the method to access the system
-    public static int displayAccessInterface() {
-        int option = 0;
-        do {
-            System.out.println("------------------------------------------------------------------------------");
-            System.out.println("\n \t\t\tWelcome To Our System");
-            System.out.println("------------------------------------------------------------------------------");
-            System.out.print("\n \t\t\t1. Login");
-            System.out.print("\n \t\t\t2. Sign Up");
-            System.out.println("\n \t\t\t0. Exit");
+  public static int displayAccessInterface() {
+    int option = -1;
+    boolean success = true;
+    do {
+        try {
+            System.out.println("\t\t\t(\\___/)");
+            System.out.println("\t\t\t(◕‿◕)               WELCOME TO OUR");
+            System.out.println("\t\t\t/   ♥  \\            EVENT MANAGEMENT");
+            System.out.println("\t\t\t│                        SYSTEM");
+            System.out.println("\t\t\t───┴───\n");
+            System.out.println("\t\t\t\"Where every event becomes magical! \"");
 
-            System.out.print("Enter Your Option:\t");
-            option = scan.nextInt();
 
-            if (option > 3 || option < 0) {
-                System.out.println("Input Error: Please Select 1 or 2 !");
+            System.out.print("\n \t\t\t\t1. Login");
+            System.out.print("\n \t\t\t\t2. Sign Up");
+            System.out.println("\n \t\t\t\t0. Exit");
+            System.out.print("\n\t\t\tEnter Your Option:\t");
+            option = scan.nextInt();  // Use class-level scan, not local
+            scan.nextLine();  
+
+            if (option > 2 || option < 0) {
+                success = false;
+                System.out.println("Input Error: Please Select 0, 1 or 2!");
             }
-
-        } while (option > 3 || option < 0);
-        return option;
-    }
+        } catch (Exception e) {
+            System.out.println("Error: Existing Unknown Character!");
+            scan.nextLine();  // Clear the buffer
+            option = -1;
+            success = false;
+        }
+    } while (option > 2 || option < 0);
+    return option;
+}
+    
 
     public static boolean displayLoginInterface(User user, User[] alluser, int[] no) {
-        Scanner scan = new Scanner(System.in);
         int logincount = 0;
 
-        System.out.println("-------------------------- Login --------------------------");
-        do {
+    System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
+    System.out.println("║                       LOGIN SYSTEM                           ║");
+    System.out.println("╚══════════════════════════════════════════════════════════════╝");        
+    do {
 
             logincount++;
             System.out.print("\nPlease enter your name: ");
@@ -151,10 +176,10 @@ public class TestUser {
     }
 
     public static void displaySignUpInterface(User user, User[] alluser, int[] no) {
-        Scanner scan = new Scanner(System.in);
 
-        System.out.println("--------------------------Sign Up--------------------------");
-
+    System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
+    System.out.println("║                       SIGN UP SYSTEM                          ║");
+    System.out.println("╚══════════════════════════════════════════════════════════════╝");
         do {
 
             System.out.print("\nPlease enter your name: ");
@@ -202,36 +227,56 @@ public class TestUser {
         // Find the actual stored user object by username
         User storedUser = null;
         for (int i = 0; i < no[0]; i++) {
-            if (alluser[i] != null && alluser[i].getAccessUsername().equals(user.getAccessUsername())) {
+            if (user.equals(alluser[i])) {
                 storedUser = alluser[i];
                 break;
             }
         }
         if (storedUser == null)
             storedUser = alluser[user.getno()]; // fallback
-
-        if (user.getAccessPassword().equals("12345")) {
+        System.out.println(  "╔═══════════════════════════════════════════════════════════╗\n"+
+                             "║                   Access Successful !!!                   ║\n"+
+                             "║═══════════════════════════════════════════════════════════║\n"+
+                             "║                                                           ║\n"+
+                             "║                                                           ║");
+        if (user.getAccessPassword().equals(ORGANIZER_PSWD)) {
             Organizer organizer = (Organizer) storedUser;
             ems.setCuurent_User(organizer, 1);
-            System.out.println(organizer.toString());
+            System.out.println(organizer.toString()+
+                             "║                                                           ║\n"+
+                             "╚═══════════════════════════════════════════════════════════╝");
+            System.out.println("Please Click Enter To continue...");
+
+            
             waitForEnter();
             organizerMenu();
-        } else if (user.getAccessPassword().equals("54321")) {
+        } else if (user.getAccessPassword().equals(SPEAKER_PSWD)) {
             Speaker speaker = (Speaker) storedUser;
             ems.setCuurent_User(speaker, 2);
-            System.out.println(speaker.toString());
+            System.out.println(speaker.toString()+
+                             "║                                                           ║\n"+
+                             "╚═══════════════════════════════════════════════════════════╝");
+            System.out.println("Please Click Enter To continue...");
+
             waitForEnter();
             speakerMenu(speaker);
-        } else if (user.getAccessPassword().equals("13148")) {
+        } else if (user.getAccessPassword().equals(STAFF_PSWD)) {
             Staff staff = (Staff) storedUser;
-            System.out.println(staff.toString());
+            System.out.println(staff.toString()+
+                             "║                                                           ║\n"+
+                             "╚═══════════════════════════════════════════════════════════╝");            System.out.println("Please Click Enter To continue...");
+
             ems.setCuurent_User(staff, 3);
             waitForEnter();
             staffMenu(staff, alluser, no);
         } else {
             Attendee attendee = (Attendee) storedUser;
-            System.out.println(attendee.toString());
+            System.out.println(attendee.toString()+
+                            "║                                                           ║\n"+
+                             "╚═══════════════════════════════════════════════════════════╝");
+
             ems.setCuurent_User(attendee, 4);
+            System.out.println("Please Click Enter To continue...");
             waitForEnter();
             attendeeMenu(attendee);
         }
@@ -280,20 +325,20 @@ public class TestUser {
 
                     String current_pwd = information[i][1];
                     // to store different user type data
-                    if (current_pwd.equals("12345")) {
+                    if (current_pwd.equals(ORGANIZER_PSWD)) {
 
                         // get the no of last user
 
                         alluser[no[0]] = new Organizer(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
                         no[0]++;
-                    } else if (current_pwd.equals("54321")) {
+                    } else if (current_pwd.equals(SPEAKER_PSWD)) {
 
                         alluser[no[0]] = new Speaker(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
                         no[0]++;
 
-                    } else if (current_pwd.equals("13148")) {
+                    } else if (current_pwd.equals(STAFF_PSWD)) {
                         alluser[no[0]] = new Staff(information[i][0], information[i][1], information[i][2],
                                 information[i][3]);
                         no[0]++;
@@ -349,29 +394,27 @@ public class TestUser {
         String contactNo = user.getSignUpContactNo();
         //
 
-        if (password.equals("12345")) {
+        if (password.equals(ORGANIZER_PSWD)) {
 
             alluser[no[0]] = new Organizer(username, password, email, contactNo);
-            user.setNo(no[0]);
-            no[0]++;
-        } else if (password.equals("54321")) {
+
+        } else if (password.equals(SPEAKER_PSWD)) {
 
             alluser[no[0]] = new Speaker(username, password, email, contactNo);
-            user.setNo(no[0]);
-            no[0]++;
-        } else if (password.equals("13148")) {
+        
+        } else if (password.equals(STAFF_PSWD)) {
 
             alluser[no[0]] = new Staff(username, password, email, contactNo);
-            user.setNo(no[0]);
-            no[0]++;
 
         } else {
 
             alluser[no[0]] = new Attendee(username, password, email, contactNo);
+
+        }
+            ems.addNewUser(alluser[no[0]]);
             user.setNo(no[0]);
             no[0]++;
 
-        }
 
     }
 
@@ -443,6 +486,7 @@ public class TestUser {
                 System.out.println("║     0. Exit                                                ║");
                 System.out.println("╚════════════════════════════════════════════════════════════╝");
                 System.out.print("Enter option: ");
+                
                 int choice = scan.nextInt();
 
                 switch (choice) {
@@ -511,9 +555,11 @@ public class TestUser {
         // Get valid option
         try {
             do {
+                
                 System.out.print("\n\t\tEnter Your Option: ");
                 option = scan.nextInt();
                 scan.nextLine();
+
             } while (option > 2 || option < 0);
         } catch (Exception e) {
             System.out.println("\t\tError: Invalid Character!!! Please enter number.");
@@ -525,6 +571,7 @@ public class TestUser {
         if (option == 0) {
             return; // Exit
         }
+        Attendee usertemp = new Attendee ();
 
         // Process based on option
         switch (option) {
@@ -532,15 +579,16 @@ public class TestUser {
                 System.out.print("\n\t\tEnter Ticket ID: ");
                 String ticketId = scan.nextLine();
                 boolean ticketFound = false;
-
                 for (Ticket ticket : tickets) {
-                    if (ticket.getTicketId().equals(ticketId)) {
+
+                    usertemp.setAccessUserName(ticket.getBuyerName());
+
+                    if (ticket.equals(ticketId)) {
                         ticketFound = true;
 
                         // Find attendee by buyer name
                         for (int i = 0; i < no[0]; i++) {
-                            if (alluser[i] != null &&
-                                    ticket.getBuyerName().equals(alluser[i].getAccessUsername())) {
+                            if (alluser[i].equals(usertemp)) {
                                 current_attendee = alluser[i];
                                 currentTicket = ticket;
                                 search = false;
@@ -560,6 +608,7 @@ public class TestUser {
 
                 if (!ticketFound) {
                     System.out.println("\t\tERROR: Ticket ID Not Found!");
+                    System.out.println("Please Enter Key To Continue...");
                     waitForEnter();
                     checkIn_Attendee(alluser, no);
                     return;
@@ -575,10 +624,10 @@ public class TestUser {
                     if (ticket.getBookingId().equals(bookingId)) {
                         bookingFound = true;
                         currentTicket = ticket;
+                        usertemp.setAccessUserName(ticket.getBuyerName());
                         // Find attendee by buyer name
                         for (int i = 0; i < no[2]; i++) {
-                            if (alluser[i] != null &&
-                                    ticket.getBuyerName().equals(alluser[i].getAccessUsername())) {
+                            if (alluser[i].equals(usertemp)) {
                                 current_attendee = alluser[i];
                                 search = false;
                                 break;
@@ -588,6 +637,7 @@ public class TestUser {
                         if (current_attendee == null) {
 
                             System.out.println("\t\tERROR: Attendee Information Not Found!");
+                            System.out.println("Please Enter Key To Continue...");
                             waitForEnter();
                             checkIn_Attendee(alluser, no);
                             return;
@@ -598,6 +648,7 @@ public class TestUser {
 
                 if (!bookingFound) {
                     System.out.println("\t\tERROR: Booking ID Not Found!");
+                    System.out.println("Please Enter Key To Continue...");
                     waitForEnter();
                     checkIn_Attendee(alluser, no);
                     return;
@@ -608,36 +659,21 @@ public class TestUser {
         // Check if already checked in
         if (!currentTicket.getStatus()) {
             System.out.println("\n\t\t╔════════════════════════════════════════════════════════════╗");
-            System.out.println("\t\t║                  ❌ ALREADY CHECKED IN!                     ║");
+            System.out.println("\t\t║                    ALREADY CHECKED IN!                     ║");
             System.out.println("\t\t╚════════════════════════════════════════════════════════════╝");
+            System.out.println("Please Enter Key To Continue...");
             waitForEnter();
             checkIn_Attendee(alluser, no);
             return;
         }
 
-        System.out.printf(
-                "╔════════════════════════════════════════════════════════════╗\n" +
-                        "║                      CHECK-IN DETAILS                      ║\n" +
-                        "╠════════════════════════════════════════════════════════════╣\n" +
-                        "║          Name           :  %-31s ║\n" +
-                        "║          Email          :  %-31s ║\n" +
-                        "║          Contact No     :  %-31s ║\n" +
-                        "║          Booking ID     :  %-31s ║\n" +
-                        "║          Ticket ID      :  %-31s ║\n" +
-                        "║          Ticket Type    :  %-31s ║\n" +
-                        "║          Seat No        :  %-31s ║\n" +
-                        "║          Status         :  %-31s ║\n" +
-                        "║          Purchase Date  :  %-31s ║\n" +
-                        "╚════════════════════════════════════════════════════════════╝\n",
-                current_attendee.getAccessUsername(),
-                current_attendee.getAccessEmail(),
-                current_attendee.getAccessContactNo(),
-                currentTicket.getBookingId(),
-                currentTicket.getTicketId(),
-                currentTicket.getTicketType(),
-                currentTicket.getSeatNum(),
-                status_ToString(currentTicket.getStatus()),
-                currentTicket.getPurchasedDate());
+        System.out.println(
+                        "╔═══════════════════════════════════════════════════════════╗\n" +
+                        "║                      CHECK-IN DETAILS                     ║\n" +
+                        "╠═══════════════════════════════════════════════════════════╣\n" +
+                        current_attendee.toString()+currentTicket.toString()+
+                        "╚═══════════════════════════════════════════════════════════╝");
+                        
 
         System.out.println("\n     Press Enter Key To Continue");
         waitForEnter();
@@ -678,7 +714,7 @@ public class TestUser {
             System.out.println(
                     "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
             System.out.println(
-                    "\t\t\t│                         ⚠️ NO CHECK-INS TODAY                                  │");
+                    "\t\t\t│                            NO CHECK-INS TODAY                                  │");
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
             return;
@@ -689,13 +725,15 @@ public class TestUser {
             System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
             System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");
             int no = 1;
-
+            Attendee usertemp = new Attendee();
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
+                    usertemp.setAccessUserName(ticket.getBuyerName());
+                    
                     if (alluser.length == 0) {
                         for (User user : alluser) {
-                            if (!(user instanceof Attendee)) {
+                            if (!(user.equals(usertemp))) {
                                 System.out.println("ERROR: No Any Attendee Resgister The System !!!");
                                 view_pending_attendee_list(alluser);
                                 break;
@@ -706,10 +744,10 @@ public class TestUser {
                     }
                     if (!ticket.getStatus()) {
                         for (User user : alluser) {
-                            if (!(user instanceof Attendee)) {
+                            if (!(user.equals(usertemp))) {
                                 continue;
                             }
-                            if (ticket.getBuyerName().equals(user.getAccessUsername())) {
+                            if (user.equals(ticket.getBuyerName())) {
                                 System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
                                         no++,
                                         ticket.getBuyerName(),
@@ -741,7 +779,7 @@ public class TestUser {
             System.out.println(
                     "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
             System.out.println(
-                    "\t\t\t│                                  NO ANY EVENT                                  │");
+                    "\t\t\t│                                  NO ANY Buyer                                  │");
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
             return;
@@ -752,13 +790,13 @@ public class TestUser {
             System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
 
             int no = 1;
-
+            Attendee usertemp= new Attendee();
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
                     if (alluser.length == 0) {
                         for (User user : alluser) {
-                            if (!(user instanceof Attendee)) {
+                            if (!(usertemp.checkClass(user))) {
                                 System.out.println("ERROR: No Any Attendee Resgister The System !!!");
                                 view_pending_attendee_list(alluser);
                                 break;
@@ -769,10 +807,10 @@ public class TestUser {
                     }
                     if (ticket.getStatus()) {
                         for (User user : alluser) {
-                            if (!(user instanceof Attendee)) {
+                            if (!(usertemp.checkClass(user))) {
                                 continue;
                             }
-                            if (ticket.getBuyerName().equals(user.getAccessUsername())) {
+                            if (user.equals(ticket.getBuyerName())) {
                                 System.out.println(
                                         "\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");
                                 System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
@@ -818,12 +856,16 @@ public class TestUser {
             System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
             int no = 1;
 
+            Attendee usertamp= new Attendee();
+            
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
+                    usertamp.setAccessUserName(ticket.getBuyerName());
+            
                     if (alluser.length == 0) {
                         for (User user : alluser) {
-                            if (!(user instanceof Attendee)) {
+                            if (!(usertamp.equals(user))) {
                                 System.out.println("ERROR: No Any Attendee Resgister The System !!!");
                                 view_pending_attendee_list(alluser);
                                 break;
@@ -833,10 +875,10 @@ public class TestUser {
                         return;
                     }
                     for (User user : alluser) {
-                        if (!(user instanceof Attendee)) {
+                        if (!(usertamp.checkClass(user))) {
                             continue;
                         }
-                        if (ticket.getBuyerName().equals(user.getAccessUsername())) {
+                        if (user.equals(ticket.getBuyerName())) {
                             System.out.println(
                                     "\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");
                             System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
@@ -915,7 +957,7 @@ public class TestUser {
 
     public static void event_report() {
         System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
-        System.out.println("\t\t║                                    EVENT REPORT                               ║");
+        System.out.println("\t\t║                                    EVENT REPORT                                ║");
         System.out.printf("\t\t║                              Generated    :%-35s ║\n", LocalDate.now());
         System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
 
@@ -933,55 +975,19 @@ public class TestUser {
                     "\t\t\t│                                  NO ANY EVENT                                  │");
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+            
+            System.out.println("Press Enter Key to Return Back ...");
+            waitForEnter();
+            return;
         } else {
-            String type = "Conference";
-            for (Conference conference : conferences) {
-                if (conference != null) {
-                    System.out.println(
-                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤");
-                    System.out.printf("\t\t\t│ %-2s │ %-18s │ %-19s │ %-8s │ %-8s│\n",
-                            conference.getEventID(),
-                            conference.getTitle(),
-                            conference.getVenue(),
-                            conference.getDate(),
-                            type);
+            for (Event event : events){
+                if (event!=null){
 
-                } else {
-                    break;
+                System.out.print("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤\n"+
+                event.toString());
                 }
             }
-            type = "Workshop";
-            for (Workshop workshop : workshops) {
-                if (workshop != null) {
-                    System.out.println(
-                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤");
-                    System.out.printf("\t\t\t│ %-12s │ %-16s │ %-18s │ %-8s │ %-11s│\n",
-                            workshop.getEventID(),
-                            workshop.getTitle(),
-                            workshop.getVenue(),
-                            workshop.getDate(),
-                            type);
-
-                } else {
-                    break;
-                }
-            }
-            type = "Concert";
-            for (Concert concert : concerts) {
-                if (concert != null) {
-                    System.out.println(
-                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤");
-                    System.out.printf("\t\t\t│ %-10s │ %-18s │ %-17s │ %-8s │ %-13s│\n",
-                            concert.getEventID(),
-                            concert.getTitle(),
-                            concert.getVenue(),
-                            concert.getDate(),
-                            type);
-
-                } else {
-                    break;
-                }
-            }
+        }
 
             System.out.println(
                     "\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
@@ -1026,9 +1032,8 @@ public class TestUser {
                 System.out.println(
                         "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
 
-                waitForEnter();
-                waitForEnter();
                 System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+                waitForEnter();
 
                 TicketType current_TicketType = TicketType.findTicketTypeById(ticketTypes, eventId);
                 int[] tol = current_TicketType.getQuantityOfAllTicketType();
@@ -1092,7 +1097,7 @@ public class TestUser {
                     if (ticket.getEventId().equals(eventId)) {
                         if (!ticket.getStatus()) {
                             total_ticket_checkin++;
-
+                            
                         }
                     }
                 }
@@ -1127,7 +1132,7 @@ public class TestUser {
                         "\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
                 System.out.print("\t\t\t|            │ ");
 
-                int displaybar = (int) (double) checkinRate / 100 * 59;
+                int displaybar = (int)(double) checkinRate / 100 * 59;
                 for (int i = 0; i < 59; i++) {
                     if (displaybar >= i) {
                         System.out.print("█");
@@ -1159,7 +1164,7 @@ public class TestUser {
             }
         }
 
-    }
+    
 
     public static void sale_report() {
 
@@ -1183,54 +1188,11 @@ public class TestUser {
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
         } else {
-            String type = "Conference";
-            for (Conference conference : conferences) {
-                if (conference != null) {
-                    System.out.println(
-                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤");
-                    System.out.printf("\t\t\t│ %-2s │ %-18s │ %-19s │ %-8s │ %-8s│\n",
-                            conference.getEventID(),
-                            conference.getTitle(),
-                            conference.getVenue(),
-                            conference.getDate(),
-                            type);
-
-                } else {
-                    break;
-                }
+            for(Event event : events){
+                System.err.println("\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤\n"
+                                    +event.toString());
             }
-            type = "Workshop";
-            for (Workshop workshop : workshops) {
-                if (workshop != null) {
-                    System.out.println(
-                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤");
-                    System.out.printf("\t\t\t│ %-12s │ %-16s │ %-18s │ %-8s │ %-11s│\n",
-                            workshop.getEventID(),
-                            workshop.getTitle(),
-                            workshop.getVenue(),
-                            workshop.getDate(),
-                            type);
-
-                } else {
-                    break;
-                }
-            }
-            type = "Concert";
-            for (Concert concert : concerts) {
-                if (concert != null) {
-                    System.out.println(
-                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤");
-                    System.out.printf("\t\t\t│ %-10s │ %-18s │ %-17s │ %-8s │ %-13s│\n",
-                            concert.getEventID(),
-                            concert.getTitle(),
-                            concert.getVenue(),
-                            concert.getDate(),
-                            type);
-
-                } else {
-                    break;
-                }
-            }
+            
 
             System.out.println(
                     "\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
@@ -1385,13 +1347,13 @@ public class TestUser {
             writer.write("\t\t║  ├────┬────────────────────┬─────────────────────┬──────────────┬───────────┤ ║\n");
             writer.write("\t\t║  │ No │ Name               │ Email               │ Ticket ID    │ Status    │ ║\n");
             writer.write("\t\t║  ├────┼────────────────────┼─────────────────────┼──────────────┼───────────┤ ║\n");
-
+            Attendee usertemp = new Attendee();
             int no = 1;
             for (Ticket ticket : tickets) {
+                usertemp.setAccessUserName(ticket.getBuyerName());
                 if (ticket != null) {
                     for (User user : alluser) {
-                        if (user instanceof Attendee && user != null
-                                && ticket.getBuyerName().equals(user.getAccessUsername())) {
+                        if (user.equals(usertemp)) {
                             writer.write(String.format("\t\t║  %2d │ %-18s │ %-19s │ %-12s │ %-8s │ ║\n",
                                     no++, ticket.getBuyerName(), user.getAccessEmail(),
                                     ticket.getTicketId(), status_ToString(ticket.getStatus())));
@@ -1887,7 +1849,7 @@ public class TestUser {
         boolean found = false;
 
         for (int i = 0; i < eventCount; i++) {
-            if (events[i].getEventID().equals(eventID)) {
+            if (events[i].equals(eventID)) {
                 if (events[i].isConcert()) {
                     Concert.removeConcert(concerts, eventID);
                 } else if (events[i].isWorkshop()) {
@@ -2169,8 +2131,9 @@ public class TestUser {
     // load all Speaker accounts from alluser into speakerPool
     static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         speakerCount = 0;
+        Speaker usertemp =new Speaker();
         for (int i = 0; i < totalUsers; i++) {
-            if (alluser [i] instanceof Speaker) {
+            if (usertemp.checkClass(alluser[i])) {
                 speakerPool[speakerCount++] = (Speaker) alluser[i];
             }
         }
@@ -2234,7 +2197,7 @@ public class TestUser {
         String sessionID = scan.nextLine();
         Session targetSession = null;
         for (int i = 0; i < conf.getSessionCount(); i++) {
-            if (conf.getSessions()[i].getSessionID().equals(sessionID)) {
+            if (conf.getSessions()[i].equals(sessionID)) {
                 targetSession = conf.getSessions()[i];
                 break;
             }
@@ -2784,7 +2747,7 @@ public class TestUser {
         System.out.println("\n--- All Tickets History for " + attendee.getAccessUsername() + " ---");
 
         for (Ticket t : tickets) {
-            if (t.getBuyerName().equals(attendee.getAccessUsername())) {
+            if (attendee.equals(t.getBuyerName())) {
                 t.displayTicketDetails();
                 System.out.println();
                 count++;
