@@ -116,16 +116,10 @@ public class TicketType {
         this.quantityOfAllTicketType[2] = quantityVip;
     }
 
-    public void setPriceEarlyBird(double priceEarlyBird) {
+    public void setPrice(double priceEarlyBird, double priceStandard, double priceVip) {
         this.priceEarlyBird = priceEarlyBird;
-    }
-
-    public void setPriceStandard(double priceStandard) {
-        this.priceStandard = priceStandard;
-    }
-
-    public void setPriceVip(double priceVip) {
-        this.priceVip = priceVip;
+        this.priceStandard=priceStandard;
+        this.priceVip=priceVip;
     }
 
     public void setPerks(String perks) {
@@ -205,23 +199,6 @@ public class TicketType {
             System.out.println("Error reading ticket type data: " + e.getMessage());
         }
         return ticketTypes;
-    }
-
-    // display all ticket type
-    public static void displayAllTicketType(List<TicketType> TicketTypes) {
-        System.out.println("=== Ticket Type Info ===");
-        for (TicketType tt : TicketTypes) {
-            System.out.println("Event Id: "+tt.getEventId());
-            System.out.println("Total Quantity: "+tt.getTotalQuantity());
-            System.out.println("Quantity of Early Bird, Standard, Vip: "+tt.getQuantityOfAllTicketType());
-            System.out.println("Available Quantity: "+tt.getAvailableQuantity());
-            System.out.println("Available Early Bird, Standard, Vip: "+tt.getAvailableType("earlybird")+", "+tt.getAvailableType("standard")+", "+tt.getAvailableType("vip"));
-            System.out.println("Price Early Bird, Standard, Vip: (RM)"+tt.getPrice("earlybird")+", "+tt.getPrice("standard")+", "+tt.getPrice("vip"));
-            System.out.println("Perks: "+tt.getPerks());
-            System.out.println("Date Sales Start: "+tt.getSalesStart());
-            System.out.println("Date Sales End: "+tt.getSalesEnd());
-            System.out.println("Date Early Bird End: "+tt.getSalesStart().plusDays(1));
-        }
     }
 
     // store ticket type data
@@ -388,5 +365,69 @@ public class TicketType {
                 vipSeats.remove(seatNum);
                 break;
         }
+    }
+
+    public void updateQuantityWithSoldTickets(int newEarlyBird, int newStandard, int newVip) {
+        int actualSoldEarlyBird = 0;
+        int actualSoldStandard = 0;
+        int actualSoldVip = 0;
+        
+        // Get tickets from TestUser.tickets
+        for (Ticket ticket : TestUser.tickets) {
+            if (ticket.getEventId().equals(this.eventId)) {
+                switch (ticket.getTicketType().toLowerCase()) {
+                    case "earlybird":
+                        actualSoldEarlyBird++;
+                        break;
+                    case "standard":
+                        actualSoldStandard++;
+                        break;
+                    case "vip":
+                        actualSoldVip++;
+                        break;
+                }
+            }
+        }
+        
+        // Update available quantities based on ACTUAL sold tickets
+        this.availableEarlyBird = newEarlyBird - actualSoldEarlyBird;
+        if (this.availableEarlyBird < 0) this.availableEarlyBird = 0;
+        
+        this.availableStandard = newStandard - actualSoldStandard;
+        if (this.availableStandard < 0) this.availableStandard = 0;
+        
+        this.availableVip = newVip - actualSoldVip;
+        if (this.availableVip < 0) this.availableVip = 0;
+        
+        this.availableQuantity = this.availableEarlyBird + this.availableStandard + this.availableVip;
+
+        generateSeats();
+    }
+
+    // display all ticket type
+    public static void displayAllTicketType(List<TicketType> TicketTypes) {
+        int i = 1 ;
+        for (TicketType tt : TicketTypes) {
+            System.out.println("\nTicket Type "+i);
+            i++;
+            System.out.println("========================");
+            System.out.println("Event Id: "+tt.getEventId());
+            System.out.println("Total Quantity: "+tt.getTotalQuantity());
+            System.out.println("Quantity of Early Bird, Standard, Vip: "+tt.getQuantityOfAllTicketType()[0]+", "+tt.getQuantityOfAllTicketType()[1]+", "+tt.getQuantityOfAllTicketType()[2]);
+            System.out.println("Available Quantity: "+tt.getAvailableQuantity());
+            System.out.println("Available Early Bird, Standard, Vip: "+tt.getAvailableType("earlybird")+", "+tt.getAvailableType("standard")+", "+tt.getAvailableType("vip"));
+            System.out.println("Price Early Bird, Standard, Vip: (RM)"+tt.getPrice("earlybird")+", "+tt.getPrice("standard")+", "+tt.getPrice("vip"));
+            System.out.println("Perks: "+tt.getPerks());
+            System.out.println("Date Sales Start: "+tt.getSalesStart());
+            System.out.println("Date Sales End: "+tt.getSalesEnd());
+            System.out.println("Date Early Bird End: "+tt.getSalesStart().plusDays(1));
+        }
+    }
+
+    public String toString(){
+        return "Event Id: "+this.getEventId()+"\nTotal Quantity: "+this.getTotalQuantity()+"\nQuantity of Early Bird, Standard, Vip: "+this.getQuantityOfAllTicketType()[0]+", "+this.getQuantityOfAllTicketType()[1]+", "+this.getQuantityOfAllTicketType()[2]
+            +"\nAvailable Quantity: "+this.getAvailableQuantity()+"\nAvailable Early Bird, Standard, Vip: "+this.getAvailableType("earlybird")+", "+this.getAvailableType("standard")+", "+this.getAvailableType("vip")
+            +"\nPrice Early Bird, Standard, Vip: (RM)"+this.getPrice("earlybird")+", "+this.getPrice("standard")+", "+this.getPrice("vip")
+            +"\nPerks: "+this.getPerks()+"\nDate Sales Start: "+this.getSalesStart()+"\nDate Sales End: "+this.getSalesEnd()+"\nDate Early Bird End: "+this.getSalesStart().plusDays(1);
     }
 }
