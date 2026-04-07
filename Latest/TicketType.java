@@ -432,6 +432,9 @@ public class TicketType {
     }
 
     public boolean equals(Object o) {
+       if (o==null){
+            return false;
+        }
         if (o instanceof TicketType) {
             TicketType ticketType = (TicketType) o;
             return this.eventId.equals(ticketType.getEventId());

@@ -89,10 +89,16 @@ public abstract class Event {
 
     @Override
     public String toString() {
-        return String.format("%-6s %-20s %-12s %-20s %-8d",
-                eventID, title, date, venue, maxTickets);
+        return String.format("\t\t\t│ %-10s │ %-18s │ %-17s │ %-10s │",
+                            getEventID(),
+                            getTitle(),
+                            getVenue(),
+                            getDate());
     }
-        public boolean equals(Object o) {
+    public boolean equals(Object o) {
+       if (o==null){
+            return false;
+        }
         if (o instanceof Event) {
             Event e = (Event) o;
             return this.eventID.equals(e.eventID);

@@ -14,7 +14,8 @@ public class Concert extends Event {
     private static final int MAX_SPEAKERS = 1;
     private Speaker[] speakers = new Speaker[MAX_SPEAKERS];
     private int speakerCount = 0;
-    
+    private final String type= "Concert";
+
     public Concert(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
         appendToFile(); // auto-save to Concert.json on creation
@@ -237,9 +238,10 @@ public class Concert extends Event {
     }
 
     @Override
-    public String toString() {
-        return super.toString();
+   public String toString() {
+        return super.toString()+ String.format("%-14s│\n",type);
     }
+
 
     public boolean isConcert() {
             return true;

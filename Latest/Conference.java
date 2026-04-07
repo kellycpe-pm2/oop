@@ -11,6 +11,7 @@ public class Conference extends Event {
     private Session[] sessions;
     private int sessionCount;
     private static final int MAX_SESSIONS = 10;
+    private final String type = "Conference";
 
     public Conference(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
@@ -283,7 +284,7 @@ public class Conference extends Event {
 
     @Override
     public String toString() {
-        return super.toString();
+        return super.toString()+ String.format("%-14s│\n",type);
     }
 
     public boolean isConference() {
@@ -298,10 +299,14 @@ public class Conference extends Event {
     }
 
     public boolean equals(Object o) {
+       if (o==null){
+            return false;
+        }
         if (o instanceof Conference) {
             Conference c = (Conference) o;
             return this.getEventID().equals(c.getEventID());
         }
         return false; // the object does not belong to Conference
     }
+    
 }

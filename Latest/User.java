@@ -22,6 +22,7 @@ public class User {
     // --------------------------Sign Up of Constructor---------------------------
     // default constructor
     User() {
+        this(null,null,null,null,null);
     }
 
     // parameterized constructor
@@ -88,35 +89,39 @@ public class User {
 
     // -------------------------- setter---------------------------
     public void setSignUpName(String signUpName) {
-        this.signUpName = signUpName;
+        this.signUpName = signUpName.strip();
     }
 
     public void setSignUpEmail(String signUpEmail) {
-        this.signUpEmail = signUpEmail;
+        this.signUpEmail = signUpEmail.strip();
     }
 
     public void setSignUpContactNo(String signUpContactNo){
-        this.signUpContactNo=signUpContactNo;
+        this.signUpContactNo=signUpContactNo.strip();
     }
 
     public void setSignUpPassword(String signUpPassword) {
-        this.signUpPassword = signUpPassword;
+        this.signUpPassword = signUpPassword.strip();
     }
 
     public void setSignUpPassword2(String signUpPassword2) {
-        this.signUpPassword2 = signUpPassword2;
+        this.signUpPassword2 = signUpPassword2.strip();
     }
 
     public void setLoginUsername(String loginUsername) {
-        this.loginUsername = loginUsername;
+        this.loginUsername = loginUsername.strip();
     }
 
     public void setLoginPassword(String loginPassword) {
-        this.loginPassword = loginPassword;
+        this.loginPassword = loginPassword.strip();
     }
 
     public void setNo(int no){
         this.no[1]=no;
+    }
+    
+    public void setAccessUserName(String username){
+        this.username=username;
     }
     // -------------------------- method---------------------------
 
@@ -147,12 +152,12 @@ public class User {
         if (existUser == null){
             return false;
         }
-
+            username=signUpName;
 
             for (int i = 0; i < existUser.length; i++) {
-                if (existUser[i] != null &&this.signUpName.equals(existUser[i].getAccessUsername())) {
+                if (existUser[i] != null &&this.equals(existUser[i])) {
                     System.out.println("Error: The Username Has Already Exist ! ");
-
+                    username=null;
                     return false;
                 }
             }
@@ -234,11 +239,9 @@ public class User {
             System.out.println("Input Error: Please Enter In Format ! ");
             return false;
             }
+        }
             
-            
-            }
-            
-            return true;
+        return true;
 
         }
 
@@ -296,22 +299,19 @@ public class User {
     public boolean validationNoExistName(User [] existUser, int [] no) {
         //check the user input is empty or not
         if (validationEmpty(this.loginUsername)) {
-
             return false;
         }
-
+            username=loginUsername;
             for (int j=0; j< no[0] ; j++) {
-            
-                if (existUser[j]!=null&&this.loginUsername.equals(existUser[j].getAccessUsername())) {
+                
+                if (existUser[j]!=null&& equals(existUser[j])) {
                 this.no[0] =j;
                 this.no[1]=j;
                 //found user
                 return true;
             }
         }
-        
-        
-
+        username=null;
         System.out.println("Error: The Username Is Not Matched ! ");
 
         return false;
@@ -336,24 +336,34 @@ public class User {
     }
 
     public String toString(){
-        return String.format("╔═══════════════════════════════════════════════════════════╗\n"+
-                             "║                   Access Successful !!!                   ║\n"+
-                             "║═══════════════════════════════════════════════════════════║\n"+
-                             "║                                                           ║\n"+
-                             "║                                                           ║\n"+
+        return String.format(
                              "║          Username       :  %-31s║\n"+
                              "║          Email          :  %-31s║\n"+
-                             "║          Contact Number :  %-31s║\n"+
-                             "║                                                           ║\n"+
-                             "║                                                           ║\n", username,email,contactNo);
+                             "║          Contact Number :  %-31s║\n", username,email,contactNo);
     }
 
+    public boolean checkClass(Object o){
+        if(o instanceof User){
+            return true;
+        }
+        return false;
+    }
 
     public boolean equals(Object o) {
+        if (o==null){
+            return false;
+        }
         if (o instanceof User) {
             User user = (User) o;
-            return this.getAccessUsername().equals(user.getAccessUsername());
+            return (username.equals(user.getAccessUsername()));
         }
         return false; // the object does not belong to Event
+    }
+
+    public boolean equals(String username){
+        if(this.username.equals(username)){
+            return true;
+        }
+        return false;
     }
 }
