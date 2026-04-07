@@ -161,6 +161,22 @@ public boolean uploadSessionTopic(String username, Session session, String newTo
         + session.getSessionID() + "]. Cannot update topic.");
     return false;
 }
-   
+
+//--------------------------------------------------
+    public boolean equalsClassType(Object o) {
+        if (o instanceof Speaker) {
+            return true;
+        }
+        return false;
+    }    
+
+
+    public boolean equals(Object o) {
+        if (o instanceof Speaker) {
+            Speaker speaker = (Speaker) o;
+            return this.getAccessUsername().equals(speaker.getAccessUsername());
+        }
+        return false; // the object does not belong to Event
+    }
      
 }

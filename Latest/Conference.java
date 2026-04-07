@@ -286,6 +286,17 @@ public class Conference extends Event {
         return super.toString();
     }
 
+    public boolean isConference() {
+            return true;
+    }
+
+    public boolean isConcert(){
+        return false;
+    }
+    public boolean isWorkshop(){
+        return false;
+    }
+
     public boolean equals(Object o) {
         if (o instanceof Conference) {
             Conference c = (Conference) o;

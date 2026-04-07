@@ -430,4 +430,13 @@ public class TicketType {
             +"\nPrice Early Bird, Standard, Vip: (RM)"+this.getPrice("earlybird")+", "+this.getPrice("standard")+", "+this.getPrice("vip")
             +"\nPerks: "+this.getPerks()+"\nDate Sales Start: "+this.getSalesStart()+"\nDate Sales End: "+this.getSalesEnd()+"\nDate Early Bird End: "+this.getSalesStart().plusDays(1);
     }
+
+    public boolean equals(Object o) {
+        if (o instanceof TicketType) {
+            TicketType ticketType = (TicketType) o;
+            return this.eventId.equals(ticketType.getEventId());
+        }
+        return false; // the object does not belong to Event
+    }
+
 }

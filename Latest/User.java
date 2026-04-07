@@ -348,11 +348,12 @@ public class User {
                              "║                                                           ║\n", username,email,contactNo);
     }
 
-    public boolean equals(User user) {
-        if (user instanceof User) {
-            return true;
-        } else{ 
-            return false;
+
+    public boolean equals(Object o) {
+        if (o instanceof User) {
+            User user = (User) o;
+            return this.getAccessUsername().equals(user.getAccessUsername());
         }
+        return false; // the object does not belong to Event
     }
 }

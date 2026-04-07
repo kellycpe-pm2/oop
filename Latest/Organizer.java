@@ -48,4 +48,19 @@ public class Organizer extends User {
         }
     }
 
+    public boolean equalsClassType(Object o) {
+        if (o instanceof Organizer) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean equals(Object o) {
+        if (o instanceof Organizer) {
+            Organizer organizer = (Organizer) o;
+            return this.getAccessUsername().equals(organizer.getAccessUsername());
+        }
+        return false; // the object does not belong to Event
+    }
+
 }

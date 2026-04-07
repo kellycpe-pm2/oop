@@ -9,12 +9,19 @@ public class Attendee extends User{
     }
 
 
-    public boolean foundAttendee(User user){
-
-        if (this == user){
+    public boolean equalsClassType(Object o) {
+        if (o instanceof Attendee) {
             return true;
         }
-            return false;
+        return false;
+    }
+
+    public boolean equals(Object o) {
+        if (o instanceof Attendee) {
+            Attendee attendee = (Attendee) o;
+            return this.getAccessUsername().equals(attendee.getAccessUsername());
+        }
+        return false; // the object does not belong to Event
     }
 }
 
