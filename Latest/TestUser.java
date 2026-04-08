@@ -15,6 +15,20 @@ public class TestUser {
     static Scanner scan = new Scanner(System.in);
     static EventManagementSystem ems = null;
 
+    // Safe integer reader
+    static int readInt() {
+        while (true) {
+            try {
+                int val = scan.nextInt();
+                scan.nextLine();
+                return val;
+            } catch (Exception e) {
+                scan.nextLine(); // clear bad token
+                System.out.print("Invalid input. Please enter a number: ");
+            }
+        }
+    }
+
     static List<TicketType> ticketTypes = new java.util.ArrayList<>();
     static List<Ticket> tickets = new java.util.ArrayList<>();
     static int ticketCount = 0;
@@ -37,10 +51,9 @@ public class TestUser {
 
     static Payment[] payments = new Payment[100];
 
-    static final String ORGANIZER_PSWD="12345";
-    static final String SPEAKER_PSWD="54321";
-    static final String STAFF_PSWD="13148";
-
+    static final String ORGANIZER_PSWD = "12345";
+    static final String SPEAKER_PSWD = "54321";
+    static final String STAFF_PSWD = "13148";
 
     public static void main(String[] args) {
         // data store for user
@@ -58,9 +71,9 @@ public class TestUser {
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
         tickets = readTicketFile();
-        bookingNo = Integer.parseInt(tickets.get(tickets.size()-1).getBookingId().substring(5));
-        
-        //check the ticket status
+        bookingNo = Integer.parseInt(tickets.get(tickets.size() - 1).getBookingId().substring(5));
+
+        // check the ticket status
         Staff.checkTotal_CheckIn(tickets);
 
         ticketCount = tickets.size();
@@ -68,94 +81,92 @@ public class TestUser {
 
         boolean active = true;
         while (active) {
-                clearScreen();
-                int option = displayAccessInterface();
-                User user = new User();
-                clearScreen();
+            clearScreen();
+            int option = displayAccessInterface();
+            User user = new User();
+            clearScreen();
 
-                switch (option) {
-                    case 1:
+            switch (option) {
+                case 1:
                     // login
-                        if (!displayLoginInterface(user, alluser, no)) {
-                            break;
-                        }
-                    // set the access user
-                        accessmenu(user, alluser, no);
+                    if (!displayLoginInterface(user, alluser, no)) {
                         break;
+                    }
+                    // set the access user
+                    accessmenu(user, alluser, no);
+                    break;
 
-                    case 2:
+                case 2:
                     // signup
 
-                        displaySignUpInterface(user, alluser, no);
+                    displaySignUpInterface(user, alluser, no);
                     // set the access user
-                        user.signUpUser();
+                    user.signUpUser();
 
-                        // create and store data
-                        createAccount(no, user, alluser);
-                        storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
+                    // create and store data
+                    createAccount(no, user, alluser);
+                    storeUserData(user.getSignUpName(), user.getSignUpPassword(), user.getSignUpEmail(),
                             user.getSignUpContactNo());
 
-                        accessmenu(user, alluser, no);
-                        break;
-                    case 0:
-                        System.out.println("            ╭━━━━━━━━╮");
-                        System.out.println("            ┃ ◕‿◕    ┃\t\t\"Good Bye!\" ");
-                        System.out.println("            ┃    ┃   ┃");
-                        System.out.println("            ┃   U    ┃");
-                        System.out.println("            ╰━━━━━━━━╯");
-                        active = false;
-                        break;
-                    default:
-                        System.out.println("Error: Please Select The Correct Number");
+                    accessmenu(user, alluser, no);
+                    break;
+                case 0:
+                    System.out.println("            ╭━━━━━━━━╮");
+                    System.out.println("            ┃ ◕‿◕    ┃\t\t\"Good Bye!\" ");
+                    System.out.println("            ┃    ┃   ┃");
+                    System.out.println("            ┃   U    ┃");
+                    System.out.println("            ╰━━━━━━━━╯");
+                    active = false;
+                    break;
+                default:
+                    System.out.println("Error: Please Select The Correct Number");
 
-                }
+            }
         }
 
     }
 
     // to select the method to access the system
-  public static int displayAccessInterface() {
-    int option = -1;
-    boolean success = true;
-    do {
-        try {
-            System.out.println("\t\t\t(\\___/)");
-            System.out.println("\t\t\t(◕‿◕)               WELCOME TO OUR");
-            System.out.println("\t\t\t/   ♥  \\            EVENT MANAGEMENT");
-            System.out.println("\t\t\t│                        SYSTEM");
-            System.out.println("\t\t\t───┴───\n");
-            System.out.println("\t\t\t\"Where every event becomes magical! \"");
+    public static int displayAccessInterface() {
+        int option = -1;
+        boolean success = true;
+        do {
+            try {
+                System.out.println("\t\t\t(\\___/)");
+                System.out.println("\t\t\t(◕‿◕)               WELCOME TO OUR");
+                System.out.println("\t\t\t/   ♥  \\            EVENT MANAGEMENT");
+                System.out.println("\t\t\t│                        SYSTEM");
+                System.out.println("\t\t\t───┴───\n");
+                System.out.println("\t\t\t\"Where every event becomes magical! \"");
 
+                System.out.print("\n \t\t\t\t1. Login");
+                System.out.print("\n \t\t\t\t2. Sign Up");
+                System.out.println("\n \t\t\t\t0. Exit");
+                System.out.print("\n\t\t\tEnter Your Option:\t");
+                option = scan.nextInt(); // Use class-level scan, not local
+                scan.nextLine();
 
-            System.out.print("\n \t\t\t\t1. Login");
-            System.out.print("\n \t\t\t\t2. Sign Up");
-            System.out.println("\n \t\t\t\t0. Exit");
-            System.out.print("\n\t\t\tEnter Your Option:\t");
-            option = scan.nextInt();  // Use class-level scan, not local
-            scan.nextLine();  
-
-            if (option > 2 || option < 0) {
+                if (option > 2 || option < 0) {
+                    success = false;
+                    System.out.println("Input Error: Please Select 0, 1 or 2!");
+                }
+            } catch (Exception e) {
+                System.out.println("Error: Existing Unknown Character!");
+                scan.nextLine(); // Clear the buffer
+                option = -1;
                 success = false;
-                System.out.println("Input Error: Please Select 0, 1 or 2!");
             }
-        } catch (Exception e) {
-            System.out.println("Error: Existing Unknown Character!");
-            scan.nextLine();  // Clear the buffer
-            option = -1;
-            success = false;
-        }
-    } while (option > 2 || option < 0);
-    return option;
-}
-    
+        } while (option > 2 || option < 0);
+        return option;
+    }
 
     public static boolean displayLoginInterface(User user, User[] alluser, int[] no) {
         int logincount = 0;
 
-    System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-    System.out.println("║                       LOGIN SYSTEM                           ║");
-    System.out.println("╚══════════════════════════════════════════════════════════════╝");        
-    do {
+        System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
+        System.out.println("║                       LOGIN SYSTEM                           ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════╝");
+        do {
 
             logincount++;
             System.out.print("\nPlease enter your name: ");
@@ -180,9 +191,9 @@ public class TestUser {
 
     public static void displaySignUpInterface(User user, User[] alluser, int[] no) {
 
-    System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-    System.out.println("║                       SIGN UP SYSTEM                         ║");
-    System.out.println("╚══════════════════════════════════════════════════════════════╝");
+        System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
+        System.out.println("║                       SIGN UP SYSTEM                         ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════╝");
         do {
 
             System.out.print("\nPlease enter your name: ");
@@ -237,46 +248,46 @@ public class TestUser {
         }
         if (storedUser == null)
             storedUser = alluser[user.getno()]; // fallback
-        System.out.println(  "╔═══════════════════════════════════════════════════════════╗\n"+
-                             "║                   Access Successful !!!                   ║\n"+
-                             "║═══════════════════════════════════════════════════════════║\n"+
-                             "║                                                           ║\n"+
-                             "║                                                           ║");
+        System.out.println("╔═══════════════════════════════════════════════════════════╗\n" +
+                "║                   Access Successful !!!                   ║\n" +
+                "║═══════════════════════════════════════════════════════════║\n" +
+                "║                                                           ║\n" +
+                "║                                                           ║");
         if (user.getAccessPassword().equals(ORGANIZER_PSWD)) {
             Organizer organizer = (Organizer) storedUser;
             ems.setCuurent_User(organizer, 1);
-            System.out.println(organizer.toString()+
-                             "║                                                           ║\n"+
-                             "╚═══════════════════════════════════════════════════════════╝");
+            System.out.println(organizer.toString() +
+                    "║                                                           ║\n" +
+                    "╚═══════════════════════════════════════════════════════════╝");
             System.out.println("Please Click Enter To continue...");
 
-            
             waitForEnter();
             organizerMenu();
         } else if (user.getAccessPassword().equals(SPEAKER_PSWD)) {
             Speaker speaker = (Speaker) storedUser;
             ems.setCuurent_User(speaker, 2);
-            System.out.println(speaker.toString()+
-                             "║                                                           ║\n"+
-                             "╚═══════════════════════════════════════════════════════════╝");
+            System.out.println(speaker.toString() +
+                    "║                                                           ║\n" +
+                    "╚═══════════════════════════════════════════════════════════╝");
             System.out.println("Please Click Enter To continue...");
 
             waitForEnter();
             speakerMenu(speaker);
         } else if (user.getAccessPassword().equals(STAFF_PSWD)) {
             Staff staff = (Staff) storedUser;
-            System.out.println(staff.toString()+
-                             "║                                                           ║\n"+
-                             "╚═══════════════════════════════════════════════════════════╝");            System.out.println("Please Click Enter To continue...");
+            System.out.println(staff.toString() +
+                    "║                                                           ║\n" +
+                    "╚═══════════════════════════════════════════════════════════╝");
+            System.out.println("Please Click Enter To continue...");
 
             ems.setCuurent_User(staff, 3);
             waitForEnter();
             staffMenu(staff, alluser, no);
         } else {
             Attendee attendee = (Attendee) storedUser;
-            System.out.println(attendee.toString()+
-                            "║                                                           ║\n"+
-                             "╚═══════════════════════════════════════════════════════════╝");
+            System.out.println(attendee.toString() +
+                    "║                                                           ║\n" +
+                    "╚═══════════════════════════════════════════════════════════╝");
 
             ems.setCuurent_User(attendee, 4);
             System.out.println("Please Click Enter To continue...");
@@ -404,7 +415,7 @@ public class TestUser {
         } else if (password.equals(SPEAKER_PSWD)) {
 
             alluser[no[0]] = new Speaker(username, password, email, contactNo);
-        
+
         } else if (password.equals(STAFF_PSWD)) {
 
             alluser[no[0]] = new Staff(username, password, email, contactNo);
@@ -414,10 +425,9 @@ public class TestUser {
             alluser[no[0]] = new Attendee(username, password, email, contactNo);
 
         }
-            ems.addNewUser(alluser[no[0]]);
-            user.setNo(no[0]);
-            no[0]++;
-
+        ems.addNewUser(alluser[no[0]]);
+        user.setNo(no[0]);
+        no[0]++;
 
     }
 
@@ -489,7 +499,7 @@ public class TestUser {
                 System.out.println("║     0. Exit                                                ║");
                 System.out.println("╚════════════════════════════════════════════════════════════╝");
                 System.out.print("Enter option: ");
-                
+
                 int choice = scan.nextInt();
 
                 switch (choice) {
@@ -558,7 +568,7 @@ public class TestUser {
         // Get valid option
         try {
             do {
-                
+
                 System.out.print("\n\t\tEnter Your Option: ");
                 option = scan.nextInt();
                 scan.nextLine();
@@ -574,7 +584,7 @@ public class TestUser {
         if (option == 0) {
             return; // Exit
         }
-        Attendee usertemp = new Attendee ();
+        Attendee usertemp = new Attendee();
 
         // Process based on option
         switch (option) {
@@ -671,12 +681,11 @@ public class TestUser {
         }
 
         System.out.println(
-                        "╔═══════════════════════════════════════════════════════════╗\n" +
+                "╔═══════════════════════════════════════════════════════════╗\n" +
                         "║                      CHECK-IN DETAILS                     ║\n" +
                         "╠═══════════════════════════════════════════════════════════╣\n" +
-                        current_attendee.toString()+currentTicket.toString()+
+                        current_attendee.toString() + currentTicket.toString() +
                         "╚═══════════════════════════════════════════════════════════╝");
-                        
 
         System.out.println("\n     Press Enter Key To Continue");
         waitForEnter();
@@ -734,7 +743,7 @@ public class TestUser {
                 if (ticket != null) {
 
                     usertemp.setAccessUserName(ticket.getBuyerName());
-                    
+
                     if (alluser.length == 0) {
                         for (User user : alluser) {
                             if (!(user.equals(usertemp))) {
@@ -764,14 +773,13 @@ public class TestUser {
                         }
                     }
 
-
                 }
 
             }
-                    System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────┘");
-                    System.out.println("\n\n\t\t\t Press Enter Key To Return Menu");
-                    waitForEnter();
-                    waitForEnter();
+            System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────┘");
+            System.out.println("\n\n\t\t\t Press Enter Key To Return Menu");
+            waitForEnter();
+            waitForEnter();
 
         }
 
@@ -797,7 +805,7 @@ public class TestUser {
             System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
 
             int no = 1;
-            Attendee usertemp= new Attendee();
+            Attendee usertemp = new Attendee();
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
@@ -863,13 +871,13 @@ public class TestUser {
             System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
             int no = 1;
 
-            Attendee usertamp= new Attendee();
-            
+            Attendee usertamp = new Attendee();
+
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
                     usertamp.setAccessUserName(ticket.getBuyerName());
-            
+
                     if (alluser.length == 0) {
                         for (User user : alluser) {
                             if (!(usertamp.equals(user))) {
@@ -907,7 +915,7 @@ public class TestUser {
             waitForEnter();
             waitForEnter();
 
-            int checkinRate = (Staff.getCheckin_Couter()*100) / tickets.size();
+            int checkinRate = (Staff.getCheckin_Couter() * 100) / tickets.size();
             String rateText = checkinRate + "%";
             System.out.println(
                     "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
@@ -936,9 +944,9 @@ public class TestUser {
             System.out.println(
                     "\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
             System.out.print("\t\t\t|            │ ");
-            int displaybar = (int) ((double) (checkinRate *59 )/100);
+            int displaybar = (int) ((double) (checkinRate * 59) / 100);
             for (int i = 0; i < 59; i++) {
-                if (i <=displaybar ) {
+                if (i <= displaybar) {
                     System.out.print("█");
                 } else {
                     System.out.print("░");
@@ -981,196 +989,196 @@ public class TestUser {
                     "\t\t\t│                                  NO ANY EVENT                                  │");
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
-            
+
             System.out.println("Press Enter Key to Return Back ...");
             waitForEnter();
             return;
         } else {
-            for (Event event : events){
-                if (event!=null){
+            for (Event event : events) {
+                if (event != null) {
 
-                System.out.print("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤\n"+
-                event.toString());
+                    System.out.print(
+                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤\n"
+                                    +
+                                    event.toString());
                 }
             }
         }
+
+        System.out.println(
+                "\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
+
+        System.out.print("\n\t\t\tEnter Event ID : ");
+
+        scan.nextLine();
+        String eventId = scan.nextLine();
+
+        Event current_event = ems.findEventById(eventId);
+        if (current_event != null) {
+            System.out.println(
+                    "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+            System.out.println(
+                    "\t\t\t│                                 EVENT INFORMATION                              │");
+            System.out.println(
+                    "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Event ID                 :             %-32s │\n",
+                    current_event.getEventID());
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Event Name               :             %-32s │\n",
+                    current_event.getTitle());
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Date                     :             %-32s │\n",
+                    current_event.getDate());
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Venue                    :             %-32s |\n",
+                    current_event.getVenue());
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Max Capacity             :             %-32d |\n",
+                    current_event.getMaxTickets());
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.println(
+                    "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+
+            System.out.println("\t\t\tPlease Press Enter Key to Continue.");
+            waitForEnter();
+
+            TicketType current_TicketType = TicketType.findTicketTypeById(ticketTypes, eventId);
+            int[] tol = current_TicketType.getQuantityOfAllTicketType();
+            // Early Bird
+            int totalEarly = tol[0];
+            int soldEarly = totalEarly - current_TicketType.getAvailableType("earlybird");
+            int availableEarly = current_TicketType.getAvailableType("earlybird");
+            double revenueEarly = soldEarly * current_TicketType.getPrice("earlybird");
+
+            // Standard
+            int totalStandard = tol[1];
+            int soldStandard = totalStandard - current_TicketType.getAvailableType("standard");
+            int availableStandard = current_TicketType.getAvailableType("standard");
+            double revenueStandard = soldStandard * current_TicketType.getPrice("standard");
+
+            // VIP
+            int totalVip = tol[2];
+            int soldVip = totalVip - current_TicketType.getAvailableType("vip");
+            int availableVip = current_TicketType.getAvailableType("vip");
+            double revenueVip = soldVip * current_TicketType.getPrice("vip");
+
+            // Print table
+            System.out.println(
+                    "\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
+            System.out.println(
+                    "\t\t\t│                                 Tickets Sales                                   │");
+            System.out.println(
+                    "\t\t\t├─────────────────────────────────────────────────────────────────────────────────┤");
+            System.out.println(
+                    "\t\t\t│ Ticket Type        │ Total        │ Sold         │ Available    │ Revenue       │");
+            System.out.println(
+                    "\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
+
+            System.out.printf("\t\t\t│ Early Bird         │ %-12f │ %-12f │ %-12d │ RM %-10.2f │\n",
+                    totalEarly, soldEarly, availableEarly, revenueEarly);
+
+            System.out.printf("\t\t\t│ Standard           │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n",
+                    totalStandard, soldStandard, availableStandard, revenueStandard);
+
+            System.out.printf("\t\t\t│ VIP                │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n",
+                    totalVip, soldVip, availableVip, revenueVip);
 
             System.out.println(
-                    "\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
+                    "\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
 
-            System.out.print("\n\t\t\tEnter Event ID : ");
+            int totalAll = totalEarly + totalStandard + totalVip;
+            int soldAll = soldEarly + soldStandard + soldVip;
+            int availableAll = availableEarly + availableStandard + availableVip;
+            double revenueAll = revenueEarly + revenueStandard + revenueVip;
 
-            scan.nextLine();
-            String eventId = scan.nextLine();
+            System.out.printf("\t\t\t│ TOTAL              │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n",
+                    totalAll, soldAll, availableAll, revenueAll);
+            System.out.println(
+                    "\t\t\t└────────────────────┴──────────────┴──────────────┴──────────────┴───────────────┘");
 
-            Event current_event = ems.findEventById(eventId);
-            if (current_event != null) {
-                System.out.println(
-                        "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
-                System.out.println(
-                        "\t\t\t│                                 EVENT INFORMATION                              │");
-                System.out.println(
-                        "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Event ID                 :             %-32s │\n",
-                        current_event.getEventID());
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Event Name               :             %-32s │\n",
-                        current_event.getTitle());
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Date                     :             %-32s │\n",
-                        current_event.getDate());
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Venue                    :             %-32s |\n",
-                        current_event.getVenue());
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Max Capacity             :             %-32d |\n",
-                        current_event.getMaxTickets());
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.println(
-                        "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+            waitForEnter();
+            System.out.println("\t\t\tPlease Press Enter Key to Continue.");
 
-                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
-                waitForEnter();
+            int total_ticket_checkin = 0;
+            for (Ticket ticket : tickets) {
+                if (ticket.getEventId().equals(eventId)) {
+                    if (!ticket.getStatus()) {
+                        total_ticket_checkin++;
 
-                TicketType current_TicketType = TicketType.findTicketTypeById(ticketTypes, eventId);
-                int[] tol = current_TicketType.getQuantityOfAllTicketType();
-                // Early Bird
-                int totalEarly = tol[0];
-                int soldEarly = totalEarly - current_TicketType.getAvailableType("earlybird");
-                int availableEarly = current_TicketType.getAvailableType("earlybird");
-                double revenueEarly = soldEarly * current_TicketType.getPrice("earlybird");
-
-                // Standard
-                int totalStandard = tol[1];
-                int soldStandard = totalStandard - current_TicketType.getAvailableType("standard");
-                int availableStandard = current_TicketType.getAvailableType("standard");
-                double revenueStandard = soldStandard * current_TicketType.getPrice("standard");
-
-                // VIP
-                int totalVip = tol[2];
-                int soldVip = totalVip - current_TicketType.getAvailableType("vip");
-                int availableVip = current_TicketType.getAvailableType("vip");
-                double revenueVip = soldVip * current_TicketType.getPrice("vip");
-
-                // Print table
-                System.out.println(
-                        "\n\t\t\t┌─────────────────────────────────────────────────────────────────────────────────┐");
-                System.out.println(
-                        "\t\t\t│                                 Tickets Sales                                   │");
-                System.out.println(
-                        "\t\t\t├─────────────────────────────────────────────────────────────────────────────────┤");
-                System.out.println(
-                        "\t\t\t│ Ticket Type        │ Total        │ Sold         │ Available    │ Revenue       │");
-                System.out.println(
-                        "\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
-
-                System.out.printf("\t\t\t│ Early Bird         │ %-12f │ %-12f │ %-12d │ RM %-10.2f │\n",
-                        totalEarly, soldEarly, availableEarly, revenueEarly);
-
-                System.out.printf("\t\t\t│ Standard           │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n",
-                        totalStandard, soldStandard, availableStandard, revenueStandard);
-
-                System.out.printf("\t\t\t│ VIP                │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n",
-                        totalVip, soldVip, availableVip, revenueVip);
-
-                System.out.println(
-                        "\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤");
-
-                int totalAll = totalEarly + totalStandard + totalVip;
-                int soldAll = soldEarly + soldStandard + soldVip;
-                int availableAll = availableEarly + availableStandard + availableVip;
-                double revenueAll = revenueEarly + revenueStandard + revenueVip;
-
-                System.out.printf("\t\t\t│ TOTAL              │ %-12d │ %-12d │ %-12d │ RM %-10.2f │\n",
-                        totalAll, soldAll, availableAll, revenueAll);
-                System.out.println(
-                        "\t\t\t└────────────────────┴──────────────┴──────────────┴──────────────┴───────────────┘");
-
-                waitForEnter();
-                System.out.println("\t\t\tPlease Press Enter Key to Continue.");
-
-                int total_ticket_checkin = 0;
-                for (Ticket ticket : tickets) {
-                    if (ticket.getEventId().equals(eventId)) {
-                        if (!ticket.getStatus()) {
-                            total_ticket_checkin++;
-                            
-                        }
                     }
                 }
-
-                double checkinRate = (soldAll > 0) ? (double) total_ticket_checkin / soldAll * 100 : 0;
-                String rateText = checkinRate + "%";
-                System.out.println(
-                        "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
-                System.out.println(
-                        "\t\t\t│                                 CHECK-IN STATISTICS                            │");
-                System.out.println(
-                        "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Total Check-ins          :             %-32d │\n",
-                        total_ticket_checkin);
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Total Attendees          :             %-32d │\n", soldAll);
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.printf("\t\t\t│        Check-in Rate            :             %-32s │\n", rateText);
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.println(
-                        "\t\t\t│                                                                                │");
-                System.out.println(
-                        "\t\t\t│                                 Check-in Rate                                  │");
-                System.out.println(
-                        "\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
-                System.out.print("\t\t\t|            │ ");
-
-                int displaybar = (int)(double) checkinRate / 100 * 59;
-                for (int i = 0; i < 59; i++) {
-                    if (displaybar >= i) {
-                        System.out.print("█");
-                    } else {
-                        System.out.print("░");
-                    }
-
-                }
-
-                System.out.println("  │    │");
-                System.out.println(
-                        "\t\t\t│            └──────────────────────────────────────────────────────────────┘    │");
-                System.out.println(
-                        "\t\t\t│                                                                                │ ");
-                System.out.println(
-                        "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
-
-                waitForEnter();
-                waitForEnter();
-                System.out.println("\t\t\tPlease Press Enter Key to Return Back Menu.");
-
-            } else {
-                System.out.println(
-                        "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
-                System.out.println(
-                        "\t\t\t│                                  NO FOUND                                      │");
-                System.out.println(
-                        "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
             }
-        }
 
-    
+            double checkinRate = (soldAll > 0) ? (double) total_ticket_checkin / soldAll * 100 : 0;
+            String rateText = checkinRate + "%";
+            System.out.println(
+                    "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+            System.out.println(
+                    "\t\t\t│                                 CHECK-IN STATISTICS                            │");
+            System.out.println(
+                    "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Total Check-ins          :             %-32d │\n",
+                    total_ticket_checkin);
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Total Attendees          :             %-32d │\n", soldAll);
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.printf("\t\t\t│        Check-in Rate            :             %-32s │\n", rateText);
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.println(
+                    "\t\t\t│                                                                                │");
+            System.out.println(
+                    "\t\t\t│                                 Check-in Rate                                  │");
+            System.out.println(
+                    "\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
+            System.out.print("\t\t\t|            │ ");
+
+            int displaybar = (int) (double) checkinRate / 100 * 59;
+            for (int i = 0; i < 59; i++) {
+                if (displaybar >= i) {
+                    System.out.print("█");
+                } else {
+                    System.out.print("░");
+                }
+
+            }
+
+            System.out.println("  │    │");
+            System.out.println(
+                    "\t\t\t│            └──────────────────────────────────────────────────────────────┘    │");
+            System.out.println(
+                    "\t\t\t│                                                                                │ ");
+            System.out.println(
+                    "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+
+            waitForEnter();
+            waitForEnter();
+            System.out.println("\t\t\tPlease Press Enter Key to Return Back Menu.");
+
+        } else {
+            System.out.println(
+                    "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
+            System.out.println(
+                    "\t\t\t│                                  NO FOUND                                      │");
+            System.out.println(
+                    "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
+        }
+    }
 
     public static void sale_report() {
 
@@ -1194,14 +1202,15 @@ public class TestUser {
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
         } else {
-            for(Event event : events){
-                if(event!=null){
-                        System.out.print("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤\n"+
-                        event.toString());
-            }
-            
+            for (Event event : events) {
+                if (event != null) {
+                    System.out.print(
+                            "\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤\n"
+                                    +
+                                    event.toString());
                 }
 
+            }
 
             System.out.println(
                     "\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
@@ -1628,11 +1637,11 @@ public class TestUser {
             System.out.println("║  6: View All Events          ║");
             System.out.println("║  7: View All Ticket Type     ║");
             System.out.println("║  8: Update Ticket Type       ║");
+            System.out.println("║  9: View My Profile          ║");
             System.out.println("║  0: Back to Main Menu        ║");
             System.out.println("╚══════════════════════════════╝");
             System.out.print("Enter option: ");
-            int choice = scan.nextInt();
-            scan.nextLine();
+            int choice = readInt();
 
             switch (choice) {
                 case 1:
@@ -1659,6 +1668,11 @@ public class TestUser {
                 case 8:
                     UpdateTicketType();
                     break;
+                case 9:
+                    Organizer currentOrganizer = (Organizer) ems.getCuurent_User();
+                    currentOrganizer.displayProfile();
+                    waitForEnter();
+                    break;
                 case 0:
                     inMenu = false;
                     break;
@@ -1676,10 +1690,14 @@ public class TestUser {
         System.out.println("1: Concert");
         System.out.println("2: Workshop");
         System.out.println("3: Conference");
+        System.out.println("0: Cancel");
         System.out.print("Enter option: ");
-        int type = scan.nextInt();
-        scan.nextLine();
+        int type = readInt();
 
+        if (type == 0) {
+            System.out.println("Cancelled.");
+            return;
+        }
         if (type < 1 || type > 3) {
             System.out.println("Invalid event type.");
             return;
@@ -1715,17 +1733,13 @@ public class TestUser {
                 System.out.print("\nCreating ticket type......");
                 scan.nextLine();
                 System.out.print("\nMax Ticket (Recommend 150):");
-                maxTix = scan.nextInt();
-                scan.nextLine();
+                maxTix = readInt();
                 System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
-                qeb = scan.nextInt();
-                scan.nextLine();
+                qeb = readInt();
                 System.out.print("Quantity Standard (Recommend 60% of total ticket):");
-                qsd = scan.nextInt();
-                scan.nextLine();
+                qsd = readInt();
                 System.out.print("Quantity Vip (Recommend 20% of total ticket):");
-                qvip = scan.nextInt();
-                scan.nextLine();
+                qvip = readInt();
             } catch (Exception e) {
                 System.out.println("Invalid input. Please retry.");
             }
@@ -1747,7 +1761,7 @@ public class TestUser {
                 System.out.print("Price Vip (RM):");
                 pvip = scan.nextDouble();
                 scan.nextLine();
-                
+
                 if (ems.validationPrice(peb, psd, pvip)) {
                     validInput = true;
                 }
@@ -1794,8 +1808,7 @@ public class TestUser {
 
             // Ask if organizer wants to assign speakers now
             System.out.print("\nDo you want to assign speakers to this concert now? (1=Yes / 0=No): ");
-            int assignNow = scan.nextInt();
-            scan.nextLine();
+            int assignNow = readInt();
             if (assignNow == 1) {
                 manageConcertSpeakers(c);
             }
@@ -1813,8 +1826,7 @@ public class TestUser {
 
             // Ask if organizer wants to assign speakers now
             System.out.print("\nDo you want to assign speakers to this workshop now? (1=Yes / 0=No): ");
-            int assignNow = scan.nextInt();
-            scan.nextLine();
+            int assignNow = readInt();
             if (assignNow == 1) {
                 manageWorkshopSpeakers(w);
             }
@@ -1822,8 +1834,7 @@ public class TestUser {
         } else {
             // Conference — ask how many sessions to create right away
             System.out.print("How many sessions to create now? (0 to skip): ");
-            int numSessions = scan.nextInt();
-            scan.nextLine();
+            int numSessions = readInt();
 
             String[] topics = new String[numSessions];
             String[] times = new String[numSessions];
@@ -1904,10 +1915,13 @@ public class TestUser {
         }
         System.out.println("\n--- Update Event ---");
         listEvents();
-        System.out.print("Select event number: ");
-        int idx = scan.nextInt() - 1;
-        scan.nextLine();
+        System.out.print("Select event number (0 to cancel): ");
+        int idx = readInt() - 1;
 
+        if (idx == -1) {
+            System.out.println("Cancelled.");
+            return;
+        }
         if (idx < 0 || idx >= eventCount) {
             System.out.println("Invalid selection.");
             return;
@@ -1935,9 +1949,14 @@ public class TestUser {
         System.out.println("  2: Date");
         System.out.println("  3: Venue");
         System.out.println("  4: Max Tickets");
+        System.out.println("  0: Cancel");
         System.out.print("Enter option: ");
-        int field = scan.nextInt();
-        scan.nextLine();
+        int field = readInt();
+
+        if (field == 0) {
+            System.out.println("Cancelled.");
+            return;
+        }
 
         switch (field) {
             case 1:
@@ -1975,8 +1994,7 @@ public class TestUser {
                 int newMax;
                 do {
                     System.out.print("New Max Tickets : ");
-                    newMax = scan.nextInt();
-                    scan.nextLine();
+                    newMax = readInt();
                 } while (!ems.validationMaxTickets(newMax));
                 e.setMaxTickets(newMax);
                 saveEvent(e);
@@ -2003,8 +2021,7 @@ public class TestUser {
             System.out.println("║  0: Back                     ║");
             System.out.println("╚══════════════════════════════╝");
             System.out.print("Enter option: ");
-            int choice = scan.nextInt();
-            scan.nextLine();
+            int choice = readInt();
 
             switch (choice) {
                 case 1:
@@ -2057,8 +2074,17 @@ public class TestUser {
             return;
         }
         conf.displaySessions();
-        System.out.print("Enter Session ID to remove: ");
-        String sessionID = scan.nextLine();
+        System.out.print("Select session number to remove (0 to cancel): ");
+        int idx = readInt() - 1;
+        if (idx == -1) {
+            System.out.println("Cancelled.");
+            return;
+        }
+        if (idx < 0 || idx >= conf.getSessionCount()) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+        String sessionID = conf.getSessions()[idx].getSessionID();
         conf.removeSession(sessionID);
         saveEvent(conf); // auto-save after session removed
     }
@@ -2077,7 +2103,7 @@ public class TestUser {
         int count = 0;
         Conference[] confList = new Conference[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i].isConcert()) {
+            if (events[i].isConference()) {
                 confList[count++] = (Conference) events[i];
             }
         }
@@ -2089,9 +2115,13 @@ public class TestUser {
         for (int i = 0; i < count; i++) {
             System.out.println("  " + (i + 1) + ": [" + confList[i].getEventID() + "] " + confList[i].getTitle());
         }
+        System.out.println("  0: Cancel");
         System.out.print("Select conference number: ");
-        int idx = scan.nextInt() - 1;
-        scan.nextLine();
+        int idx = readInt() - 1;
+        if (idx == -1) {
+            System.out.println("Cancelled.");
+            return null;
+        }
         if (idx < 0 || idx >= count) {
             System.out.println("Invalid selection.");
             return null;
@@ -2120,8 +2150,7 @@ public class TestUser {
             System.out.println("║  0: Back                         ║");
             System.out.println("╚══════════════════════════════════╝");
             System.out.print("Enter option: ");
-            int choice = scan.nextInt();
-            scan.nextLine();
+            int choice = readInt();
 
             switch (choice) {
                 case 1:
@@ -2151,7 +2180,7 @@ public class TestUser {
     // load all Speaker accounts from alluser into speakerPool
     static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         speakerCount = 0;
-        Speaker usertemp =new Speaker();
+        Speaker usertemp = new Speaker();
         for (int i = 0; i < totalUsers; i++) {
             if (usertemp.checkClass(alluser[i])) {
                 speakerPool[speakerCount++] = (Speaker) alluser[i];
@@ -2178,23 +2207,24 @@ public class TestUser {
             return;
         }
         conf.displaySessions();
-        System.out.print("Enter Session ID to assign speaker to: ");
-        String sessionID = scan.nextLine();
-        Session targetSession = null;
-        for (int i = 0; i < conf.getSessionCount(); i++) {
-            if (conf.getSessions()[i].getSessionID().equals(sessionID)) {
-                targetSession = conf.getSessions()[i];
-                break;
-            }
-        }
-        if (targetSession == null) {
-            System.out.println("Error: Session [" + sessionID + "] not found !");
+        System.out.print("Select session number to assign speaker to (0 to cancel): ");
+        int sIdx = readInt() - 1;
+        if (sIdx == -1) {
+            System.out.println("Cancelled.");
             return;
         }
+        if (sIdx < 0 || sIdx >= conf.getSessionCount()) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+        Session targetSession = conf.getSessions()[sIdx];
         viewSpeakers();
-        System.out.print("Select speaker number: ");
-        int spIdx = scan.nextInt() - 1;
-        scan.nextLine();
+        System.out.print("Select speaker number (0 to cancel): ");
+        int spIdx = readInt() - 1;
+        if (spIdx == -1) {
+            System.out.println("Cancelled.");
+            return;
+        }
         if (spIdx < 0 || spIdx >= speakerCount) {
             System.out.println("Invalid selection.");
             return;
@@ -2213,19 +2243,17 @@ public class TestUser {
             return;
         }
         conf.displaySessions();
-        System.out.print("Enter Session ID: ");
-        String sessionID = scan.nextLine();
-        Session targetSession = null;
-        for (int i = 0; i < conf.getSessionCount(); i++) {
-            if (conf.getSessions()[i].equals(sessionID)) {
-                targetSession = conf.getSessions()[i];
-                break;
-            }
-        }
-        if (targetSession == null) {
-            System.out.println("Error: Session [" + sessionID + "] not found !");
+        System.out.print("Select session number (0 to cancel): ");
+        int sIdx = readInt() - 1;
+        if (sIdx == -1) {
+            System.out.println("Cancelled.");
             return;
         }
+        if (sIdx < 0 || sIdx >= conf.getSessionCount()) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+        Session targetSession = conf.getSessions()[sIdx];
         System.out.print("Enter Speaker Username to remove: ");
         String speakerUsername = scan.nextLine();
         ems.removeSpeaker(targetSession, speakerUsername);
@@ -2255,8 +2283,7 @@ public class TestUser {
         System.out.println("║  0: Back                     ║");
         System.out.println("╚══════════════════════════════╝");
         System.out.print("Enter option: ");
-        int opt = scan.nextInt();
-        scan.nextLine();
+        int opt = readInt();
 
         if (opt == 1) {
             assignSpeakerToConcertOrWorkshop(concert, null);
@@ -2270,9 +2297,12 @@ public class TestUser {
             System.out.print("Enter Speaker Username to replace: ");
             String oldUname = scan.nextLine();
             viewSpeakers();
-            System.out.print("Select new speaker number: ");
-            int spIdx = scan.nextInt() - 1;
-            scan.nextLine();
+            System.out.print("Select new speaker number (0 to cancel): ");
+            int spIdx = readInt() - 1;
+            if (spIdx == -1) {
+                System.out.println("Cancelled.");
+                return;
+            }
             if (spIdx < 0 || spIdx >= speakerCount) {
                 System.out.println("Invalid selection.");
                 return;
@@ -2317,8 +2347,7 @@ public class TestUser {
         System.out.println("║  0: Back                     ║");
         System.out.println("╚══════════════════════════════╝");
         System.out.print("Enter option: ");
-        int opt = scan.nextInt();
-        scan.nextLine();
+        int opt = readInt();
 
         if (opt == 1) {
             assignSpeakerToConcertOrWorkshop(null, workshop);
@@ -2332,9 +2361,12 @@ public class TestUser {
             System.out.print("Enter Speaker Username to replace: ");
             String oldUname = scan.nextLine();
             viewSpeakers();
-            System.out.print("Select new speaker number: ");
-            int spIdx = scan.nextInt() - 1;
-            scan.nextLine();
+            System.out.print("Select new speaker number (0 to cancel): ");
+            int spIdx = readInt() - 1;
+            if (spIdx == -1) {
+                System.out.println("Cancelled.");
+                return;
+            }
             if (spIdx < 0 || spIdx >= speakerCount) {
                 System.out.println("Invalid selection.");
                 return;
@@ -2372,8 +2404,7 @@ public class TestUser {
         while (keepAssigning) {
             viewSpeakers();
             System.out.print("Select speaker number to assign (0 to stop): ");
-            int spIdx = scan.nextInt() - 1;
-            scan.nextLine();
+            int spIdx = readInt() - 1;
             if (spIdx == -1) {
                 keepAssigning = false;
             } else if (spIdx < 0 || spIdx >= speakerCount) {
@@ -2386,8 +2417,7 @@ public class TestUser {
                     workshop.assignSpeaker(sp);
                 }
                 System.out.print("Assign another speaker to this " + eventLabel + "? (1=Yes / 0=No): ");
-                int cont = scan.nextInt();
-                scan.nextLine();
+                int cont = readInt();
                 if (cont != 1)
                     keepAssigning = false;
             }
@@ -2414,9 +2444,13 @@ public class TestUser {
             System.out.println("  " + (i + 1) + ": [" + concertList[i].getEventID() + "] "
                     + concertList[i].getTitle());
         }
+        System.out.println("  0: Cancel");
         System.out.print("Select concert number: ");
-        int idx = scan.nextInt() - 1;
-        scan.nextLine();
+        int idx = readInt() - 1;
+        if (idx == -1) {
+            System.out.println("Cancelled.");
+            return null;
+        }
         if (idx < 0 || idx >= count) {
             System.out.println("Invalid selection.");
             return null;
@@ -2442,9 +2476,13 @@ public class TestUser {
             System.out.println("  " + (i + 1) + ": [" + workshopList[i].getEventID() + "] "
                     + workshopList[i].getTitle());
         }
+        System.out.println("  0: Cancel");
         System.out.print("Select workshop number: ");
-        int idx = scan.nextInt() - 1;
-        scan.nextLine();
+        int idx = readInt() - 1;
+        if (idx == -1) {
+            System.out.println("Cancelled.");
+            return null;
+        }
         if (idx < 0 || idx >= count) {
             System.out.println("Invalid selection.");
             return null;
@@ -2576,7 +2614,7 @@ public class TestUser {
     // ─────────────────────────────────────────────────────────────────────────
     // Auto-save a single event's list to the correct JSON file based on its type
     static void saveEvent(Event e) {
-        if (e.isConcert()){
+        if (e.isConcert()) {
             Concert.storeConcertData(concerts);
         } else if (e.isWorkshop()) {
             Workshop.storeWorkshopData(workshops);
@@ -2688,11 +2726,14 @@ public class TestUser {
         // pick ticket type
         String ticketType = "";
         while (true) {
-            try{
+            try {
                 System.out.println("===== Ticket Type =====");
-                System.out.println("1. EarlyBird  - RM " + tt.getPrice("earlybird")+" ("+tt.getAvailableType("earlybird")+" tickets available)");
-                System.out.println("2. Standard   - RM " + tt.getPrice("standard")+" ("+tt.getAvailableType("standard")+" tickets available)");
-                System.out.println("3. VIP        - RM " + tt.getPrice("vip")+" ("+tt.getAvailableType("vip")+" tickets available)");
+                System.out.println("1. EarlyBird  - RM " + tt.getPrice("earlybird") + " ("
+                        + tt.getAvailableType("earlybird") + " tickets available)");
+                System.out.println("2. Standard   - RM " + tt.getPrice("standard") + " ("
+                        + tt.getAvailableType("standard") + " tickets available)");
+                System.out.println("3. VIP        - RM " + tt.getPrice("vip") + " (" + tt.getAvailableType("vip")
+                        + " tickets available)");
                 System.out.print("Select ticket type: ");
                 int type = scan.nextInt();
                 scan.nextLine();
@@ -2726,30 +2767,30 @@ public class TestUser {
         // payment
         System.out.println("\nThe total amount = RM " + tt.getPrice(ticketType));
         while (true) {
-            try{
-            System.out.println("Payment Method");
-            System.out.println("1. Touch N Go");
-            System.out.println("2. Credit/Debit Card");
-            System.out.println("3. Online Banking");
-            System.out.print("Select your payment method: ");
-            int method = scan.nextInt();
-            scan.nextLine();
-            if (method == 1 || method == 2 || method == 3) {
-                break;
-            } else {
-                System.out.println("Invalid option. Try again.");
-            }
-            }catch (Exception e){
+            try {
+                System.out.println("Payment Method");
+                System.out.println("1. Touch N Go");
+                System.out.println("2. Credit/Debit Card");
+                System.out.println("3. Online Banking");
+                System.out.print("Select your payment method: ");
+                int method = scan.nextInt();
+                scan.nextLine();
+                if (method == 1 || method == 2 || method == 3) {
+                    break;
+                } else {
+                    System.out.println("Invalid option. Try again.");
+                }
+            } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a number (1, 2, or 3).");
                 scan.nextLine(); // Clear the invalid input buffer
             }
         }
         System.out.println("\nProcessing payment...");
         System.out.println("Payment Success!");
-        Payment p= new Payment(a, eventId, tt.getPrice(ticketType), bookingNo);
+        Payment p = new Payment(a, eventId, tt.getPrice(ticketType), bookingNo);
         payments[ticketCount] = p;
         System.out.print(p.toString());
-        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, p,ticketCount);
+        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, p, ticketCount);
 
         if (ticket != null) {
             scan.nextLine();
@@ -2813,7 +2854,8 @@ public class TestUser {
             TicketType tt = TicketType.findTicketTypeById(ticketTypes, e.getEventID());
 
             System.out.printf("  │ %-2d │ %-4s │ %-12s │ %-15s │ %-10s │ %-15s │ %-19s │ %-18s │ %3d              │%n",
-                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(), tt.getAvailableQuantity());
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(),
+                    tt.getAvailableQuantity());
         }
         System.out.println(
                 "  └────┴──────┴──────────────┴─────────────────┴────────────┴─────────────────┴─────────────────────┴────────────────────┴──────────────────┘");
@@ -2825,105 +2867,112 @@ public class TestUser {
             return;
         }
         viewAllTicketType();
-        System.out.println("Enter number of ticket type that you want to update: ");
-        int choice = scan.nextInt();
-        if (choice < 0 || choice > ticketTypes.size()) {
+        System.out.print("Enter number of ticket type to update (0 to cancel): ");
+        int choice = readInt();
+        if (choice == 0) {
+            System.out.println("Cancelled.");
+            return;
+        }
+        if (choice < 1 || choice > ticketTypes.size()) {
             System.out.println("Invalid input. Please retry.");
             return;
-        } else {
-            System.out.println("Ticket Type " + choice + "\n============================");
-            TicketType tt = ticketTypes.get(choice - 1);
-            System.out.print(tt.toString());
-            System.out.println("\n\n1. Quantity of ticket");
-            System.out.println("2. Price of ticket");
-            System.out.println("3. Perks");
-            System.out.println("4. Sales Start Date");
-            System.out.println("5. Sales End Date");
-            System.out.println("Select which field you want to update: ");
-            int choice1 = scan.nextInt();
-            System.out.print("\nUpdating ticket type......");
-            switch (choice1) {
-                case 1:
-                    int maxTix = 0;
-                    int qeb = 0;
-                    int qsd = 0;
-                    int qvip = 0;
-                    do {
-                        try {
-                            scan.nextLine();
-                            System.out.print("\nMax Ticket (Recommend 150):");
-                            maxTix = scan.nextInt();
-                            scan.nextLine();
-                            System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
-                            qeb = scan.nextInt();
-                            scan.nextLine();
-                            System.out.print("Quantity Standard (Recommend 60% of total ticket):");
-                            qsd = scan.nextInt();
-                            scan.nextLine();
-                            System.out.print("Quantity Vip (Recommend 20% of total ticket):");
-                            qvip = scan.nextInt();
-                            scan.nextLine();
-                        } catch (Exception e) {
-                            System.out.println("Invalid input. Please retry.");
-                        }
-                    } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
-                    tt.setTotalQuantity(maxTix, qeb, qsd, qvip);
-                    tt.updateQuantityWithSoldTickets(qeb, qsd, qvip);
-                    break;
-                case 2:
-                    double peb = 0.0;
-                    double psd = 0.0;
-                    double pvip = 0.0;
-                    do {
-                        System.out.print("\nPrice Early Bird (RM):");
-                        peb = scan.nextDouble();
-                        scan.nextLine();
-                        System.out.print("Price Standard (RM):");
-                        psd = scan.nextDouble();
-                        scan.nextLine();
-                        System.out.print("Price Vip (RM):");
-                        pvip = scan.nextDouble();
-                        scan.nextLine();
-                    } while (!ems.validationPrice(peb, psd, pvip));
-                    tt.setPrice(peb, psd, pvip);
-                    break;
-                case 3:
-                    String perks;
-                    do {
-                        System.out.print("\nPerks Provided: (if no just enter -) ");
-                        perks = scan.nextLine();
-                    } while (!ems.validationPerks(perks));
-                    tt.setPerks(perks);
-                    break;
-                case 4:
-                    String ssdate;
-                    LocalDate salesStartDate;
-                    do {
-                        System.out.print("Sales Start Date (YYYY-MM-DD) : ");
-                        ssdate = scan.nextLine();
-                        salesStartDate = ems.validationSalesStartDate(ssdate,
-                                ems.findEventById(tt.getEventId()).getDate());
-                    } while (salesStartDate == null);
-                    tt.setSalesStart(salesStartDate);
-                    break;
-                case 5:
-                    String sedate;
-                    LocalDate salesEndDate;
-                    do {
-                        System.out.print("Sales End Date (YYYY-MM-DD) : ");
-                        sedate = scan.nextLine();
-                        salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(),
-                                ems.getEventById(tt.getEventId()).getDate());
-                    } while (salesEndDate == null);
-                    tt.setSalesEnd(salesEndDate);
-                    break;
-                default:
-                    System.out.println("Invalid input. Please retry");
-            }
-            storeTicketTypeData(ticketTypes);
-            System.out.println("Update Sucessfully.");
         }
-
+        System.out.println("Ticket Type " + choice + "\n============================");
+        TicketType tt = ticketTypes.get(choice - 1);
+        System.out.print(tt.toString());
+        System.out.println("\n\n1. Quantity of ticket");
+        System.out.println("2. Price of ticket");
+        System.out.println("3. Perks");
+        System.out.println("4. Sales Start Date");
+        System.out.println("5. Sales End Date");
+        System.out.println("0. Cancel");
+        System.out.print("Select which field you want to update: ");
+        int choice1 = readInt();
+        if (choice1 == 0) {
+            System.out.println("Cancelled.");
+            return;
+        }
+        System.out.print("\nUpdating ticket type......");
+        switch (choice1) {
+            case 1:
+                int maxTix = 0;
+                int qeb = 0;
+                int qsd = 0;
+                int qvip = 0;
+                do {
+                    try {
+                        scan.nextLine();
+                        System.out.print("\nMax Ticket (Recommend 150):");
+                        maxTix = readInt();
+                        System.out.print("Quantity Early Bird (Recommend 20% of total ticket):");
+                        qeb = readInt();
+                        System.out.print("Quantity Standard (Recommend 60% of total ticket):");
+                        qsd = readInt();
+                        System.out.print("Quantity Vip (Recommend 20% of total ticket):");
+                        qvip = readInt();
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Please retry.");
+                    }
+                } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
+                tt.setTotalQuantity(maxTix, qeb, qsd, qvip);
+                tt.updateQuantityWithSoldTickets(qeb, qsd, qvip);
+                break;
+            case 2:
+                double peb = 0.0;
+                double psd = 0.0;
+                double pvip = 0.0;
+                boolean validPrice = false;
+                while (!validPrice) {
+                    try {
+                        System.out.print("\nPrice Early Bird (RM):");
+                        peb = Double.parseDouble(scan.nextLine().trim());
+                        System.out.print("Price Standard (RM):");
+                        psd = Double.parseDouble(scan.nextLine().trim());
+                        System.out.print("Price Vip (RM):");
+                        pvip = Double.parseDouble(scan.nextLine().trim());
+                        if (ems.validationPrice(peb, psd, pvip))
+                            validPrice = true;
+                    } catch (Exception e) {
+                        System.out.println("Invalid input. Please enter numbers only.");
+                    }
+                }
+                tt.setPrice(peb, psd, pvip);
+                break;
+            case 3:
+                String perks;
+                do {
+                    System.out.print("\nPerks Provided: (if no just enter -) ");
+                    perks = scan.nextLine();
+                } while (!ems.validationPerks(perks));
+                tt.setPerks(perks);
+                break;
+            case 4:
+                String ssdate;
+                LocalDate salesStartDate;
+                do {
+                    System.out.print("Sales Start Date (YYYY-MM-DD) : ");
+                    ssdate = scan.nextLine();
+                    salesStartDate = ems.validationSalesStartDate(ssdate,
+                            ems.findEventById(tt.getEventId()).getDate());
+                } while (salesStartDate == null);
+                tt.setSalesStart(salesStartDate);
+                break;
+            case 5:
+                String sedate;
+                LocalDate salesEndDate;
+                do {
+                    System.out.print("Sales End Date (YYYY-MM-DD) : ");
+                    sedate = scan.nextLine();
+                    salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(),
+                            ems.getEventById(tt.getEventId()).getDate());
+                } while (salesEndDate == null);
+                tt.setSalesEnd(salesEndDate);
+                break;
+            default:
+                System.out.println("Invalid input. Please retry");
+        }
+        storeTicketTypeData(ticketTypes);
+        System.out.println("Update Successfully.");
     }
 
     // create Ticket file
@@ -2958,7 +3007,8 @@ public class TestUser {
                     LocalDate purchasedDate = LocalDate.parse(lines.get(i + 8));
                     String bookingId = lines.get(i + 9);
 
-                    Ticket t = new Ticket(ticketId, status, buyerName, eventId, ticketType, totalAmount, seatNo, perks, purchasedDate,bookingId);
+                    Ticket t = new Ticket(ticketId, status, buyerName, eventId, ticketType, totalAmount, seatNo, perks,
+                            purchasedDate, bookingId);
                     tickets.add(t);
                     i += 10; // 10 lines per record
                 }
@@ -2980,8 +3030,8 @@ public class TestUser {
                 writer.write(t.getTicketType() + "\n");
                 writer.write(t.getTotalAmount() + "\n");
                 writer.write(t.getSeatNum() + "\n");
-                writer.write(t.getPerks() + "\n"); 
-                writer.write(t.getPurchasedDate() + "\n"); 
+                writer.write(t.getPerks() + "\n");
+                writer.write(t.getPurchasedDate() + "\n");
                 writer.write(t.getBookingId() + "\n");
 
             }
@@ -3012,23 +3062,26 @@ public class TestUser {
                 int i = 0;
                 while (i < lines.size()) {
                     String eventId = lines.get(i);
-                    int totalQuantity = (int)Double.parseDouble(lines.get(i + 1));
-                    int quantityEarlyBird = (int)Double.parseDouble(lines.get(i + 2));
-                    int quantityStandard = (int)Double.parseDouble(lines.get(i + 3));
-                    int quantityVip = (int)Double.parseDouble(lines.get(i + 4));
-                    int availableQuantity = (int)Double.parseDouble(lines.get(i + 5));
-                    int availableEarlyBird = (int)Double.parseDouble(lines.get(i + 6));
-                    int availableStandard = (int)Double.parseDouble(lines.get(i + 7));
-                    int availableVip = (int)Double.parseDouble(lines.get(i + 8));
+                    int totalQuantity = (int) Double.parseDouble(lines.get(i + 1));
+                    int quantityEarlyBird = (int) Double.parseDouble(lines.get(i + 2));
+                    int quantityStandard = (int) Double.parseDouble(lines.get(i + 3));
+                    int quantityVip = (int) Double.parseDouble(lines.get(i + 4));
+                    int availableQuantity = (int) Double.parseDouble(lines.get(i + 5));
+                    int availableEarlyBird = (int) Double.parseDouble(lines.get(i + 6));
+                    int availableStandard = (int) Double.parseDouble(lines.get(i + 7));
+                    int availableVip = (int) Double.parseDouble(lines.get(i + 8));
                     double priceEarlyBird = Double.parseDouble(lines.get(i + 9));
                     double priceStandard = Double.parseDouble(lines.get(i + 10));
                     double priceVip = Double.parseDouble(lines.get(i + 11));
                     String perks = lines.get(i + 12);
                     LocalDate salesStart = LocalDate.parse(lines.get(i + 13));
                     LocalDate salesEnd = LocalDate.parse(lines.get(i + 14));
-                    // earlyBirdEnd is NOT stored — constructor computes it as salesStart.plusDays(1)
+                    // earlyBirdEnd is NOT stored — constructor computes it as
+                    // salesStart.plusDays(1)
 
-                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard, quantityVip, availableQuantity, availableEarlyBird, availableStandard, availableVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
+                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard,
+                            quantityVip, availableQuantity, availableEarlyBird, availableStandard, availableVip,
+                            priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
                     ticketTypes.add(tt);
 
                     // NEW: Load tickets and remove already sold seats
@@ -3043,8 +3096,7 @@ public class TestUser {
 
                     i += 15; // 15 lines per record
                 }
-            }
-            else{
+            } else {
                 System.out.println("There is no ticket type record created.");
             }
         } catch (IOException e) {
@@ -3068,7 +3120,7 @@ public class TestUser {
                 writer.write(tt.getAvailableType("vip") + "\n");
                 writer.write(String.format("%.2f", tt.getPrice("earlybird")) + "\n");
                 writer.write(String.format("%.2f", tt.getPrice("standard")) + "\n");
-                writer.write(String.format("%.2f", tt.getPrice("vip")) + "\n"); 
+                writer.write(String.format("%.2f", tt.getPrice("vip")) + "\n");
                 writer.write(tt.getPerks() + "\n");
                 writer.write(tt.getSalesStart().toString() + "\n");
                 writer.write(tt.getSalesEnd().toString() + "\n");
