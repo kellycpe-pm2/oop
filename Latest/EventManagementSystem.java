@@ -24,7 +24,7 @@ public class EventManagementSystem {
         this.events=events;
         EventManagementSystem.tickets=tickets;
         EventManagementSystem.payments=payments;
-        this.user_no=countUser_Num();
+        EventManagementSystem.user_no=countUser_Num();
     
     }   
      public EventManagementSystem(){
@@ -402,25 +402,25 @@ public class EventManagementSystem {
     }
 
     // validate price
-    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
-        if (priceEarlyBird == 0 || priceStandard == 0 || priceVip == 0){
-            System.out.println("Ticket prices cannot be zero.");
-            return false;
-        }
+    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {    
         if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
             System.out.println("Ticket prices cannot be negative.");
             return false;
         }
+        
         if (priceVip <= priceStandard) {
-            System.out.println("VIP price should be greater than Standard price.");
+            System.out.println("VIP price (RM" + priceVip + ") should be greater than Standard price (RM" + priceStandard + ").");
             return false;
         }
+        
         if (priceStandard <= priceEarlyBird) {
-            System.out.println("Standard price should be greater than Early Bird price.");
+            System.out.println("Standard price (RM" + priceStandard + ") should be greater than Early Bird price (RM" + priceEarlyBird + ").");
             return false;
         }
+
         return true;
     }
+
 
     public boolean validationPerks(String perks) {
         if (perks == null || perks.trim().isEmpty()) {
@@ -490,13 +490,13 @@ public class EventManagementSystem {
 
     }
 
-// In EventManagementSystem.java
-    public Ticket purchaseTicket(TicketType tt,String eventId, String ticketTypeName, String bookingId, int ticketCount) {    
+    public Ticket purchaseTicket(TicketType tt,String eventId, String ticketTypeName, Payment payment, int ticketCount) {    
         if (tt == null) {
             System.out.println("Error: TicketType cannot be null!");
             return null;
         }
-        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(),ticketTypeName, true, eventId, ticketCount,bookingId);
+
+        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(),ticketTypeName, true, eventId, ticketCount,payment.getBookingId());
         return ticket;
     }
     public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName){
