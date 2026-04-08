@@ -8,12 +8,13 @@ public class Payment{
     double paymentAmount;
     private LocalDate paymentDate;
 
-    public Payment(Attendee a, String eventId, double paymentAmount){
+    public Payment(Attendee a, String eventId, double paymentAmount, int bookingNo){
         name=a.getAccessUsername();
         this.eventId=eventId;
         this.paymentAmount=paymentAmount;
         paymentDate=LocalDate.now();
         bookingNo++;
+        Payment.bookingNo=bookingNo;
         bookingId=generateBookingId(eventId);
     }
 
@@ -28,7 +29,7 @@ public class Payment{
             return false;
     }
 
-        //generate Booking ID
+    //generate Booking ID
     public String generateBookingId(String eventId){
         bookingId= "B" + eventId+String.format("%03d", bookingNo++);
         return bookingId;
