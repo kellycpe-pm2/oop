@@ -3,17 +3,16 @@ public class Session {
     private String topic;
     private String time;
 
-    // speaker association
+    // Speaker usernames only — no dependency on Speaker class
     private static final int MAX_SPEAKERS = 5;
-    private Speaker[] speakers = new Speaker[MAX_SPEAKERS];
+    private String[] speakerUsernames = new String[MAX_SPEAKERS];
     private int speakerCount = 0;
 
-    //speaker status tracking
-     private String[] speakerStatus = new String[MAX_SPEAKERS];
-     private String[] rejectionReason = new String[MAX_SPEAKERS];
-   
+    // Speaker status tracking (indexed in parallel with speakerUsernames)
+    private String[] speakerStatus = new String[MAX_SPEAKERS];
+    private String[] rejectionReason = new String[MAX_SPEAKERS];
 
-    // auto-generate sessionID: S001, S002, ...
+    // Auto-generate sessionID: S001, S002, …
     private static int sessionCounter = 1;
 
     private static String generateSessionID() {
@@ -25,13 +24,14 @@ public class Session {
         this.topic = topic;
         this.time = time;
 
-         for (int i = 0; i < MAX_SPEAKERS; i++) {
-        speakerStatus[i] = "pending";
-        rejectionReason[i] = "";
-    }
+        for (int i = 0; i < MAX_SPEAKERS; i++) {
+            speakerStatus[i] = "pending";
+            rejectionReason[i] = "";
+        }
     }
 
-    // Getters
+    // ── Getters ──────────────────────────────────────────────────────────────
+
     public String getSessionID() {
         return sessionID;
     }
@@ -44,15 +44,20 @@ public class Session {
         return time;
     }
 
-    public Speaker[] getSpeakers() {
-        return speakers;
-    }
-
     public int getSpeakerCount() {
         return speakerCount;
     }
 
-    // Setters
+    /**
+     * Returns the raw username array (length MAX_SPEAKERS; only indices
+     * 0..speakerCount-1 are populated).
+     */
+    public String[] getSpeakers() {
+        return speakerUsernames;
+    }
+
+    // ── Setters ──────────────────────────────────────────────────────────────
+
     public void setSessionID(String sessionID) {
         this.sessionID = sessionID;
     }
@@ -65,145 +70,164 @@ public class Session {
         this.time = time;
     }
 
-    // add speaker to session
-    public boolean addSpeaker(Speaker speaker) {
+    // ── Speaker management ───────────────────────────────────────────────────
+
+    /** Add a speaker by username. Returns false if full or already assigned. */
+    public boolean addSpeaker(String username) {
         if (speakerCount >= MAX_SPEAKERS) {
-            System.out.println("Error: Session [" + sessionID + "] already has the maximum number of speakers.");
+            System.out.println("Error: Session [" + sessionID
+                    + "] already has the maximum number of speakers.");
             return false;
         }
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(speaker.getAccessUsername())) {
-                System.out.println("Error: Speaker [" + speaker.getAccessUsername()
+            if (speakerUsernames[i].equals(username)) {
+                System.out.println("Error: Speaker [" + username
                         + "] is already assigned to session [" + sessionID + "].");
                 return false;
             }
         }
-        speakers[speakerCount] = speaker;
+        speakerUsernames[speakerCount] = username;
+        speakerStatus[speakerCount] = "pending";
+        rejectionReason[speakerCount] = "";
         speakerCount++;
         return true;
     }
 
-    // remove speaker from session
+    /** Remove a speaker by username. Returns false if not found. */
     public boolean removeSpeaker(String username) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(username)) {
+            if (speakerUsernames[i].equals(username)) {
+                // Shift remaining entries left
                 for (int j = i; j < speakerCount - 1; j++) {
-                    speakers[j] = speakers[j + 1];
+                    speakerUsernames[j] = speakerUsernames[j + 1];
+                    speakerStatus[j] = speakerStatus[j + 1];
+                    rejectionReason[j] = rejectionReason[j + 1];
                 }
-                speakers[speakerCount - 1] = null;
+                speakerUsernames[speakerCount - 1] = null;
+                speakerStatus[speakerCount - 1] = "pending";
+                rejectionReason[speakerCount - 1] = "";
                 speakerCount--;
-                System.out.println("Speaker [" + username + "] removed from session [" + sessionID + "].");
+                System.out.println("Speaker [" + username
+                        + "] removed from session [" + sessionID + "].");
                 return true;
             }
         }
-        System.out.println("Error: Speaker [" + username + "] not found in session [" + sessionID + "].");
+        System.out.println("Error: Speaker [" + username
+                + "] not found in session [" + sessionID + "].");
         return false;
     }
 
-    // Get speaker status by username
-public String getSpeakerStatus(String username) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].getAccessUsername().equals(username)) {
-            return speakerStatus[i] != null ? speakerStatus[i] : "pending";
-        }
-    }
-    return "not_assigned";
-}
-
-// Get rejection reason for a speaker
-public String getRejectionReason(String username) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].getAccessUsername().equals(username)) {
-            return rejectionReason[i] != null ? rejectionReason[i] : "";
-        }
-    }
-    return "";
-}
-
-// Check if a speaker is assigned to this session
-public boolean hasSpeaker(String username) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].equals(username)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// Accept session invitation
-public boolean acceptInvitation(String username) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].equals(username)) {
-            if ("pending".equals(speakerStatus[i])) {
-                speakerStatus[i] = "accepted";
-                System.out.println("Speaker [" + username + "] accepted session [" + sessionID + "].");
+    /** Check whether a username is assigned to this session. */
+    public boolean hasSpeaker(String username) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
                 return true;
-            } else if ("accepted".equals(speakerStatus[i])) {
-                System.out.println("Speaker [" + username + "] has already accepted this session.");
-                return false;
-            } else if ("rejected".equals(speakerStatus[i])) {
-                System.out.println("Speaker [" + username + "] has already rejected this session.");
-                return false;
             }
         }
+        return false;
     }
-    System.out.println("Speaker [" + username + "] not found in session [" + sessionID + "].");
-    return false;
-}
 
-// Reject session invitation with reason
-public boolean rejectInvitation(String username, String reason) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakers[i] != null && speakers[i].equals(username)) {
-            if ("pending".equals(speakerStatus[i])) {
-                speakerStatus[i] = "rejected";
-                rejectionReason[i] = reason;
-                System.out.println("Speaker [" + username + "] rejected session [" + sessionID + "].");
-                System.out.println("Reason: " + reason);
-                return true;
-            } else if ("accepted".equals(speakerStatus[i])) {
-                System.out.println("Speaker [" + username + "] has already accepted this session.");
-                return false;
-            } else if ("rejected".equals(speakerStatus[i])) {
-                System.out.println("Speaker [" + username + "] has already rejected this session.");
-                return false;
+    /** Get the invitation status for a speaker username. */
+    public String getSpeakerStatus(String username) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+                return speakerStatus[i] != null ? speakerStatus[i] : "pending";
             }
         }
+        return "not_assigned";
     }
-    System.out.println("Speaker [" + username + "] not found in session [" + sessionID + "].");
-    return false;
-}
+
+    /** Get the rejection reason for a speaker username. */
+    public String getRejectionReason(String username) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+                return rejectionReason[i] != null ? rejectionReason[i] : "";
+            }
+        }
+        return "";
+    }
+
+    /** Accept the session invitation for a given username. */
+    public boolean acceptInvitation(String username) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+                if ("pending".equals(speakerStatus[i])) {
+                    speakerStatus[i] = "accepted";
+                    System.out.println("Speaker [" + username
+                            + "] accepted session [" + sessionID + "].");
+                    return true;
+                } else if ("accepted".equals(speakerStatus[i])) {
+                    System.out.println("Speaker [" + username
+                            + "] has already accepted this session.");
+                    return false;
+                } else {
+                    System.out.println("Speaker [" + username
+                            + "] has already rejected this session.");
+                    return false;
+                }
+            }
+        }
+        System.out.println("Speaker [" + username
+                + "] not found in session [" + sessionID + "].");
+        return false;
+    }
+
+    /** Reject the session invitation for a given username, with a reason. */
+    public boolean rejectInvitation(String username, String reason) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+                if ("pending".equals(speakerStatus[i])) {
+                    speakerStatus[i] = "rejected";
+                    rejectionReason[i] = reason;
+                    System.out.println("Speaker [" + username
+                            + "] rejected session [" + sessionID + "].");
+                    System.out.println("Reason: " + reason);
+                    return true;
+                } else if ("accepted".equals(speakerStatus[i])) {
+                    System.out.println("Speaker [" + username
+                            + "] has already accepted this session.");
+                    return false;
+                } else {
+                    System.out.println("Speaker [" + username
+                            + "] has already rejected this session.");
+                    return false;
+                }
+            }
+        }
+        System.out.println("Speaker [" + username
+                + "] not found in session [" + sessionID + "].");
+        return false;
+    }
+
+    // ── toString / equals ────────────────────────────────────────────────────
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[" + sessionID + "] Topic: " + topic + "  Time: " + time + "  Speakers: ");
+        sb.append("[").append(sessionID).append("] Topic: ").append(topic)
+                .append("  Time: ").append(time).append("  Speakers: ");
         if (speakerCount == 0) {
             sb.append("None");
         } else {
             for (int i = 0; i < speakerCount; i++) {
                 if (i > 0)
                     sb.append(", ");
-                sb.append(speakers[i].getAccessUsername());
+                sb.append(speakerUsernames[i]);
             }
         }
         return sb.toString();
     }
 
     public boolean equals(Object o) {
-        if (o==null){
+        if (o == null)
             return false;
-        }
         if (o instanceof Session) {
-            Session session = (Session) o;
-            return this.sessionID.equals(session.getSessionID());
-        }
-        return false; // the object does not belong to Event
-    }
-    
-    public boolean equals (String sessionID){
-        if(this.sessionID.equals(sessionID)){
-            return true;
+            return this.sessionID.equals(((Session) o).getSessionID());
         }
         return false;
+    }
+
+    public boolean equals(String sessionID) {
+        return this.sessionID.equals(sessionID);
     }
 }
