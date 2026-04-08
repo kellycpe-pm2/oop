@@ -11,7 +11,8 @@ public class Attendee extends User{
 
     public String toString(){
             return super.toString()+String.format("║          Position       :  %-31s║\n",role);
-                                                }
+    }
+
     public boolean checkClass(Object o){
         if(o instanceof User){
             return true;
@@ -29,6 +30,7 @@ public class Attendee extends User{
         }
         return false; // the object does not belong to Event
     }
+    
     public boolean equals(String username){
         if(getAccessUsername().equals(username)){
             return true;
