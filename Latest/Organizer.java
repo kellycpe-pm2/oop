@@ -2,18 +2,16 @@ public class Organizer extends User {
 
     // instance variable
     private static int no = 0;
-    private final String role="Organizer";
+    private final String role = "Organizer";
+
     // ------------------constructor-------------------------------
-    // default constructor
     Organizer() {
         super();
     }
 
-    // parameterized constructor
     Organizer(String username, String password, String email, String contactNo) {
         super(username, password, email, contactNo);
         Organizer.no++;
-
     }
 
     @Override
@@ -21,16 +19,26 @@ public class Organizer extends User {
         return Organizer.no;
     }
 
-
     // ------------------toString-------------------------------
     public String toString(int no) {
-        return String.format("%-15s",
-                getAccessUsername());
+        return String.format("%-15s", getAccessUsername());
     }
-        public String toString(){
-            return super.toString()+String.format("║          Position       :  %-31s║\n",role);
-                                                }
 
+    public String toString() {
+        return super.toString() + String.format("║          Position       :  %-31s║\n", role);
+    }
+
+    // ------------------displayProfile-------------------------------
+    public void displayProfile() {
+        System.out.println("╔═══════════════════════════════════════════════════════════╗");
+        System.out.println("║                    Organizer Profile                      ║");
+        System.out.println("║═══════════════════════════════════════════════════════════║");
+        System.out.println("║                                                           ║");
+        System.out.print(this.toString());
+        System.out.println("║                                                           ║");
+        System.out.println("╚═══════════════════════════════════════════════════════════╝");
+        System.out.println("Please Click Enter To continue...");
+    }
 
     // ------------------displayInfo-------------------------------
     public void displayInfo() {
@@ -42,28 +50,28 @@ public class Organizer extends User {
         }
     }
 
-    public boolean checkClass(Object o){
-        if(o instanceof User){
+    public boolean checkClass(Object o) {
+        if (o instanceof User) {
             return true;
         }
         return false;
     }
+
     public boolean equals(Object o) {
-       if (o==null){
+        if (o == null) {
             return false;
         }
         if (o instanceof Organizer) {
             Organizer organizer = (Organizer) o;
             return this.getAccessUsername().equals(organizer.getAccessUsername());
         }
-        return false; // the object does not belong to Event
+        return false;
     }
 
-    public boolean equals(String username){
-        if(getAccessUsername().equals(username)){
+    public boolean equals(String username) {
+        if (getAccessUsername().equals(username)) {
             return true;
         }
         return false;
     }
-
 }
