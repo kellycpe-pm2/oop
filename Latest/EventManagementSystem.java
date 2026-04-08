@@ -4,111 +4,115 @@ import java.util.List;
 
 public class EventManagementSystem {
     private static List<Ticket> tickets = new java.util.ArrayList<>();
-    private static Payment [] payments = new Payment[100];
+    private static Payment[] payments = new Payment[100];
 
     private static final int MAX_EVENTS = 300;
 
     private Event[] events = new Event[MAX_EVENTS];
     private int eventCount = 0;
 
-    private static int user_no=0;
+    private static int user_no = 0;
     private User current_user;
-    private  User [] user = new User [400];
+    private User[] user = new User[400];
 
-    
-//get methods for Events
-// Get all events across every type (flat array)
+    // get methods for Events
+    // Get all events across every type (flat array)
 
-    public EventManagementSystem(User [] user,Event [] events, List<Ticket> tickets, Payment [] payments ){
-        this.user=user;
-        this.events=events;
-        EventManagementSystem.tickets=tickets;
-        EventManagementSystem.payments=payments;
-        EventManagementSystem.user_no=countUser_Num();
-    
-    }   
-     public EventManagementSystem(){
-        this(null,null,null,null);
+    public EventManagementSystem(User[] user, Event[] events, List<Ticket> tickets, Payment[] payments) {
+        this.user = user;
+        this.events = events;
+        EventManagementSystem.tickets = tickets;
+        EventManagementSystem.payments = payments;
+        EventManagementSystem.user_no = countUser_Num();
+
     }
 
-    //Getter Method
+    public EventManagementSystem() {
+        this(null, null, null, null);
+    }
 
-    public Event [] getEvents(){
+    // Getter Method
+
+    public Event[] getEvents() {
         return events;
     }
-    public User [] getUsers(){
+
+    public User[] getUsers() {
         return user;
     }
-    public User getCuurent_User(){
+
+    public User getCuurent_User() {
         return current_user;
     }
-    public static Payment [] getPayments(){
+
+    public static Payment[] getPayments() {
         return EventManagementSystem.payments;
     }
 
-    public static List <Ticket>  getTicket(){
+    public static List<Ticket> getTicket() {
         return tickets;
     }
-    
-    public void setCuurent_User(Object current_User, int type){
-        switch(type){
+
+    public void setCuurent_User(Object current_User, int type) {
+        switch (type) {
             case 1:
-                this.current_user=(Organizer) current_User;
-            break;
+                this.current_user = (Organizer) current_User;
+                break;
             case 2:
-                this.current_user=(Speaker) current_User;
+                this.current_user = (Speaker) current_User;
 
-            break;
+                break;
             case 3:
-                this.current_user=(Staff) current_User;
+                this.current_user = (Staff) current_User;
 
-            break;
+                break;
             case 4:
-                this.current_user=(Attendee) current_User;
-            break;
+                this.current_user = (Attendee) current_User;
+                break;
         }
-        
+
     }
 
-    public void setUsers(User [] alluser){
-        this.user=alluser;
+    public void setUsers(User[] alluser) {
+        this.user = alluser;
     }
 
-    public void setEvents(Event [] events){
-        this.events=events;
+    public void setEvents(Event[] events) {
+        this.events = events;
     }
 
-    public static void setTickets(List<Ticket> tickets){
-        EventManagementSystem.tickets=tickets;
+    public static void setTickets(List<Ticket> tickets) {
+        EventManagementSystem.tickets = tickets;
     }
 
-    public static void setPayment(Payment [] payments){
-        EventManagementSystem.payments=payments;
+    public static void setPayment(Payment[] payments) {
+        EventManagementSystem.payments = payments;
     }
-// other method
+
+    // other method
     public Event[] getActiveEvents() {
         int total = eventCount;
         Event[] active = new Event[total];
         int idx = 0;
-            for (int i = 0; i < total; i++) {
-                active[idx++] = events[i];
-            }
-        
+        for (int i = 0; i < total; i++) {
+            active[idx++] = events[i];
+        }
+
         return active;
     }
 
-    public int countUser_Num(){
-        for (User current_user: user){
-            if(current_user!=null){
+    public int countUser_Num() {
+        for (User current_user : user) {
+            if (current_user != null) {
                 user_no++;
             }
-            
+
         }
-        if (user_no==0){
+        if (user_no == 0) {
             return 0;
-        }else{
+        } else {
             return user_no--;
-   
+
         }
     }
 
@@ -116,7 +120,7 @@ public class EventManagementSystem {
     public Concert[] getActiveConcerts() {
         Concert[] result = new Concert[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i].isConcert()){
+            if (events[i].isConcert()) {
                 result[i] = (Concert) events[i];
             }
         }
@@ -127,9 +131,10 @@ public class EventManagementSystem {
     public Workshop[] getActiveWorkshops() {
         Workshop[] result = new Workshop[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i].isWorkshop()){
+            if (events[i].isWorkshop()) {
                 result[i] = (Workshop) events[i];
-            }        }
+            }
+        }
         return result;
     }
 
@@ -137,9 +142,9 @@ public class EventManagementSystem {
     public Conference[] getActiveConferences() {
         Conference[] result = new Conference[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i].isConference()){
+            if (events[i].isConference()) {
                 result[i] = (Conference) events[i];
-            }        
+            }
         }
         return result;
     }
@@ -161,7 +166,9 @@ public class EventManagementSystem {
     public int getEventCount() {
         return eventCount;
     }
-//------------------------------------------------------------------------Get event end here
+
+    // ------------------------------------------------------------------------Get
+    // event end here
     public boolean validationInputTicketType(int choice) {
         if (choice == 1 || choice == 2 || choice == 3) {
             return true;
@@ -169,24 +176,19 @@ public class EventManagementSystem {
         return false;
     }
 
-
-    //==================================User part==============================
-    public void addNewUser(User user){
-        this.user[user_no] =user;
+    // ==================================User part==============================
+    public void addNewUser(User user) {
+        this.user[user_no] = user;
         user_no++;
-    
+
     }
-    
-    //----------------------------------------------------------------------------------------
-    //Staff Part
-    //---------------------------------------------------------------------------------------
 
-    
-    
+    // ----------------------------------------------------------------------------------------
+    // Staff Part
+    // ---------------------------------------------------------------------------------------
 
-    //----------------------------------------------------------------------------------------
-    
-    
+    // ----------------------------------------------------------------------------------------
+
     // -------------------------- validation for event ---------------------------
 
     // validate title (must not be empty and at least 3 characters)
@@ -270,20 +272,21 @@ public class EventManagementSystem {
         }
         return true;
     }
-        public boolean validationInputEventId(String eventId) {
-            for (Event e : this.events) {
-                if (e != null && e.equals(eventId)) {
-                    return true;
-                }
-            
+
+    public boolean validationInputEventId(String eventId) {
+        for (Event e : this.events) {
+            if (e != null && e.equals(eventId)) {
+                return true;
             }
 
-        return false;
         }
+
+        return false;
+    }
 
     // -------------------------- create event ---------------------------
 
-     // Creates a Concert and stores it in events[CONCERT][]
+    // Creates a Concert and stores it in events[CONCERT][]
     public Concert createConcert(String title, String date, String venue, int maxTickets) {
         if (!validationTitle(title))
             return null;
@@ -294,13 +297,13 @@ public class EventManagementSystem {
             return null;
         if (!validationMaxTickets(maxTickets))
             return null;
-        if (eventCount>= MAX_EVENTS) {
+        if (eventCount >= MAX_EVENTS) {
             System.out.println("Error: Concert list is full !");
             return null;
         }
 
         Concert c = new Concert(title, parsedDate, venue, maxTickets);
-        events[eventCount]= c;
+        events[eventCount] = c;
         eventCount++;
         System.out.println("Concert created and stored successfully : " + c.getEventID());
         return c;
@@ -324,7 +327,7 @@ public class EventManagementSystem {
 
         Workshop w = new Workshop(title, parsedDate, venue, maxTickets);
         events[eventCount] = w;
-        eventCount ++;
+        eventCount++;
         System.out.println("Workshop created and stored successfully : " + w.getEventID());
         return w;
     }
@@ -352,7 +355,7 @@ public class EventManagementSystem {
             conf.autoCreateSessions(sessionTopics, sessionTimes);
         }
         events[eventCount] = conf;
-        eventCount ++;
+        eventCount++;
         System.out.println("Conference created and stored successfully : " + conf.getEventID());
         return conf;
     }
@@ -373,7 +376,7 @@ public class EventManagementSystem {
             System.out.println("Error: Speaker not found !");
             return false;
         }
-        if (session.addSpeaker(speaker)) {
+        if (session.addSpeaker(speaker.getAccessUsername())) {
             System.out.println("Speaker [" + speaker.getAccessUsername() + "] assigned to session ["
                     + session.getSessionID() + "] successfully.");
             return true;
@@ -389,38 +392,40 @@ public class EventManagementSystem {
         return session.removeSpeaker(speakerUsername);
     }
 
-//ticket type part
+    // ticket type part
     // validate the quantity set
-    public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
+    public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard,
+            int quantityVip) {
         if (totalQuantity == quantityEarlyBird + quantityStandard + quantityVip) {
             return true;
-        }
-        else{
-            System.out.println("Sum of ticket type quantities not equal to totalQuantity. Please reset the quantity of ticket.");
+        } else {
+            System.out.println(
+                    "Sum of ticket type quantities not equal to totalQuantity. Please reset the quantity of ticket.");
             return false;
         }
     }
 
     // validate price
-    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {    
+    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
         if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
             System.out.println("Ticket prices cannot be negative.");
             return false;
         }
-        
+
         if (priceVip <= priceStandard) {
-            System.out.println("VIP price (RM" + priceVip + ") should be greater than Standard price (RM" + priceStandard + ").");
+            System.out.println(
+                    "VIP price (RM" + priceVip + ") should be greater than Standard price (RM" + priceStandard + ").");
             return false;
         }
-        
+
         if (priceStandard <= priceEarlyBird) {
-            System.out.println("Standard price (RM" + priceStandard + ") should be greater than Early Bird price (RM" + priceEarlyBird + ").");
+            System.out.println("Standard price (RM" + priceStandard + ") should be greater than Early Bird price (RM"
+                    + priceEarlyBird + ").");
             return false;
         }
 
         return true;
     }
-
 
     public boolean validationPerks(String perks) {
         if (perks == null || perks.trim().isEmpty()) {
@@ -441,8 +446,7 @@ public class EventManagementSystem {
             if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
                 System.out.println("Error: Sales Start Date must before event date !");
                 return null;
-            }
-            else if (parsedDate.isBefore(LocalDate.now())){
+            } else if (parsedDate.isBefore(LocalDate.now())) {
                 System.out.println("Error: Sales Start Date must in the future !");
                 return null;
             }
@@ -463,12 +467,10 @@ public class EventManagementSystem {
             if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
                 System.out.println("Error: Sales End Date must before event date !");
                 return null;
-            }
-            else if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)){
+            } else if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)) {
                 System.out.println("Error: Sales End Date must after sales start date !");
-                return null; 
-            }
-            else if(parsedDate.isBefore(LocalDate.now())){
+                return null;
+            } else if (parsedDate.isBefore(LocalDate.now())) {
                 System.out.println("Error: Sales End Date must in the future !");
                 return null;
             }
@@ -480,38 +482,40 @@ public class EventManagementSystem {
     }
 
     public Event findEventById(String eventId) {
-            for (Event e : this.events) {
-                if (e != null && e.equals(eventId)) {
-                    return e;
-                }
+        for (Event e : this.events) {
+            if (e != null && e.equals(eventId)) {
+                return e;
             }
-        
+        }
+
         return null;
 
     }
 
-    public Ticket purchaseTicket(TicketType tt,String eventId, String ticketTypeName, Payment payment, int ticketCount) {    
+    public Ticket purchaseTicket(TicketType tt, String eventId, String ticketTypeName, Payment payment,
+            int ticketCount) {
         if (tt == null) {
             System.out.println("Error: TicketType cannot be null!");
             return null;
         }
 
-        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(),ticketTypeName, true, eventId, ticketCount,payment.getBookingId());
+        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(), ticketTypeName, true, eventId, ticketCount,
+                payment.getBookingId());
         return ticket;
     }
-    public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName){
-        if (LocalDate.now().isAfter(tt.getSalesEnd()) || LocalDate.now().isBefore(tt.getSalesStart())){
-            System.out.println("Error: Ticket cannot be purchased because the sales period haven't start/already over!");
+
+    public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName) {
+        if (LocalDate.now().isAfter(tt.getSalesEnd()) || LocalDate.now().isBefore(tt.getSalesStart())) {
+            System.out
+                    .println("Error: Ticket cannot be purchased because the sales period haven't start/already over!");
             return false;
-        }
-        else if (ticketTypeName.toLowerCase().equals("earlybird")){
-            if (LocalDate.now().isAfter(tt.getEarlyBirdEnd())){
+        } else if (ticketTypeName.toLowerCase().equals("earlybird")) {
+            if (LocalDate.now().isAfter(tt.getEarlyBirdEnd())) {
                 System.out.println("Error: Early Bird ticket cannot be purchased due to period is over!");
                 return false;
             }
             return true;
-        }
-        else{
+        } else {
             return true;
         }
     }
