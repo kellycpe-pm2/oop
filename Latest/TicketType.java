@@ -1,8 +1,3 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
@@ -136,94 +131,6 @@ public class TicketType {
 
     public void setEarlyBirdEnd(LocalDate earlybirdEnd) {
         this.earlyBirdEnd = earlybirdEnd;
-    }
-
-    // create TicketType file
-    public void createTicektTypeFile() {
-        try {
-            File ttFile = new File("TicketType.json");
-            if (ttFile.createNewFile()) {
-                System.out.println("Please Waiting...");
-                System.out.println("Ticket Type file created: " + ttFile.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("Error creating ticket type file: " + e.getMessage());
-        }
-    }
-
-    // Reads all ticket type from "TicketType.json"
-    public static List<TicketType> readTicektTypeData() {
-        List<TicketType> ticketTypes = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("TicketType.json"));
-            if (!lines.isEmpty()) {
-                int i = 0;
-                while (i < lines.size()) {
-                    String eventId = lines.get(i);
-                    int totalQuantity = (int)Double.parseDouble(lines.get(i + 1));
-                    int quantityEarlyBird = (int)Double.parseDouble(lines.get(i + 2));
-                    int quantityStandard = (int)Double.parseDouble(lines.get(i + 3));
-                    int quantityVip = (int)Double.parseDouble(lines.get(i + 4));
-                    int availableQuantity = (int)Double.parseDouble(lines.get(i + 5));
-                    int availableEarlyBird = (int)Double.parseDouble(lines.get(i + 6));
-                    int availableStandard = (int)Double.parseDouble(lines.get(i + 7));
-                    int availableVip = (int)Double.parseDouble(lines.get(i + 8));
-                    double priceEarlyBird = Double.parseDouble(lines.get(i + 9));
-                    double priceStandard = Double.parseDouble(lines.get(i + 10));
-                    double priceVip = Double.parseDouble(lines.get(i + 11));
-                    String perks = lines.get(i + 12);
-                    LocalDate salesStart = LocalDate.parse(lines.get(i + 13));
-                    LocalDate salesEnd = LocalDate.parse(lines.get(i + 14));
-                    // earlyBirdEnd is NOT stored — constructor computes it as salesStart.plusDays(1)
-
-                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard, quantityVip, availableQuantity, availableEarlyBird, availableStandard, availableVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
-                    ticketTypes.add(tt);
-
-                    // NEW: Load tickets and remove already sold seats
-                    List<Ticket> allTickets = Ticket.readTicketFile();
-                    for (Ticket ticket : allTickets) {
-                        if (ticket.getEventId().equals(tt.getEventId())) {
-                            // Remove the seat that was already sold
-                            String seatToRemove = ticket.getSeatNum();
-                            tt.removeSeat(ticket.getTicketType(), seatToRemove);
-                        }
-                    }
-
-                    i += 15; // 15 lines per record
-                }
-            }
-            else{
-                System.out.println("There is no ticket type record created.");
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading ticket type data: " + e.getMessage());
-        }
-        return ticketTypes;
-    }
-
-    // store ticket type data
-    public static void storeTicketTypeData(List<TicketType> TicketTypes) {
-        try (Writer writer = new java.io.FileWriter("TicketType.json")) {
-            for (TicketType tt : TicketTypes) {
-                writer.write(tt.getEventId() + "\n");
-                writer.write(tt.getTotalQuantity() + "\n");
-                writer.write(tt.getQuantityOfAllTicketType()[0] + "\n");
-                writer.write(tt.getQuantityOfAllTicketType()[1] + "\n");
-                writer.write(tt.getQuantityOfAllTicketType()[2] + "\n");
-                writer.write(tt.getAvailableQuantity() + "\n");
-                writer.write(tt.getAvailableType("earlybird") + "\n");
-                writer.write(tt.getAvailableType("standard") + "\n");
-                writer.write(tt.getAvailableType("vip") + "\n");
-                writer.write(String.format("%.2f", tt.getPrice("earlybird")) + "\n");
-                writer.write(String.format("%.2f", tt.getPrice("standard")) + "\n");
-                writer.write(String.format("%.2f", tt.getPrice("vip")) + "\n"); 
-                writer.write(tt.getPerks() + "\n");
-                writer.write(tt.getSalesStart().toString() + "\n");
-                writer.write(tt.getSalesEnd().toString() + "\n");
-            }
-        } catch (IOException e) {
-            System.out.println("Error storing ticket type data: " + e.getMessage());
-        }
     }
 
     // check availability of quantity ticket
