@@ -1,10 +1,7 @@
-import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Ticket {
@@ -138,70 +135,6 @@ public class Ticket {
         System.out.println("------------------------------------------------------------------");
         for (Ticket t : tickets) {
             t.displayTicketDetails();
-        }
-    }
-
-    // create Ticket file
-    public void createTicketFile() {
-        try {
-            File ticketFile = new File("Ticket.json");
-            if (ticketFile.createNewFile()) {
-                System.out.println("Please Waiting...");
-                System.out.println("Ticket file created: " + ticketFile.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("Error creating ticket file: " + e.getMessage());
-        }
-    }
-
-    // Reads all ticket from "Ticket.json"
-    public static List<Ticket> readTicketFile() {
-        List<Ticket> tickets = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("Ticket.json"));
-            if (!lines.isEmpty()) {
-                int i = 0;
-                while (i < lines.size()) {
-                    String ticketId = lines.get(i);
-                    boolean status = Boolean.parseBoolean(lines.get(i + 1));
-                    String buyerName = lines.get(i + 2);
-                    String eventId = lines.get(i + 3);
-                    String ticketType = lines.get(i + 4);
-                    double totalAmount = Double.parseDouble(lines.get(i + 5));
-                    String seatNo = lines.get(i + 6);
-                    String perks = lines.get(i + 7);
-                    LocalDate purchasedDate = LocalDate.parse(lines.get(i + 8));
-                    String bookingId = lines.get(i + 9);
-
-                    Ticket t = new Ticket(ticketId, status, buyerName, eventId, ticketType, totalAmount, seatNo, perks, purchasedDate,bookingId);
-                    tickets.add(t);
-                    i += 10; // 10 lines per record
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading ticket data: " + e.getMessage());
-        }
-        return tickets;
-    }
-
-    // store ticket history data to Ticket.json
-    public static void storeTicketData(List<Ticket> tickets) {
-        try (Writer writer = new java.io.FileWriter("Ticket.json")) {
-            for (Ticket t : tickets) {
-                writer.write(t.getTicketId() + "\n");
-                writer.write(t.getStatus() + "\n");
-                writer.write(t.getBuyerName() + "\n");
-                writer.write(t.getEventId() + "\n");
-                writer.write(t.getTicketType() + "\n");
-                writer.write(t.getTotalAmount() + "\n");
-                writer.write(t.getSeatNum() + "\n");
-                writer.write(t.getPerks() + "\n"); 
-                writer.write(t.getPurchasedDate() + "\n"); 
-                writer.write(t.getBookingId() + "\n");
-
-            }
-        } catch (IOException e) {
-            System.out.println("Error storing ticket data: " + e.getMessage());
         }
     }
 
