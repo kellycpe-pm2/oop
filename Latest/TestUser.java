@@ -178,7 +178,7 @@ public class TestUser {
     public static void displaySignUpInterface(User user, User[] alluser, int[] no) {
 
     System.out.println("\n╔══════════════════════════════════════════════════════════════╗");
-    System.out.println("║                       SIGN UP SYSTEM                          ║");
+    System.out.println("║                       SIGN UP SYSTEM                         ║");
     System.out.println("╚══════════════════════════════════════════════════════════════╝");
         do {
 
@@ -760,12 +760,15 @@ public class TestUser {
                         }
                     }
 
+
+                }
+
+            }
                     System.out.println("\t\t\t└────────────────────────────────────────────────────────────────────┘");
                     System.out.println("\n\n\t\t\t Press Enter Key To Return Menu");
                     waitForEnter();
                     waitForEnter();
-                }
-            }
+
         }
 
     }
@@ -900,7 +903,7 @@ public class TestUser {
             waitForEnter();
             waitForEnter();
 
-            int checkinRate = (Staff.getCheckin_Couter() * 100) / tickets.size();
+            int checkinRate = (Staff.getCheckin_Couter()*100) / tickets.size();
             String rateText = checkinRate + "%";
             System.out.println(
                     "\n\t\t\t┌────────────────────────────────────────────────────────────────────────────────┐");
@@ -929,9 +932,9 @@ public class TestUser {
             System.out.println(
                     "\t\t\t│            ┌──────────────────────────────────────────────────────────────┐    │");
             System.out.print("\t\t\t|            │ ");
-            int displaybar = (int) (double) checkinRate / 100 * 59;
+            int displaybar = (int) ((double) (checkinRate *59 )/100);
             for (int i = 0; i < 59; i++) {
-                if (displaybar >= i) {
+                if (i <=displaybar ) {
                     System.out.print("█");
                 } else {
                     System.out.print("░");
@@ -947,9 +950,8 @@ public class TestUser {
             System.out.println(
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
 
-            waitForEnter();
-            waitForEnter();
             System.out.println("\t\t\tPlease Press Enter Key to Return Back Menu.");
+            waitForEnter();
 
         }
 
@@ -1169,7 +1171,7 @@ public class TestUser {
     public static void sale_report() {
 
         System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
-        System.out.println("\t\t║                                     SALES REPORT                                ║");
+        System.out.println("\t\t║                                  SALES REPORT             v                     ║");
         System.out.printf("\t\t║                              Generated    :%-35s ║\n", LocalDate.now());
         System.out.println("\t\t╚════════════════════════════════════════════════════════════════════════════════╝");
 
@@ -1189,10 +1191,13 @@ public class TestUser {
                     "\t\t\t└────────────────────────────────────────────────────────────────────────────────┘");
         } else {
             for(Event event : events){
-                System.err.println("\t\t\t├────────────────────┼──────────────┼──────────────┼──────────────┼───────────────┤\n"
-                                    +event.toString());
+                if(event!=null){
+                        System.out.print("\t\t\t├────────────┼────────────────────┼───────────────────┼────────────┼──────────────┤\n"+
+                        event.toString());
             }
             
+                }
+
 
             System.out.println(
                     "\t\t\t└─────────────────────────────────────────────────────────────────────────────────┘");
@@ -1384,7 +1389,7 @@ public class TestUser {
             FileWriter writer = new FileWriter(filename);
 
             writer.write("\t\t╔════════════════════════════════════════════════════════════════════════════════╗\n");
-            writer.write("\t\t║                                SALES REPORT                                    ║\n");
+            writer.write("\t\t║                                SALES REPORT                                   ║\n");
             writer.write("\t\t╠════════════════════════════════════════════════════════════════════════════════╣\n");
             writer.write("\t\t║  Generated: "
                     + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
