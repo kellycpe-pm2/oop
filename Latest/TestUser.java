@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class TestUser {
     static List<TicketType> ticketTypes = new java.util.ArrayList<>();
     static List<Ticket> tickets = new java.util.ArrayList<>();
     static int ticketCount = 0;
+    static int bookingNo;
 
     // in-memory lists — loaded from / saved to JSON files
     static List<Concert> concerts = new java.util.ArrayList<>();
@@ -55,7 +57,8 @@ public class TestUser {
         loadSpeakersFromUsers(alluser, no[0]); // populate speakerPool from Speaker accounts in user.json
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
-        tickets = Ticket.readTicketFile();
+        tickets = readTicketFile();
+        bookingNo = Integer.parseInt(tickets.get(tickets.size()-1).getBookingId().substring(5));
         
         //check the ticket status
         Staff.checkTotal_CheckIn(tickets);
@@ -706,6 +709,8 @@ public class TestUser {
     }
 
     public static void view_checkin(User[] alluser) {
+        int no = 1;
+
         System.out.println("\n\t\t╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("\t\t║                           CHECK-IN LIST                                        ║");
         System.out.printf("\t\t║                               %-48s ║\n", LocalDate.now());
@@ -724,7 +729,6 @@ public class TestUser {
             System.out.println("\t\t\t├────┬────────────────────┬─────────────────────┬──────────┬─────────┤");
             System.out.println("\t\t\t│ No │      Name          │        Email        │  Ticket  │ Status  │");
             System.out.println("\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");
-            int no = 1;
             Attendee usertemp = new Attendee();
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
@@ -1730,17 +1734,28 @@ public class TestUser {
         double peb = 0.0;
         double psd = 0.0;
         double pvip = 0.0;
-        do {
-            System.out.print("\nPrice Early Bird (RM):");
-            peb = scan.nextDouble();
-            scan.nextLine();
-            System.out.print("Price Standard (RM):");
-            psd = scan.nextDouble();
-            scan.nextLine();
-            System.out.print("Price Vip (RM):");
-            pvip = scan.nextDouble();
-            scan.nextLine();
-        } while (!ems.validationPrice(peb, psd, pvip));
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                System.out.print("\nPrice Early Bird (RM):");
+                peb = scan.nextDouble();
+                scan.nextLine();
+                System.out.print("Price Standard (RM):");
+                psd = scan.nextDouble();
+                scan.nextLine();
+                System.out.print("Price Vip (RM):");
+                pvip = scan.nextDouble();
+                scan.nextLine();
+                
+                if (ems.validationPrice(peb, psd, pvip)) {
+                    validInput = true;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter numbers only.");
+                scan.nextLine(); // Clear buffer
+            }
+        }
 
         String perks;
         do {
@@ -1772,7 +1787,7 @@ public class TestUser {
             TicketType tt = new TicketType(c.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd,
                     pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
-            TicketType.storeTicketTypeData(ticketTypes);
+            storeTicketTypeData(ticketTypes);
             concerts.add(c);
             events[eventCount++] = c;
             System.out.println("Concert created successfully : " + c.getEventID());
@@ -1791,7 +1806,7 @@ public class TestUser {
             TicketType tt = new TicketType(w.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd,
                     pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
-            TicketType.storeTicketTypeData(ticketTypes);
+            storeTicketTypeData(ticketTypes);
             workshops.add(w);
             events[eventCount++] = w;
             System.out.println("Workshop created successfully : " + w.getEventID());
@@ -1828,7 +1843,7 @@ public class TestUser {
             TicketType tt = new TicketType(conf.getEventID(), maxTix, qeb, qsd, qvip, maxTix, qeb, qsd, qvip, peb, psd,
                     pvip, perks, salesStartDate, salesEndDate);
             ticketTypes.add(tt);
-            TicketType.storeTicketTypeData(ticketTypes);
+            storeTicketTypeData(ticketTypes);
             if (numSessions > 0) {
                 conf.autoCreateSessions(topics, times);
             }
@@ -2574,7 +2589,7 @@ public class TestUser {
         Concert.storeConcertData(concerts);
         Workshop.storeWorkshopData(workshops);
         Conference.storeConferenceData(conferences);
-        TicketType.storeTicketTypeData(ticketTypes);
+        storeTicketTypeData(ticketTypes);
         System.out.println("All events saved successfully.");
     }
 
@@ -2588,7 +2603,7 @@ public class TestUser {
         concerts = Concert.readConcertData();
         workshops = Workshop.readWorkshopData();
         conferences = Conference.readConferenceData();
-        ticketTypes = TicketType.readTicektTypeData(); // load ticket types so purchase works
+        ticketTypes = readTicektTypeData(); // load ticket types so purchase works
         for (Concert c : concerts) {
             events[eventCount++] = c;
         }
@@ -2620,11 +2635,11 @@ public class TestUser {
             System.out.println("╚══════════════════════════════╝");
             System.out.print("Enter option: ");
             int choice = scan.nextInt();
-            scan.nextLine();
+            System.out.println("\n");
 
             switch (choice) {
                 case 1:
-                    viewAllEvents();
+                    displayEvents();
                     break;
                 case 2:
                     purchaseTicket(attendee);
@@ -2651,7 +2666,8 @@ public class TestUser {
         // pick event
         String eventId;
         while (true) {
-            listEvents();
+            displayEvents();
+            scan.nextLine();
             System.out.print("Enter Event ID: ");
             eventId = scan.nextLine();
 
@@ -2672,29 +2688,34 @@ public class TestUser {
         // pick ticket type
         String ticketType = "";
         while (true) {
-            System.out.println("===== Ticket Type =====");
-            System.out.println("1. EarlyBird  - RM " + tt.getPrice("earlybird"));
-            System.out.println("2. Standard   - RM " + tt.getPrice("standard"));
-            System.out.println("3. VIP        - RM " + tt.getPrice("vip"));
-            System.out.print("Select ticket type: ");
-            int type = scan.nextInt();
-            scan.nextLine();
-            if (type == 1) {
-                ticketType = "earlybird";
-            } else if (type == 2) {
-                ticketType = "standard";
-            } else if (type == 3) {
-                ticketType = "vip";
-            } else {
-                System.out.println("Invalid option. Try again.");
-                continue;
-            }
+            try{
+                System.out.println("===== Ticket Type =====");
+                System.out.println("1. EarlyBird  - RM " + tt.getPrice("earlybird")+" ("+tt.getAvailableType("earlybird")+" tickets available)");
+                System.out.println("2. Standard   - RM " + tt.getPrice("standard")+" ("+tt.getAvailableType("standard")+" tickets available)");
+                System.out.println("3. VIP        - RM " + tt.getPrice("vip")+" ("+tt.getAvailableType("vip")+" tickets available)");
+                System.out.print("Select ticket type: ");
+                int type = scan.nextInt();
+                scan.nextLine();
+                if (type == 1) {
+                    ticketType = "earlybird";
+                } else if (type == 2) {
+                    ticketType = "standard";
+                } else if (type == 3) {
+                    ticketType = "vip";
+                } else {
+                    System.out.println("Invalid option. Try again.");
+                    continue;
+                }
 
-            if (!tt.isAvailable(ticketType)) {
-                System.out.println("Sorry, no " + ticketType + " tickets available!");
-                return;
+                if (!tt.isAvailable(ticketType)) {
+                    System.out.println("Sorry, no " + ticketType + " tickets available!");
+                    return;
+                }
+                break;
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number (1, 2, or 3).");
+                scan.nextLine(); // Clear the invalid input buffer
             }
-            break;
         }
 
         if (!ems.validationPurchaseTicket(tt, ticketType)) {
@@ -2705,6 +2726,7 @@ public class TestUser {
         // payment
         System.out.println("\nThe total amount = RM " + tt.getPrice(ticketType));
         while (true) {
+            try{
             System.out.println("Payment Method");
             System.out.println("1. Touch N Go");
             System.out.println("2. Credit/Debit Card");
@@ -2717,15 +2739,17 @@ public class TestUser {
             } else {
                 System.out.println("Invalid option. Try again.");
             }
+            }catch (Exception e){
+                System.out.println("Invalid input. Please enter a number (1, 2, or 3).");
+                scan.nextLine(); // Clear the invalid input buffer
+            }
         }
         System.out.println("\nProcessing payment...");
         System.out.println("Payment Success!");
-
-        Payment p = new Payment(a, eventId, tt.getPrice(ticketType));
+        Payment p= new Payment(a, eventId, tt.getPrice(ticketType), bookingNo);
         payments[ticketCount] = p;
         System.out.print(p.toString());
-        String bookingId = p.getBookingId();
-        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType,  bookingId,ticketCount);
+        Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, p,ticketCount);
 
         if (ticket != null) {
             scan.nextLine();
@@ -2733,8 +2757,8 @@ public class TestUser {
             scan.nextLine();
             ticket.displayTicketDetails();
             tickets.add(ticket);
-            Ticket.storeTicketData(tickets);
-            TicketType.storeTicketTypeData(ticketTypes); // update available quantity
+            storeTicketData(tickets);
+            storeTicketTypeData(ticketTypes); // update available quantity
             scan.nextLine();
         } else {
             System.out.println("Purchase failed. Please try again.");
@@ -2772,6 +2796,27 @@ public class TestUser {
         }
         System.out.println("\nAll Ticket Type\n-----------------------------");
         TicketType.displayAllTicketType(ticketTypes);
+    }
+
+    static void displayEvents() {
+        System.out.println(
+                "  ┌────┬──────┬──────────────┬─────────────────┬────────────┬─────────────────┬─────────────────────┬────────────────────┬──────────────────┐");
+        System.out.printf("  │ %-2s │ %-4s │ %-12s │ %-15s │ %-10s │ %-15s │ %-19s │ %-18s │ %16s │%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Available Ticket");
+        System.out.println(
+                "  ├────┼──────┼──────────────┼─────────────────┼────────────┼─────────────────┼─────────────────────┼────────────────────┼──────────────────┤");
+        for (int i = 0; i < eventCount; i++) {
+            Event e = events[i];
+            String type = e.getClass().getSimpleName();
+            String title = e.getTitle().length() > 20 ? e.getTitle().substring(0, 17) + "..." : e.getTitle();
+            String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
+            TicketType tt = TicketType.findTicketTypeById(ticketTypes, e.getEventID());
+
+            System.out.printf("  │ %-2d │ %-4s │ %-12s │ %-15s │ %-10s │ %-15s │ %-19s │ %-18s │ %3d              │%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(), tt.getAvailableQuantity());
+        }
+        System.out.println(
+                "  └────┴──────┴──────────────┴─────────────────┴────────────┴─────────────────┴─────────────────────┴────────────────────┴──────────────────┘");
     }
 
     static void UpdateTicketType() {
@@ -2875,10 +2920,162 @@ public class TestUser {
                 default:
                     System.out.println("Invalid input. Please retry");
             }
-            TicketType.storeTicketTypeData(ticketTypes);
+            storeTicketTypeData(ticketTypes);
             System.out.println("Update Sucessfully.");
         }
 
+    }
+
+    // create Ticket file
+    public void createTicketFile() {
+        try {
+            File ticketFile = new File("Ticket.json");
+            if (ticketFile.createNewFile()) {
+                System.out.println("Please Waiting...");
+                System.out.println("Ticket file created: " + ticketFile.getName());
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating ticket file: " + e.getMessage());
+        }
+    }
+
+    // Reads all ticket from "Ticket.json"
+    public static List<Ticket> readTicketFile() {
+        List<Ticket> tickets = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get("Ticket.json"));
+            if (!lines.isEmpty()) {
+                int i = 0;
+                while (i < lines.size()) {
+                    String ticketId = lines.get(i);
+                    boolean status = Boolean.parseBoolean(lines.get(i + 1));
+                    String buyerName = lines.get(i + 2);
+                    String eventId = lines.get(i + 3);
+                    String ticketType = lines.get(i + 4);
+                    double totalAmount = Double.parseDouble(lines.get(i + 5));
+                    String seatNo = lines.get(i + 6);
+                    String perks = lines.get(i + 7);
+                    LocalDate purchasedDate = LocalDate.parse(lines.get(i + 8));
+                    String bookingId = lines.get(i + 9);
+
+                    Ticket t = new Ticket(ticketId, status, buyerName, eventId, ticketType, totalAmount, seatNo, perks, purchasedDate,bookingId);
+                    tickets.add(t);
+                    i += 10; // 10 lines per record
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading ticket data: " + e.getMessage());
+        }
+        return tickets;
+    }
+
+    // store ticket history data to Ticket.json
+    public static void storeTicketData(List<Ticket> tickets) {
+        try (Writer writer = new java.io.FileWriter("Ticket.json")) {
+            for (Ticket t : tickets) {
+                writer.write(t.getTicketId() + "\n");
+                writer.write(t.getStatus() + "\n");
+                writer.write(t.getBuyerName() + "\n");
+                writer.write(t.getEventId() + "\n");
+                writer.write(t.getTicketType() + "\n");
+                writer.write(t.getTotalAmount() + "\n");
+                writer.write(t.getSeatNum() + "\n");
+                writer.write(t.getPerks() + "\n"); 
+                writer.write(t.getPurchasedDate() + "\n"); 
+                writer.write(t.getBookingId() + "\n");
+
+            }
+        } catch (IOException e) {
+            System.out.println("Error storing ticket data: " + e.getMessage());
+        }
+    }
+
+    // create TicketType file
+    public void createTicektTypeFile() {
+        try {
+            File ttFile = new File("TicketType.json");
+            if (ttFile.createNewFile()) {
+                System.out.println("Please Waiting...");
+                System.out.println("Ticket Type file created: " + ttFile.getName());
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating ticket type file: " + e.getMessage());
+        }
+    }
+
+    // Reads all ticket type from "TicketType.json"
+    public static List<TicketType> readTicektTypeData() {
+        List<TicketType> ticketTypes = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get("TicketType.json"));
+            if (!lines.isEmpty()) {
+                int i = 0;
+                while (i < lines.size()) {
+                    String eventId = lines.get(i);
+                    int totalQuantity = (int)Double.parseDouble(lines.get(i + 1));
+                    int quantityEarlyBird = (int)Double.parseDouble(lines.get(i + 2));
+                    int quantityStandard = (int)Double.parseDouble(lines.get(i + 3));
+                    int quantityVip = (int)Double.parseDouble(lines.get(i + 4));
+                    int availableQuantity = (int)Double.parseDouble(lines.get(i + 5));
+                    int availableEarlyBird = (int)Double.parseDouble(lines.get(i + 6));
+                    int availableStandard = (int)Double.parseDouble(lines.get(i + 7));
+                    int availableVip = (int)Double.parseDouble(lines.get(i + 8));
+                    double priceEarlyBird = Double.parseDouble(lines.get(i + 9));
+                    double priceStandard = Double.parseDouble(lines.get(i + 10));
+                    double priceVip = Double.parseDouble(lines.get(i + 11));
+                    String perks = lines.get(i + 12);
+                    LocalDate salesStart = LocalDate.parse(lines.get(i + 13));
+                    LocalDate salesEnd = LocalDate.parse(lines.get(i + 14));
+                    // earlyBirdEnd is NOT stored — constructor computes it as salesStart.plusDays(1)
+
+                    TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard, quantityVip, availableQuantity, availableEarlyBird, availableStandard, availableVip, priceEarlyBird, priceStandard, priceVip, perks, salesStart, salesEnd);
+                    ticketTypes.add(tt);
+
+                    // NEW: Load tickets and remove already sold seats
+                    List<Ticket> allTickets = readTicketFile();
+                    for (Ticket ticket : allTickets) {
+                        if (ticket.getEventId().equals(tt.getEventId())) {
+                            // Remove the seat that was already sold
+                            String seatToRemove = ticket.getSeatNum();
+                            tt.removeSeat(ticket.getTicketType(), seatToRemove);
+                        }
+                    }
+
+                    i += 15; // 15 lines per record
+                }
+            }
+            else{
+                System.out.println("There is no ticket type record created.");
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading ticket type data: " + e.getMessage());
+        }
+        return ticketTypes;
+    }
+
+    // store ticket type data
+    public static void storeTicketTypeData(List<TicketType> TicketTypes) {
+        try (Writer writer = new java.io.FileWriter("TicketType.json")) {
+            for (TicketType tt : TicketTypes) {
+                writer.write(tt.getEventId() + "\n");
+                writer.write(tt.getTotalQuantity() + "\n");
+                writer.write(tt.getQuantityOfAllTicketType()[0] + "\n");
+                writer.write(tt.getQuantityOfAllTicketType()[1] + "\n");
+                writer.write(tt.getQuantityOfAllTicketType()[2] + "\n");
+                writer.write(tt.getAvailableQuantity() + "\n");
+                writer.write(tt.getAvailableType("earlybird") + "\n");
+                writer.write(tt.getAvailableType("standard") + "\n");
+                writer.write(tt.getAvailableType("vip") + "\n");
+                writer.write(String.format("%.2f", tt.getPrice("earlybird")) + "\n");
+                writer.write(String.format("%.2f", tt.getPrice("standard")) + "\n");
+                writer.write(String.format("%.2f", tt.getPrice("vip")) + "\n"); 
+                writer.write(tt.getPerks() + "\n");
+                writer.write(tt.getSalesStart().toString() + "\n");
+                writer.write(tt.getSalesEnd().toString() + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Error storing ticket type data: " + e.getMessage());
+        }
     }
 
     // speaker part
