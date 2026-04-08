@@ -6,7 +6,6 @@ public abstract class Event {
     private LocalDate date;
     private String venue;
     private int maxTickets;
-    private TicketType ticketType;
 
     // auto-generate eventID
     private static int eventCounter = 1;
@@ -45,10 +44,6 @@ public abstract class Event {
         return maxTickets;
     }
 
-    public TicketType getTicketType() {
-        return ticketType;
-    }
-
     public static int getEventCounter(){
         return Event.eventCounter;
     }
@@ -72,10 +67,6 @@ public abstract class Event {
 
     public void setMaxTickets(int maxTickets) {
         this.maxTickets = maxTickets;
-    }
-
-    public void setTicketType(TicketType ticketType) {
-        this.ticketType = ticketType;
     }
 
     // abstract method — subclasses must implement
