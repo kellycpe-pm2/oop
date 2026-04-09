@@ -2177,6 +2177,46 @@ public class TestUser {
         }
     }
 
+// Ensure speaker file exists (create if not)
+    public static void ensureSpeakerFileExists() {
+        File speakerFile = new File("speaker.json");
+        if (!speakerFile.exists()) {
+            try {
+                if (speakerFile.createNewFile()) {
+                    System.out.println("Speaker file created: " + speakerFile.getName());
+                }
+            } catch (IOException e) {
+                System.out.println("Error creating speaker file: " + e.getMessage());
+            }
+        }
+    }
+
+    // Load speaker data with auto-create
+    public static void readSpeakerData() {
+        int no;
+        ensureSpeakerFileExists(); // Make sure file exists first
+
+        try {
+            List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+
+            if (lines.isEmpty()) {
+                no = 0;
+            } else {
+                no = (lines.size() / 4);
+                String[][] information = new String[no][4];
+
+                for (int i = 0; i < lines.size(); i++) {
+                    information[i / 4][i % 4] = lines.get(i);
+                }
+
+                for (int i = 0; i < no; i++) {
+                    Speaker.getBioArray()[i] = information[i][3];
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading speaker data: " + e.getMessage());
+        }
+    }
     // load all Speaker accounts from alluser into speakerPool
     static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         speakerCount = 0;
@@ -3374,11 +3414,12 @@ public class TestUser {
         System.out.print("Enter new topic: ");
         String newTopic = scan.nextLine();
 
-        speaker.uploadSessionTopic(speaker.getAccessUsername(), targetSession, newTopic);
+        ems.uploadSessionTopic(speaker.getAccessUsername(), targetSession, newTopic);
     }
 
     // Update speaker bio
     static void updateSpeakerBio(Speaker speaker) {
+     
         System.out.println("\n--- Update Your Bio ---");
         System.out.println("Current Bio: " + speaker.getBio());
         System.out.print("Enter new bio: ");
