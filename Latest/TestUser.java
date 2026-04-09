@@ -67,7 +67,7 @@ public class TestUser {
         // load data
 
         readUserData(no, alluser);
-       // loadSpeakersFromUsers(alluser, no[0]); // populate speakerPool from Speaker accounts in user.json
+        loadSpeakersFromUsers(alluser, no[0]); // populate speakerPool from Speaker accounts in user.json
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
         tickets = readTicketFile();
@@ -2192,7 +2192,7 @@ public class TestUser {
     }
 
     // Load speaker data with auto-create
-  /*   public static void readSpeakerData() {
+    public static void readSpeakerData() {
         int no;
         ensureSpeakerFileExists(); // Make sure file exists first
 
@@ -2230,7 +2230,7 @@ public class TestUser {
             System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
         }
     }
-*/
+
     // ── Conference session speaker management (original, renamed) ─────────────
 
     // assign a speaker from the pool to a conference session
