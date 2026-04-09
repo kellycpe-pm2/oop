@@ -30,7 +30,7 @@ public class Speaker extends User {
     }
 
     // ------------------getter-------------------------------
-    public String getBio(int no) {
+      public String getBio(int no) {
         return Speaker.bio[no];
     }
 
@@ -40,6 +40,7 @@ public class Speaker extends User {
         }
         return "No bio available";
     }
+
 
     @Override
     public int getno() {
@@ -71,49 +72,11 @@ public class Speaker extends User {
         System.out.println("=== Speaker Info ===");
         System.out.println("Username: " + getAccessUsername());
         System.out.println("Email: " + getAccessEmail());
-        System.out.println("Bio: " + (no > 0 ? Speaker.bio[no - 1] : "No bio available"));
+        System.out.println("Bio: " + getBio());
     }
     // ------------------method-------------------------------
 
-    // Ensure speaker file exists (create if not)
-    public static void ensureSpeakerFileExists() {
-        File speakerFile = new File("speaker.json");
-        if (!speakerFile.exists()) {
-            try {
-                if (speakerFile.createNewFile()) {
-                    System.out.println("Speaker file created: " + speakerFile.getName());
-                }
-            } catch (IOException e) {
-                System.out.println("Error creating speaker file: " + e.getMessage());
-            }
-        }
-    }
-
-    // Load speaker data with auto-create
-    public static void readSpeakerData() {
-        ensureSpeakerFileExists(); // Make sure file exists first
-
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
-
-            if (lines.isEmpty()) {
-                no = 0;
-            } else {
-                no = (lines.size() / 4);
-                String[][] information = new String[no][4];
-
-                for (int i = 0; i < lines.size(); i++) {
-                    information[i / 4][i % 4] = lines.get(i);
-                }
-
-                for (int i = 0; i < no; i++) {
-                    Speaker.bio[i] = information[i][3];
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading speaker data: " + e.getMessage());
-        }
-    }
+    
 
     // Find speaker by username from speaker array
     public static Speaker findSpeakerByUsername(String username, Speaker[] speakerArray, int speakerCount) {
@@ -128,7 +91,7 @@ public class Speaker extends User {
     // ------------------upload bio-------------------------------
     public boolean uploadBio(String username, String newBio) {
         // readSpeakerData();
-        for (int i = 0; i <= no; i++) {
+        for (int i = 0; i < no; i++) {
             if (getAccessUsername() != null && getAccessUsername().equals(username)) {
                 Speaker.bio[i] = newBio;
                 // rewriteSpeakerData();
@@ -140,34 +103,7 @@ public class Speaker extends User {
         return false;
     }
 
-    // Upload/update session topic
-    public boolean uploadSessionTopic(String username, Session session, String newTopic) {
-        // Session.getSpeakers() returns String[] of usernames
-        String[] assigned = session.getSpeakers();
-        for (int i = 0; i < session.getSpeakerCount(); i++) {
-            if (assigned[i] != null && assigned[i].equals(username)) {
-                String status = session.getSpeakerStatus(username);
-                if ("accepted".equals(status)) {
-                    session.setTopic(newTopic);
-                    System.out.println("Session [" + session.getSessionID()
-                            + "] topic updated to: \"" + newTopic
-                            + "\" by speaker: " + username);
-                    return true;
-                } else if ("pending".equals(status)) {
-                    System.out.println(
-                            "You need to accept the session first before updating the topic.");
-                    return false;
-                } else {
-                    System.out.println(
-                            "You have rejected this session. Cannot update topic.");
-                    return false;
-                }
-            }
-        }
-        System.out.println("Speaker [" + username + "] is not assigned to session ["
-                + session.getSessionID() + "]. Cannot update topic.");
-        return false;
-    }
+    
 
     // --------------------------------------------------
 
