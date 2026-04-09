@@ -22,6 +22,10 @@ public class Payment{
         return this.bookingId;
     }
 
+    public static void setBookingNo(int bookingNo){
+        Payment.bookingNo=bookingNo;
+    }
+
     public boolean validationPaymentMethod(int method){
         if (method==1||method==2||method==3)
             return true;

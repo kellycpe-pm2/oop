@@ -24,6 +24,7 @@ public class EventManagementSystem {
         EventManagementSystem.tickets = tickets;
         EventManagementSystem.payments = payments;
         EventManagementSystem.user_no = countUser_Num();
+        Payment.setBookingNo(Ticket.getTicketCount());
 
     }
 
