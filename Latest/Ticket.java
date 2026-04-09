@@ -109,6 +109,9 @@ public class Ticket {
         return this.perks;
     }
 
+    public static int getTicketCount(){
+        return Ticket.ticketCount;
+    }
     public void setStatus(boolean status){
         updateTicketStatus(this.ticketId);
         this.status=status;
