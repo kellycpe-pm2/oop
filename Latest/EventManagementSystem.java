@@ -392,6 +392,35 @@ public class EventManagementSystem {
         return session.removeSpeaker(speakerUsername);
     }
 
+ // Upload/update session topic
+    public boolean uploadSessionTopic(String username, Session session, String newTopic) {
+        // Session.getSpeakers() returns String[] of usernames
+        String[] assigned = session.getSpeakers();
+        for (int i = 0; i < session.getSpeakerCount(); i++) {
+            if (assigned[i] != null && assigned[i].equals(username)) {
+                String status = session.getSpeakerStatus(username);
+                if ("accepted".equals(status)) {
+                    session.setTopic(newTopic);
+                    System.out.println("Session [" + session.getSessionID()
+                            + "] topic updated to: \"" + newTopic
+                            + "\" by speaker: " + username);
+                    return true;
+                } else if ("pending".equals(status)) {
+                    System.out.println(
+                            "You need to accept the session first before updating the topic.");
+                    return false;
+                } else {
+                    System.out.println(
+                            "You have rejected this session. Cannot update topic.");
+                    return false;
+                }
+            }
+        }
+        System.out.println("Speaker [" + username + "] is not assigned to session ["
+                + session.getSessionID() + "]. Cannot update topic.");
+        return false;
+    }
+
     // ticket type part
     // validate the quantity set
     public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard,
