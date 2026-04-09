@@ -1,9 +1,3 @@
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
 public class Speaker extends User {
 
     // instance variable
@@ -121,14 +115,11 @@ public class Speaker extends User {
     }
 
     public boolean equals(Object o) {
-        if (o == null) {
+        if (super.equals(o)){
+            return true;
+        }else{
             return false;
         }
-        if (o instanceof Speaker) {
-            Speaker speaker = (Speaker) o;
-            return this.getAccessUsername().equals(speaker.getAccessUsername());
-        }
-        return false; // the object does not belong to Event
     }
 
     public boolean equals(String username) {

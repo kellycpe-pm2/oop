@@ -21,17 +21,14 @@ public class Attendee extends User{
     }
 
     public boolean equals(Object o) {
-        if (o==null){
+        if (super.equals(o)){
+            return true;
+        }else{
             return false;
         }
-        if (o instanceof Attendee) {
-            Attendee attendee = (Attendee) o;
-            return this.getAccessUsername().equals(attendee.getAccessUsername());
-        }
-        return false; // the object does not belong to Event
     }
     
-    public boolean equals(String username){
+    public boolean hasAttendee(String username){
         if(getAccessUsername().equals(username)){
             return true;
         }

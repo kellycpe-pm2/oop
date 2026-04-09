@@ -350,6 +350,7 @@ public class User {
     }
 
     public boolean equals(Object o) {
+        if(this==o){return true;}
         if (o==null){
             return false;
         }
@@ -360,7 +361,7 @@ public class User {
         return false; // the object does not belong to Event
     }
 
-    public boolean equals(String username){
+    public boolean hasUser(String username){
         if(this.username.equals(username)){
             return true;
         }

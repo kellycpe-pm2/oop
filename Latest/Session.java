@@ -219,6 +219,7 @@ public class Session {
     }
 
     public boolean equals(Object o) {
+        if(this==o){return true;}
         if (o == null)
             return false;
         if (o instanceof Session) {
@@ -227,7 +228,7 @@ public class Session {
         return false;
     }
 
-    public boolean equals(String sessionID) {
+    public boolean hasSession(String sessionID) {
         return this.sessionID.equals(sessionID);
     }
 }

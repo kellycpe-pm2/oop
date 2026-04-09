@@ -255,10 +255,10 @@ public class Concert extends Event {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof Concert) {
-            Concert c = (Concert) o;
-            return this.getEventID().equals(c.getEventID());
+        if (super.equals(o)){
+            return true;
+        }else{
+            return false;
         }
-        return false;
     }
 }

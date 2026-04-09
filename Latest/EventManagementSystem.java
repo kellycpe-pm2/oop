@@ -153,7 +153,7 @@ public class EventManagementSystem {
     public Event getEventById(String eventID) {
         for (int type = 0; type < 3; type++) {
             for (int i = 0; i < eventCount; i++) {
-                if (events[i] != null && events[i].equals(eventID)) {
+                if (events[i] != null && events[i].hasEvent(eventID)) {
                     return events[i];
                 }
             }
@@ -275,7 +275,7 @@ public class EventManagementSystem {
 
     public boolean validationInputEventId(String eventId) {
         for (Event e : this.events) {
-            if (e != null && e.equals(eventId)) {
+            if (e != null && e.hasEvent(eventId)) {
                 return true;
             }
 
@@ -512,7 +512,7 @@ public class EventManagementSystem {
 
     public Event findEventById(String eventId) {
         for (Event e : this.events) {
-            if (e != null && e.equals(eventId)) {
+            if (e != null && e.hasEvent(eventId)) {
                 return e;
             }
         }
@@ -546,6 +546,20 @@ public class EventManagementSystem {
             return true;
         } else {
             return true;
+        }
+    }
+
+    public String toString (){
+        return "User\t:"+current_user.toString();
+    }
+
+    public boolean equals(Object o){
+        if(this == o){return true;}
+        if(o == null){return false;}
+        if (o instanceof EventManagementSystem){
+            return true;
+        }else{
+            return false;
         }
     }
 }

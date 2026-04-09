@@ -253,13 +253,10 @@ public class Workshop extends Event {
 
     
     public boolean equals(Object o) {
-       if (o==null){
+        if (super.equals(o)){
+            return true;
+        }else{
             return false;
         }
-        if (o instanceof Workshop) {
-            Workshop w = (Workshop) o;
-            return this.getEventID().equals(w.getEventID());
-        }
-        return false;
     }
 }
