@@ -596,7 +596,7 @@ public class TestUser {
 
                     usertemp.setAccessUserName(ticket.getBuyerName());
 
-                    if (ticket.equals(ticketId)) {
+                    if (ticket.hasTicket(ticketId)) {
                         ticketFound = true;
 
                         // Find attendee by buyer name
@@ -760,7 +760,7 @@ public class TestUser {
                             if (!(user.equals(usertemp))) {
                                 continue;
                             }
-                            if (user.equals(ticket.getBuyerName())) {
+                            if (user.hasUser(ticket.getBuyerName())) {
                                 System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
                                         no++,
                                         ticket.getBuyerName(),
@@ -825,7 +825,7 @@ public class TestUser {
                             if (!(usertemp.checkClass(user))) {
                                 continue;
                             }
-                            if (user.equals(ticket.getBuyerName())) {
+                            if (user.hasUser(ticket.getBuyerName())) {
                                 System.out.println(
                                         "\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");
                                 System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
@@ -893,7 +893,7 @@ public class TestUser {
                         if (!(usertamp.checkClass(user))) {
                             continue;
                         }
-                        if (user.equals(ticket.getBuyerName())) {
+                        if (user.hasUser(ticket.getBuyerName())) {
                             System.out.println(
                                     "\t\t\t├────┼────────────────────┼─────────────────────┼──────────┼─────────┤");
                             System.out.printf("\t\t\t│ %-2d │ %-18s │ %-19s │ %-8s │ %-8s│\n",
@@ -1880,7 +1880,7 @@ public class TestUser {
         boolean found = false;
 
         for (int i = 0; i < eventCount; i++) {
-            if (events[i].equals(eventID)) {
+            if (events[i].hasEvent(eventID)) {
                 if (events[i].isConcert()) {
                     Concert.removeConcert(concerts, eventID);
                 } else if (events[i].isWorkshop()) {
@@ -2857,7 +2857,7 @@ public class TestUser {
         System.out.println("\n--- All Tickets History for " + attendee.getAccessUsername() + " ---");
 
         for (Ticket t : tickets) {
-            if (attendee.equals(t.getBuyerName())) {
+            if (attendee.hasAttendee(t.getBuyerName())) {
                 t.displayTicketDetails();
                 System.out.println();
                 count++;

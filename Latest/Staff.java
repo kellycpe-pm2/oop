@@ -41,13 +41,10 @@ public class Staff extends User{
     }
 
     public boolean equals(Object o) {
-        if (o==null){
+        if (super.equals(o)){
+            return true;
+        }else{
             return false;
         }
-        if (o instanceof Staff) {
-            Staff staff = (Staff) o;
-            return this.getAccessUsername().equals(staff.getAccessUsername());
-        }
-        return false; // the object does not belong to Event
     }
 }

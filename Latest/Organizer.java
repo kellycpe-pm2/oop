@@ -58,17 +58,14 @@ public class Organizer extends User {
     }
 
     public boolean equals(Object o) {
-        if (o == null) {
+        if (super.equals(o)){
+            return true;
+        }else{
             return false;
         }
-        if (o instanceof Organizer) {
-            Organizer organizer = (Organizer) o;
-            return this.getAccessUsername().equals(organizer.getAccessUsername());
-        }
-        return false;
     }
 
-    public boolean equals(String username) {
+    public boolean hasOrganizer(String username) {
         if (getAccessUsername().equals(username)) {
             return true;
         }

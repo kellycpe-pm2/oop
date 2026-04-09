@@ -184,6 +184,10 @@ public class Ticket {
 
 
    public boolean equals(Object o) {
+        if(this ==o){
+            return true;
+        }
+        
         if (o==null){
             return false;
         }
@@ -194,7 +198,7 @@ public class Ticket {
         return false; // the object does not belong to Event
     }
 
-    public boolean equals(String ticketId){
+    public boolean hasTicket(String ticketId){
         if (ticketId.equals(ticketId)){
             return true;
         }

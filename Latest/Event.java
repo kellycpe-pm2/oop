@@ -87,6 +87,7 @@ public abstract class Event {
                             getDate());
     }
     public boolean equals(Object o) {
+       if(this == o){return true;}
        if (o==null){
             return false;
         }
@@ -97,7 +98,7 @@ public abstract class Event {
         return false; // the object does not belong to Event
     }
 
-    public boolean equals(String eventId){
+    public boolean hasEvent(String eventId){
         if (this.eventID.equals(eventId)){
             return true;
         }

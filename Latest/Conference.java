@@ -291,11 +291,10 @@ public class Conference extends Event {
     }
 
     public boolean equals(Object o) {
-        if (o == null)
+        if (super.equals(o)){
+            return true;
+        }else{
             return false;
-        if (o instanceof Conference) {
-            return this.getEventID().equals(((Conference) o).getEventID());
         }
-        return false;
     }
 }
