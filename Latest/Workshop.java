@@ -1,10 +1,4 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Workshop extends Event {
@@ -17,7 +11,6 @@ public class Workshop extends Event {
 
     public Workshop(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
-        appendToFile(); // auto-save to Workshop.json on creation
     }
 
     // Private constructor used only when loading from file — skips auto-save
@@ -107,83 +100,6 @@ public class Workshop extends Event {
         }
     }
 
-    // ── File I/O ─────────────────────────────────────────────────────────────
-
-    // Appends this workshop's data to Workshop.json
-    private void appendToFile() {
-        try {
-            File workshopFile = new File("Workshop.json");
-            workshopFile.createNewFile();
-            try (Writer writer = new java.io.FileWriter(workshopFile, true)) {
-                writeWorkshopRecord(writer);
-            }
-        } catch (IOException e) {
-            System.out.println("Error auto-saving workshop data: " + e.getMessage());
-        }
-    }
-
-    // Helper: writes one workshop record
-    // Format: eventID / title / date / venue / maxTickets / speakerCount / [name x
-    // N]
-    private void writeWorkshopRecord(Writer writer) throws IOException {
-        writer.write(getEventID() + "\n");
-        writer.write(getTitle() + "\n");
-        writer.write(getDate().toString() + "\n");
-        writer.write(getVenue() + "\n");
-        writer.write(getMaxTickets() + "\n");
-        writer.write(speakerCount + "\n");
-        for (int i = 0; i < speakerCount; i++) {
-            writer.write(speakerNames[i] + "\n");
-        }
-    }
-
-    // create Workshop file
-    public void createWorkshopFile() {
-        try {
-            File workshopFile = new File("Workshop.json");
-            if (workshopFile.createNewFile()) {
-                System.out.println("Please Waiting...");
-                System.out.println("Workshop file created: " + workshopFile.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("Error creating workshop file: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Reads all workshops from "Workshop.json".
-     * Format per record:
-     * eventID, title, date, venue, maxTickets, speakerCount, [name x speakerCount]
-     */
-    public static List<Workshop> readWorkshopData() {
-        List<Workshop> workshops = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
-            if (!lines.isEmpty()) {
-                int i = 0;
-                while (i < lines.size()) {
-                    String eventID = lines.get(i++);
-                    String title = lines.get(i++);
-                    LocalDate date = LocalDate.parse(lines.get(i++));
-                    String venue = lines.get(i++);
-                    int maxTickets = Integer.parseInt(lines.get(i++));
-                    int storedSpeakerCount = Integer.parseInt(lines.get(i++));
-
-                    Workshop w = new Workshop(title, date, venue, maxTickets, true);
-                    w.setEventID(eventID);
-
-                    for (int s = 0; s < storedSpeakerCount; s++) {
-                        w.speakerNames[w.speakerCount++] = lines.get(i++);
-                    }
-                    workshops.add(w);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading workshop data: " + e.getMessage());
-        }
-        return workshops;
-    }
-
     // display all workshops
     public static void displayAllWorkshops(List<Workshop> workshops) {
         System.out.println("=== Workshop Info ===");
@@ -195,23 +111,11 @@ public class Workshop extends Event {
         }
     }
 
-    // store workshop data to Workshop.json
-    public static void storeWorkshopData(List<Workshop> workshops) {
-        try (Writer writer = new java.io.FileWriter("Workshop.json")) {
-            for (Workshop w : workshops) {
-                w.writeWorkshopRecord(writer);
-            }
-        } catch (IOException e) {
-            System.out.println("Error storing workshop data: " + e.getMessage());
-        }
-    }
-
     // remove a workshop by eventID from the list and update Workshop.json
     public static boolean removeWorkshop(List<Workshop> workshops, String eventID) {
         for (int i = 0; i < workshops.size(); i++) {
             if (workshops.get(i).getEventID().equals(eventID)) {
                 workshops.remove(i);
-                storeWorkshopData(workshops);
                 System.out.println("Workshop [" + eventID + "] removed successfully.");
                 return true;
             }
