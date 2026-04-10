@@ -2218,18 +2218,22 @@ public class TestUser {
         }
     }
     // load all Speaker accounts from alluser into speakerPool
-    static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
-        speakerCount = 0;
-        Speaker usertemp = new Speaker();
-        for (int i = 0; i < totalUsers; i++) {
-            if (usertemp.checkClass(alluser[i])) {
-                speakerPool[speakerCount++] = (Speaker) alluser[i];
-            }
-        }
-        if (speakerCount > 0) {
-            System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
+static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
+    speakerCount = 0;
+    Speaker usertemp = new Speaker();
+    for (int i = 0; i < totalUsers; i++) {
+        if (usertemp.checkClass(alluser[i])) {
+            speakerPool[speakerCount++] = (Speaker) alluser[i];
         }
     }
+    
+    // IMPORTANT: Update the static 'no' variable in Speaker class
+    Speaker.setSpeakerCount(speakerCount);
+    
+    if (speakerCount > 0) {
+        System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
+    }
+}
 
     // ── Conference session speaker management (original, renamed) ─────────────
 
@@ -3186,7 +3190,7 @@ public class TestUser {
             System.out.println("║  3: Update Session Topic     ║");
             System.out.println("║  4: Update Bio               ║");
             System.out.println("║  5: View My Info             ║");
-            System.out.println("║  6: Back to Main Menu        ║");
+            System.out.println("║  0: Back to Main Menu        ║");
             System.out.println("╚══════════════════════════════╝");
             System.out.print("Enter option: ");
             int choice = scan.nextInt();
