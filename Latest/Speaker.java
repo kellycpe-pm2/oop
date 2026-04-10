@@ -35,16 +35,34 @@ public class Speaker extends User {
         return "No bio available";
     }
 
+    public static String[] getBioArray() {
+    return bio;
+}
 
     @Override
     public int getno() {
         return Speaker.no;
     }
 
-    // ------------------setter-------------------------------
-    public void setBio(String bio) {
-        Speaker.bio[no] = bio;
+// ------------------setter-------------------------------
+// Set current speaker's bio
+public void setCurrentBio(String bio) {
+    if (no > 0) {
+        Speaker.bio[no - 1] = bio;
     }
+}
+
+// Set the total number of speakers (for loading from file)
+public static void setSpeakerCount(int count) {
+    no = count;
+}
+
+// Set bio at specific index (for file operations)
+public static void setBioAtIndex(int index, String bioText) {
+    if (index >= 0 && index < no) {
+        Speaker.bio[index] = bioText;
+    }
+}
 
     // ------------------toString-------------------------------
     public String toString(int no) {
@@ -84,18 +102,16 @@ public class Speaker extends User {
 
     // ------------------upload bio-------------------------------
     public boolean uploadBio(String username, String newBio) {
-        // readSpeakerData();
-        for (int i = 0; i < no; i++) {
-            if (getAccessUsername() != null && getAccessUsername().equals(username)) {
-                Speaker.bio[i] = newBio;
-                // rewriteSpeakerData();
-                System.out.println("Bio updated successfully for: " + username);
-                return true;
-            }
+    if (getAccessUsername() != null && getAccessUsername().equals(username)) {
+        if (no > 0) {
+            Speaker.bio[no - 1] = newBio;  // Update at current speaker's index
+            System.out.println("Bio updated successfully for: " + username);
+            return true;
         }
-        System.out.println("Speaker not found: " + username);
-        return false;
     }
+    System.out.println("Speaker not found: " + username);
+    return false;
+}
 
     
 
