@@ -14,7 +14,7 @@ public class Attendee extends User{
     }
 
     public boolean checkClass(Object o){
-        if(o instanceof User){
+        if(o instanceof Attendee){
             return true;
         }
         return false;
@@ -28,8 +28,8 @@ public class Attendee extends User{
         }
     }
     
-    public boolean hasAttendee(String username){
-        if(getAccessUsername().equals(username)){
+    public boolean hasUser(String username){
+        if(getUsername().equals(username)){
             return true;
         }
         return false;
