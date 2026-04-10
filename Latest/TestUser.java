@@ -1885,20 +1885,18 @@ public class TestUser {
                     Concert.removeConcert(concerts, eventID);
                 } else if (events[i].isWorkshop()) {
                     Workshop.removeWorkshop(workshops, eventID);
-                } else if (events[i].isWorkshop()) {
+                } else if (events[i].isConference()) {
                     Conference.removeConference(conferences, eventID);
-
-                    // remove from flat events array
-                    for (int z = i; z < eventCount - 1; z++) {
-                        events[z] = events[z + 1];
-                    }
-                    events[eventCount - 1] = null;
-                    eventCount--;
-                    found = true;
-                    break;
                 }
+                // remove from flat events[] array for all types
+                for (int z = i; z < eventCount - 1; z++) {
+                    events[z] = events[z + 1];
+                }
+                events[eventCount - 1] = null;
+                eventCount--;
+                found = true;
+                break;
             }
-
         }
         if (!found) {
             System.out.println("Error: Event [" + eventID + "] not found !");
@@ -2177,7 +2175,7 @@ public class TestUser {
         }
     }
 
-// Ensure speaker file exists (create if not)
+    // Ensure speaker file exists (create if not)
     public static void ensureSpeakerFileExists() {
         File speakerFile = new File("speaker.json");
         if (!speakerFile.exists()) {
@@ -2217,28 +2215,31 @@ public class TestUser {
             System.out.println("Error reading speaker data: " + e.getMessage());
         }
     }
+
     // load all Speaker accounts from alluser into speakerPool
-static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
-    speakerCount = 0;
-    Speaker usertemp = new Speaker();
-    for (int i = 0; i < totalUsers; i++) {
-        if (usertemp.checkClass(alluser[i])) {
-            speakerPool[speakerCount++] = (Speaker) alluser[i];
+    static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
+        speakerCount = 0;
+        Speaker usertemp = new Speaker();
+        for (int i = 0; i < totalUsers; i++) {
+            if (usertemp.checkClass(alluser[i])) {
+                speakerPool[speakerCount++] = (Speaker) alluser[i];
+            }
+        }
+
+        // IMPORTANT: Update the static 'no' variable in Speaker class
+        Speaker.setSpeakerCount(speakerCount);
+
+        if (speakerCount > 0) {
+            System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
         }
     }
-    
-    // IMPORTANT: Update the static 'no' variable in Speaker class
-    Speaker.setSpeakerCount(speakerCount);
-    
-    if (speakerCount > 0) {
-        System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
-    }
-}
 
     // ── Conference session speaker management (original, renamed) ─────────────
 
     // assign a speaker from the pool to a conference session
     static void assignSpeakerToConferenceSession() {
+        // Refresh pool so speakers added this session are visible
+        loadSpeakersFromUsers(ems.getUsers(), countUsers(ems.getUsers()));
         if (speakerCount == 0) {
             System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
             return;
@@ -2351,7 +2352,7 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
                 System.out.println("Invalid selection.");
                 return;
             }
-            concert.changeSpeaker(oldUname, speakerPool[spIdx]);
+            concert.changeSpeaker(oldUname, speakerPool[spIdx].getAccessUsername());
             Concert.storeConcertData(concerts);
         } else if (opt == 3) {
             if (concert.getSpeakerCount() == 0) {
@@ -2415,7 +2416,7 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
                 System.out.println("Invalid selection.");
                 return;
             }
-            workshop.changeSpeaker(oldUname, speakerPool[spIdx]);
+            workshop.changeSpeaker(oldUname, speakerPool[spIdx].getAccessUsername());
             Workshop.storeWorkshopData(workshops);
         } else if (opt == 3) {
             if (workshop.getSpeakerCount() == 0) {
@@ -2439,6 +2440,8 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
      * Pass either a Concert or Workshop (the other must be null).
      */
     static void assignSpeakerToConcertOrWorkshop(Concert concert, Workshop workshop) {
+        // Refresh pool so speakers added this session are visible
+        loadSpeakersFromUsers(ems.getUsers(), countUsers(ems.getUsers()));
         if (speakerCount == 0) {
             System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
             return;
@@ -2456,9 +2459,9 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
             } else {
                 Speaker sp = speakerPool[spIdx];
                 if (concert != null) {
-                    concert.assignSpeaker(sp);
+                    concert.assignSpeaker(sp.getAccessUsername());
                 } else {
-                    workshop.assignSpeaker(sp);
+                    workshop.assignSpeaker(sp.getAccessUsername());
                 }
                 System.out.print("Assign another speaker to this " + eventLabel + "? (1=Yes / 0=No): ");
                 int cont = readInt();
@@ -2534,8 +2537,20 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         return workshopList[idx];
     }
 
+    // count non-null users in the array
+    static int countUsers(User[] users) {
+        int count = 0;
+        for (User u : users) {
+            if (u != null)
+                count++;
+        }
+        return count;
+    }
+
     // view all registered speakers
     static void viewSpeakers() {
+        // Refresh speakerPool so newly created speaker accounts are always included
+        loadSpeakersFromUsers(ems.getUsers(), countUsers(ems.getUsers()));
         if (speakerCount == 0) {
             System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
             return;
@@ -2590,12 +2605,12 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
             if (e.isConcert()) {
                 Concert c = (Concert) e;
                 if (c.getSpeakerCount() > 0) {
-                    speakerCol = c.getSpeakers()[0].getAccessUsername();
+                    speakerCol = c.getSpeakers()[0];
                 }
             } else if (e.isWorkshop()) {
                 Workshop w = (Workshop) e;
                 if (w.getSpeakerCount() > 0) {
-                    speakerCol = w.getSpeakers()[0].getAccessUsername();
+                    speakerCol = w.getSpeakers()[0];
                 }
             }
             // Conference: speakers belong to individual sessions — leave column empty
@@ -2831,7 +2846,7 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         }
         System.out.println("\nProcessing payment...");
         System.out.println("Payment Success!");
-        
+
         Payment p = new Payment(a, eventId, tt.getPrice(ticketType), bookingNo);
         payments[ticketCount] = p;
         System.out.print(p.toString());
@@ -3424,7 +3439,7 @@ static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
 
     // Update speaker bio
     static void updateSpeakerBio(Speaker speaker) {
-     
+
         System.out.println("\n--- Update Your Bio ---");
         System.out.println("Current Bio: " + speaker.getBio());
         System.out.print("Enter new bio: ");
