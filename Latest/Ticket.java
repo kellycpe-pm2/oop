@@ -9,17 +9,19 @@ public class Ticket {
     private String ticketId;
     private boolean status;
     private String eventId;
-    private String seatNo;
+    private String seatNumber;
     private double totalAmount;
     private String buyerName;
     private String ticketType;
     private String bookingId;
     String perks;
     private LocalDate purchaseDate;
-    private static int ticketCount;
+    private static int ticketCount=0;
 
 
     // constructor
+    // Constructor for creating NEW ticket
+
     public Ticket(TicketType tt, String buyerName, String ticketType, boolean status, String eventId, int ticketCount,String bookingId) {
         this.tt = tt;
         this.buyerName =buyerName;
@@ -28,24 +30,29 @@ public class Ticket {
         this.status=status;
         this.eventId = eventId;
         this.purchaseDate = LocalDate.now();
-        ticketCount++;
-        this.ticketId = "T" + String.format("%05d", ticketCount);
-        this.totalAmount=tt.getPrice(ticketType);
-        this.seatNo=tt.getSeat(ticketType);
-        this.perks=tt.getPerks();
+
+        //update the data using the old data
         Ticket.ticketCount=ticketCount;
-        
+        this.ticketId = "T" + String.format("%05d", Ticket.ticketCount);
+
+        this.totalAmount=tt.getPrice(ticketType);
+        this.seatNumber=tt.getSeat(ticketType);
+        this.perks=tt.getPerks();
         tt.reduceQuantity(ticketType);
+        //increase for the next use        
+        Ticket.ticketCount++;
+
     }
 
-    public Ticket(String ticketId, boolean status, String buyerName, String eventId, String ticketType, double totalAmount, String seatNo, String perks, LocalDate purchaseDate,String bookingId) {
+    // Constructor for loading EXISTING ticket from file
+    public Ticket(String ticketId, boolean status, String buyerName, String eventId, String ticketType, double totalAmount, String seatNumber, String perks, LocalDate purchaseDate,String bookingId) {
         this.ticketId = ticketId;
         this.status=status;
         this.buyerName=buyerName;
         this.eventId = eventId;
         this.ticketType = ticketType;
         this.totalAmount = totalAmount;
-        this.seatNo = seatNo;
+        this.seatNumber = seatNumber;
         this.perks=perks;
         this.purchaseDate = purchaseDate;
         this.bookingId=bookingId;
@@ -59,8 +66,8 @@ public class Ticket {
             return false;
         }
 
-        this.seatNo = tt.getSeat(ticketType);
-        if (seatNo == null) {
+        this.seatNumber = tt.getSeat(ticketType);
+        if (seatNumber == null) {
             System.out.println("No seats available for TicketType: " + ticketType);
             return false;
         }
@@ -83,7 +90,7 @@ public class Ticket {
     }
 
     public String getSeatNum(){
-        return this.seatNo;
+        return this.seatNumber;
     }
 
     public String getTicketType(){
@@ -117,18 +124,19 @@ public class Ticket {
         this.status=status;
     }
 
+
     // display ticket details
     public void displayTicketDetails() {
         System.out.println("Ticket");
-        System.out.println("-----------------------");
-        System.out.println("Ticket ID: " + ticketId);
-        System.out.println("Booking ID: " + bookingId);
-        System.out.println("Event ID: " + eventId);
-        System.out.println("Seat No: " + seatNo);
-        System.out.println("Ticket Type: " + ticketType);
-        System.out.println("Price: " + totalAmount);
-        System.out.println("Perks: " + perks);
-        System.out.println("Purchase Date: " + purchaseDate);
+        System.out.println("------------------------------------");
+        System.out.println("Ticket ID         : " + ticketId);
+        System.out.println("Booking ID        : " + bookingId);
+        System.out.println("Event ID          : " + eventId);
+        System.out.println("Seat Number  : " + seatNumber);
+        System.out.println("Ticket Type       :" + ticketType);
+        System.out.println("Price             : " + totalAmount);
+        System.out.println("Perks             : " + perks);
+        System.out.println("Purchase Date     : " + purchaseDate);
 
     }
 
@@ -167,7 +175,7 @@ public class Ticket {
 
     public TicketType findTicketTypeById(TicketType[] ticketTypes, String eventId) {
         for (TicketType tt : ticketTypes) {
-            if (tt != null && eventId.equals(eventId)) {
+            if (tt != null &&  tt.getEventId().equals(eventId)) {
                 return tt;
             }
         }
@@ -181,7 +189,7 @@ public class Ticket {
                              "║          Ticket ID      :  %-31s║\n"+
                              "║          Ticket Type    :  %-31s║\n"+
                              "║          Seat No        :  %-31s║\n"
-                             ,this.bookingId, this.eventId, this.ticketId,this.ticketType,this.seatNo,this.purchaseDate);
+                             ,this.bookingId, this.eventId, this.ticketId,this.ticketType,this.seatNumber,this.purchaseDate);
     
     } 
 
@@ -198,14 +206,11 @@ public class Ticket {
             Ticket ticket = (Ticket) o;
             return this.ticketId.equals(ticket.getTicketId());
         }
-        return false; // the object does not belong to Event
+        return false; // the object does No belong to Event
     }
 
     public boolean hasTicket(String ticketId){
-        if (ticketId.equals(ticketId)){
-            return true;
-        }
-        return false;
+        return this.ticketId != null && this.ticketId.equals(ticketId); 
     }
 
 }
