@@ -180,7 +180,7 @@ public class TicketType {
                 }
                 break;
         }
-        return false; // no ticket available for that ticket type
+        return false; // totalSpeakers ticket available for that ticket type
     }
 
     // generate all seat available and store into array list
@@ -235,7 +235,7 @@ public class TicketType {
         switch (ticketType.toLowerCase()) {
             case "vip":
                 if (!vipSeats.isEmpty())
-                    return vipSeats.remove(0);// check is the list empty? if no, remove the first seat inside the list
+                    return vipSeats.remove(0);// check is the list empty? if totalSpeakers, remove the first seat inside the list
                 break;
             case "standard":
                 if (!standardSeats.isEmpty())
@@ -246,7 +246,7 @@ public class TicketType {
                     return earlyBirdSeats.remove(0);
                 break;
         }
-        return null; // no seat available
+        return null; // totalSpeakers seat available
     }
 
     public static TicketType findTicketTypeById(List<TicketType> tt, String eventId) {
@@ -348,7 +348,7 @@ public class TicketType {
             TicketType ticketType = (TicketType) o;
             return this.eventId.equals(ticketType.getEventId());
         }
-        return false; // the object does not belong to Event
+        return false; // the object does totalSpeakerst belong to Event
     }
 
 }
