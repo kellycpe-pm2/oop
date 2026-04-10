@@ -377,8 +377,8 @@ public class EventManagementSystem {
             System.out.println("Error: Speaker not found !");
             return false;
         }
-        if (session.addSpeaker(speaker.getAccessUsername())) {
-            System.out.println("Speaker [" + speaker.getAccessUsername() + "] assigned to session ["
+        if (session.addSpeaker(speaker.getUsername())) {
+            System.out.println("Speaker [" + speaker.getUsername() + "] assigned to session ["
                     + session.getSessionID() + "] successfully.");
             return true;
         }
@@ -529,7 +529,7 @@ public class EventManagementSystem {
             return null;
         }
 
-        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(), ticketTypeName, true, eventId, ticketCount,
+        Ticket ticket = new Ticket(tt, current_user.getUsername(), ticketTypeName, true, eventId, ticketCount,
                 payment.getBookingId());
         return ticket;
     }

@@ -44,14 +44,14 @@ public class Concert extends Event {
             return false;
         }
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(speaker.getAccessUsername())) {
-                System.out.println("Error: Speaker [" + speaker.getAccessUsername()
+            if (speakers[i].getUsername().equals(speaker.getUsername())) {
+                System.out.println("Error: Speaker [" + speaker.getUsername()
                         + "] is already assigned to this concert.");
                 return false;
             }
         }
         speakers[speakerCount++] = speaker;
-        System.out.println("Speaker [" + speaker.getAccessUsername()
+        System.out.println("Speaker [" + speaker.getUsername()
                 + "] assigned to concert [" + getEventID() + "] successfully.");
         return true;
     }
@@ -59,7 +59,7 @@ public class Concert extends Event {
     // Remove a speaker from this concert by username.
     public boolean removeSpeaker(String username) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(username)) {
+            if (speakers[i].getUsername().equals(username)) {
                 for (int j = i; j < speakerCount - 1; j++) {
                     speakers[j] = speakers[j + 1];
                 }
@@ -78,18 +78,18 @@ public class Concert extends Event {
     // Replace an existing speaker with a new one (change speaker).
     public boolean changeSpeaker(String oldUsername, Speaker newSpeaker) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(oldUsername)) {
+            if (speakers[i].getUsername().equals(oldUsername)) {
                 for (int j = 0; j < speakerCount; j++) {
-                    if (j != i && speakers[j].getAccessUsername()
-                            .equals(newSpeaker.getAccessUsername())) {
-                        System.out.println("Error: Speaker [" + newSpeaker.getAccessUsername()
+                    if (j != i && speakers[j].getUsername()
+                            .equals(newSpeaker.getUsername())) {
+                        System.out.println("Error: Speaker [" + newSpeaker.getUsername()
                                 + "] is already assigned to this concert.");
                         return false;
                     }
                 }
                 speakers[i] = newSpeaker;
                 System.out.println("Speaker [" + oldUsername + "] replaced with ["
-                        + newSpeaker.getAccessUsername()
+                        + newSpeaker.getUsername()
                         + "] in concert [" + getEventID() + "] successfully.");
                 return true;
             }
@@ -106,7 +106,7 @@ public class Concert extends Event {
             System.out.println("    No speakers assigned.");
         } else {
             for (int i = 0; i < speakerCount; i++) {
-                System.out.println("    " + (i + 1) + ": " + speakers[i].getAccessUsername());
+                System.out.println("    " + (i + 1) + ": " + speakers[i].getUsername());
             }
         }
     }
@@ -137,7 +137,7 @@ public class Concert extends Event {
         writer.write(getMaxTickets() + "\n");
         writer.write(speakerCount + "\n");
         for (int i = 0; i < speakerCount; i++) {
-            writer.write(speakers[i].getAccessUsername() + "\n");
+            writer.write(speakers[i].getUsername() + "\n");
         }
     }
 
@@ -192,16 +192,7 @@ public class Concert extends Event {
     }
 
     // display all concerts
-    public static void displayAllConcerts(List<Concert> concerts) {
-        System.out.println("=== Concert Info ===");
-        System.out.printf("%-6s %-20s %-12s %-20s %-8s%n", "ID", "Title", "Date", "Venue", "MaxTix");
-        System.out.println("------------------------------------------------------------------");
-        for (Concert c : concerts) {
-            System.out.println(c.toString());
-            c.displaySpeakers();
-        }
-    }
-
+  
     // store concert data to Concert.json
     public static void storeConcertData(List<Concert> concerts) {
         try (Writer writer = new java.io.FileWriter("Concert.json")) {
@@ -225,6 +216,17 @@ public class Concert extends Event {
         }
         System.out.println("Error: Concert [" + eventID + "] not found !");
         return false;
+    }
+    
+    
+    public static void displayAllConcerts(List<Concert> concerts) {
+        System.out.println("=== Concert Info ===");
+        System.out.printf("%-6s %-20s %-12s %-20s %-8s%n", "ID", "Title", "Date", "Venue", "MaxTix");
+        System.out.println("------------------------------------------------------------------");
+        for (Concert c : concerts) {
+            System.out.println(c.toString());
+            c.displaySpeakers();
+        }
     }
 
     @Override

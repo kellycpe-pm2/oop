@@ -36,10 +36,6 @@ public class Speaker extends User {
     }
 
 
-    @Override
-    public int getno() {
-        return Speaker.no;
-    }
 
     // ------------------setter-------------------------------
     public void setBio(String bio) {
@@ -49,7 +45,7 @@ public class Speaker extends User {
     // ------------------toString-------------------------------
     public String toString(int no) {
         return String.format("%-15s %-25s %-30s",
-                getAccessUsername(), Speaker.bio[no]);
+                getUsername(), Speaker.bio[no]);
     }
 
     // ------------------displayInfo-------------------------------
@@ -64,8 +60,8 @@ public class Speaker extends User {
 
     public void displaySingleInfo() {
         System.out.println("=== Speaker Info ===");
-        System.out.println("Username: " + getAccessUsername());
-        System.out.println("Email: " + getAccessEmail());
+        System.out.println("Username: " + getUsername());
+        System.out.println("Email: " + getEmail());
         System.out.println("Bio: " + getBio());
     }
     // ------------------method-------------------------------
@@ -75,7 +71,7 @@ public class Speaker extends User {
     // Find speaker by username from speaker array
     public static Speaker findSpeakerByUsername(String username, Speaker[] speakerArray, int speakerCount) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakerArray[i] != null && speakerArray[i].getAccessUsername().equals(username)) {
+            if (speakerArray[i] != null && speakerArray[i].getUsername().equals(username)) {
                 return speakerArray[i];
             }
         }
@@ -86,7 +82,7 @@ public class Speaker extends User {
     public boolean uploadBio(String username, String newBio) {
         // readSpeakerData();
         for (int i = 0; i < no; i++) {
-            if (getAccessUsername() != null && getAccessUsername().equals(username)) {
+            if (getUsername() != null && getUsername().equals(username)) {
                 Speaker.bio[i] = newBio;
                 // rewriteSpeakerData();
                 System.out.println("Bio updated successfully for: " + username);
@@ -122,8 +118,8 @@ public class Speaker extends User {
         }
     }
 
-    public boolean equals(String username) {
-        if (getAccessUsername().equals(username)) {
+    public boolean hasUser(String username) {
+        if (getUsername().equals(username)) {
             return true;
         }
         return false;

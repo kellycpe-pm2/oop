@@ -1,7 +1,6 @@
 public class Organizer extends User {
 
     // instance variable
-    private static int no = 0;
     private final String role = "Organizer";
 
     // ------------------constructor-------------------------------
@@ -11,18 +10,9 @@ public class Organizer extends User {
 
     Organizer(String username, String password, String email, String contactNo) {
         super(username, password, email, contactNo);
-        Organizer.no++;
-    }
-
-    @Override
-    public int getno() {
-        return Organizer.no;
     }
 
     // ------------------toString-------------------------------
-    public String toString(int no) {
-        return String.format("%-15s", getAccessUsername());
-    }
 
     public String toString() {
         return super.toString() + String.format("║          Position       :  %-31s║\n", role);
@@ -40,18 +30,9 @@ public class Organizer extends User {
         System.out.println("Please Click Enter To continue...");
     }
 
-    // ------------------displayInfo-------------------------------
-    public void displayInfo() {
-        System.out.println("=== Organizer Info ===");
-        System.out.printf("%-15s %-25s %-15s%n", "Username", "Email", "Contact No");
-        System.out.println("----------------------------------------------------");
-        for (int i = 0; i <= no; i++) {
-            System.out.println(toString(i));
-        }
-    }
 
     public boolean checkClass(Object o) {
-        if (o instanceof User) {
+        if (o instanceof Organizer) {
             return true;
         }
         return false;
@@ -65,8 +46,8 @@ public class Organizer extends User {
         }
     }
 
-    public boolean hasOrganizer(String username) {
-        if (getAccessUsername().equals(username)) {
+    public boolean hasUser(String username) {
+        if (getUsername().equals(username)) {
             return true;
         }
         return false;

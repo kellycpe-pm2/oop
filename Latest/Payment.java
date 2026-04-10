@@ -9,7 +9,7 @@ public class Payment{
     private LocalDate paymentDate;
 
     public Payment(Attendee a, String eventId, double paymentAmount, int bookingNo){
-        name=a.getAccessUsername();
+        name=a.getUsername();
         this.eventId=eventId;
         this.paymentAmount=paymentAmount;
         paymentDate=LocalDate.now();
