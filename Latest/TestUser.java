@@ -101,7 +101,6 @@ public class TestUser {
 
                     displaySignUpInterface(user, alluser, no);
                     // set the access user
-                    
 
                     accessmenu(user, alluser, no);
                     break;
@@ -171,14 +170,14 @@ public class TestUser {
             if (logincount > 2) {
                 return false;
             }
-        } while (!validationNoExistName(name ,user, alluser, no));
+        } while (!validationNoExistName(name, user, alluser, no));
 
         do {
 
             System.out.print("\nPlease enter your Password: ");
             password = scan.nextLine();
 
-        } while (!validationLoginPwd(password,alluser,no));
+        } while (!validationLoginPwd(password, alluser, no));
 
         System.out.println("------------------------------------------------------------");
         return true;
@@ -197,7 +196,7 @@ public class TestUser {
 
             System.out.print("\nPlease enter your name: ");
             name = scan.nextLine();
-        } while (!validationName(name) || !validationExist(name,alluser));
+        } while (!validationName(name) || !validationExist(name, alluser));
 
         do {
 
@@ -225,16 +224,15 @@ public class TestUser {
             System.out.print("\nPlease enter your comfirm password: ");
             password2 = scan.nextLine();
 
-        } while (!validationPassword2(password,password2));
+        } while (!validationPassword2(password, password2));
 
         System.out.println("------------------------------------------------------------");
-    
+
         // create and store data
         user.setUserName(name);
-        createAccount(no, user, alluser,name,password,email,contactNo);
-        storeUserData(name,password,email,contactNo);
+        createAccount(no, user, alluser, name, password, email, contactNo);
+        storeUserData(name, password, email, contactNo);
 
-    
     }
 
     public static void accessmenu(User user, User[] alluser, int[] no) {
@@ -247,7 +245,7 @@ public class TestUser {
             }
         }
         if (storedUser == null)
-        
+
             storedUser = alluser[no[0]]; // fallback
 
         System.out.println("╔═══════════════════════════════════════════════════════════╗\n" +
@@ -376,7 +374,7 @@ public class TestUser {
                         no[i]--;
 
                     }
-                
+
                 }
 
             } // create user file
@@ -403,7 +401,8 @@ public class TestUser {
         }
     }
 
-    public static void createAccount(int[] no, User user, User[] alluser,String name, String password,String email,String contactNo) {
+    public static void createAccount(int[] no, User user, User[] alluser, String name, String password, String email,
+            String contactNo) {
 
         if (password.equals(ORGANIZER_PSWD)) {
 
@@ -442,24 +441,23 @@ public class TestUser {
     }
 
     // validation for signup
-    public static boolean validationExist(String name,User [] existUser) {
-        
+    public static boolean validationExist(String name, User[] existUser) {
+
         if (validationEmpty(name)) {
 
             return false;
         }
 
-        if (existUser == null){
+        if (existUser == null) {
             return false;
         }
 
-            for (int i = 0; i < existUser.length; i++) {
-                if (existUser[i] != null &&name.equals(existUser[i].getUsername())) {
-                    System.out.println("Error: The Username Has Already Exist ! ");
-                    return false;
-                }
+        for (int i = 0; i < existUser.length; i++) {
+            if (existUser[i] != null && name.equals(existUser[i].getUsername())) {
+                System.out.println("Error: The Username Has Already Exist ! ");
+                return false;
             }
-        
+        }
 
         return true;
     }
@@ -513,38 +511,37 @@ public class TestUser {
 
         }
     }
-   
-   //validation for contact number
-    public static boolean validationContactNo(String contactNo){ 
+
+    // validation for contact number
+    public static boolean validationContactNo(String contactNo) {
 
         char[] contactNoArray = contactNo.toCharArray();
-         if (validationEmpty(contactNo)) {
+        if (validationEmpty(contactNo)) {
             return false;
         }
-       
 
-        // check the contact number length 
-        else if(contactNoArray.length!=11&& contactNoArray.length!=10 ){
+        // check the contact number length
+        else if (contactNoArray.length != 11 && contactNoArray.length != 10) {
             System.out.println("Input Error: Please Enter In Format ! ");
             return false;
 
         }
-                 // check the character is in number
+        // check the character is in number
 
-        else{
-            for (int i=0; i < contactNoArray.length; i++){
-            if (!((int) contactNoArray[i] >= 48 && (int) contactNoArray[i] <= 57)) {
-            System.out.println("Input Error: Please Enter In Format ! ");
-            return false;
+        else {
+            for (int i = 0; i < contactNoArray.length; i++) {
+                if (!((int) contactNoArray[i] >= 48 && (int) contactNoArray[i] <= 57)) {
+                    System.out.println("Input Error: Please Enter In Format ! ");
+                    return false;
+                }
             }
-        }
-            
-        return true;
+
+            return true;
 
         }
 
-        
     }
+
     // validation password (it length must be more than 5 char)
     public static boolean validationPassword(String password) {
         if (validationEmpty(password)) {
@@ -560,7 +557,7 @@ public class TestUser {
         }
     }
 
-    public static boolean validationPassword2(String password,String password2) {
+    public static boolean validationPassword2(String password, String password2) {
         if (validationEmpty(password2)) {
             return false;
         }
@@ -590,35 +587,33 @@ public class TestUser {
         }
     }
 
-
     // validation for login
 
-    public static boolean validationNoExistName(String name,User user,User [] existUser, int [] no) {
-        //check the user input is empty or not
+    public static boolean validationNoExistName(String name, User user, User[] existUser, int[] no) {
+        // check the user input is empty or not
         if (validationEmpty(name)) {
             return false;
         }
-            for (int j=0; j< no[0] ; j++) {
-                user.setUserName(name);
-                if (existUser[j]!=null&& user.equals(existUser[j])) {
-                no[0] =j;
-                //found user
+        for (int j = 0; j < no[0]; j++) {
+            user.setUserName(name);
+            if (existUser[j] != null && user.equals(existUser[j])) {
+                no[0] = j;
+                // found user
                 return true;
             }
         }
         System.out.println("Error: The Username Is Not Matched ! ");
 
         return false;
-       
+
     }
 
-    public static boolean validationLoginPwd(String password,User [] user, int [] no) {
+    public static boolean validationLoginPwd(String password, User[] user, int[] no) {
         if (validationEmpty(password)) {
             return false;
         }
 
-
-        String current_pswd= user[no[0]].getPassword();
+        String current_pswd = user[no[0]].getPassword();
         if (password.equals(current_pswd)) {
             return true;
 
@@ -627,14 +622,6 @@ public class TestUser {
 
         return false;
     }
-
-
-
-
-
-
-
-
 
     // additional function
     public static void waitForEnter() {
@@ -658,12 +645,6 @@ public class TestUser {
             }
         }
     }
-
-
-
-
-
-
 
     // _________________________________________________________________________
     // Staff Part
@@ -2056,11 +2037,11 @@ public class TestUser {
                 conf.autoCreateSessions(topics, times);
             }
             conferences.add(conf);
-            
+
             events[eventCount++] = conf;
-            int eventIdx=0;
-            if(eventCount !=0){
-                eventIdx= eventCount-1;
+            int eventIdx = 0;
+            if (eventCount != 0) {
+                eventIdx = eventCount - 1;
             }
             saveEvent(events[eventIdx]);
             System.out.println("Conference created successfully : " + conf.getEventID());
@@ -2382,7 +2363,7 @@ public class TestUser {
         }
     }
 
-// Ensure speaker file exists (create if not)
+    // Ensure speaker file exists (create if not)
     public static void ensureSpeakerFileExists() {
         File speakerFile = new File("speaker.json");
         if (!speakerFile.exists()) {
@@ -2395,33 +2376,35 @@ public class TestUser {
             }
         }
     }
-/* 
-    // Load speaker data with auto-create
-    public static void readSpeakerData() {
-        int no;
-        ensureSpeakerFileExists(); // Make sure file exists first
 
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
-
-            if (lines.isEmpty()) {
-                no = 0;
-            } else {
-                no = (lines.size() / 4);
-                String[][] information = new String[no][4];
-
-                for (int i = 0; i < lines.size(); i++) {
-                    information[i / 4][i % 4] = lines.get(i);
-                }
-
-                for (int i = 0; i < no; i++) {
-                    Speaker.getBioArray()[i] = information[i][3];
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading speaker data: " + e.getMessage());
-        }
-    }*/
+    /*
+     * // Load speaker data with auto-create
+     * public static void readSpeakerData() {
+     * int no;
+     * ensureSpeakerFileExists(); // Make sure file exists first
+     * 
+     * try {
+     * List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+     * 
+     * if (lines.isEmpty()) {
+     * no = 0;
+     * } else {
+     * no = (lines.size() / 4);
+     * String[][] information = new String[no][4];
+     * 
+     * for (int i = 0; i < lines.size(); i++) {
+     * information[i / 4][i % 4] = lines.get(i);
+     * }
+     * 
+     * for (int i = 0; i < no; i++) {
+     * Speaker.getBioArray()[i] = information[i][3];
+     * }
+     * }
+     * } catch (IOException e) {
+     * System.out.println("Error reading speaker data: " + e.getMessage());
+     * }
+     * }
+     */
     // load all Speaker accounts from alluser into speakerPool
     static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         speakerCount = 0;
@@ -2865,12 +2848,13 @@ public class TestUser {
         } else if (e.isWorkshop()) {
             Workshop.storeWorkshopData(workshops);
         } else if (e.isConference()) {
-            Conference cof = (Conference)e;
+            Conference cof = (Conference) e;
             storeConferenceData();
         }
     }
 
-    static void saveAllEvents(String eventID,String title,LocalDate date, String venue, int maxTickets, int sessionCount,Session [] sessions) {
+    static void saveAllEvents(String eventID, String title, LocalDate date, String venue, int maxTickets,
+            int sessionCount, Session[] sessions) {
         Concert.storeConcertData(concerts);
         Workshop.storeWorkshopData(workshops);
         storeConferenceData();
@@ -2904,12 +2888,13 @@ public class TestUser {
         }
     }
 
-    static void appendToFile(String eventID, String title, LocalDate date, String venue, int maxTickets, int sessionCount,Session [] sessions ) {
+    static void appendToFile(String eventID, String title, LocalDate date, String venue, int maxTickets,
+            int sessionCount, Session[] sessions) {
         try {
             File confFile = new File("Conference.json");
             confFile.createNewFile();
             try (Writer writer = new java.io.FileWriter(confFile, true)) {
-                writeConferenceRecord(writer,eventID,title,date,venue,maxTickets,sessionCount,sessions);
+                writeConferenceRecord(writer, eventID, title, date, venue, maxTickets, sessionCount, sessions);
             }
         } catch (IOException e) {
             System.out.println("Error auto-saving conference data: " + e.getMessage());
@@ -2943,10 +2928,11 @@ public class TestUser {
      * Session now stores usernames directly (String[]), so no Speaker object is
      * needed.
      */
-    private static void writeConferenceRecord(Writer writer,String eventID,String title,LocalDate date, String venue, int maxTickets, int sessionCount,Session [] sessions) {
+    private static void writeConferenceRecord(Writer writer, String eventID, String title, LocalDate date, String venue,
+            int maxTickets, int sessionCount, Session[] sessions) {
         try {
-            writer.write( eventID + "\n");
-            writer.write(  title + "\n");
+            writer.write(eventID + "\n");
+            writer.write(title + "\n");
             writer.write(date.toString() + "\n");
             writer.write(venue + "\n");
             writer.write(maxTickets + "\n");
@@ -2957,17 +2943,16 @@ public class TestUser {
                 writer.write(session.getTopic() + "\n");
                 writer.write(session.getTime() + "\n");
                 writer.write(session.getSpeakerCount() + "\n");
-            // getSpeakers() returns String[] — no Speaker object required
+                // getSpeakers() returns String[] — no Speaker object required
                 String[] usernames = session.getSpeakers();
                 for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
                     writer.write(usernames[sp] + "\n");
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Error : No Found File !");
         }
-    }catch (Exception e){
-        System.out.println("Error : No Found File !");
     }
-}
-
 
     public void createConferenceFile() {
         try {
@@ -3010,7 +2995,7 @@ public class TestUser {
                         String topic = lines.get(i++);
                         String time = lines.get(i++);
                         int speakerCount = Integer.parseInt(lines.get(i++));
-                        Session session = new Session (topic,time);
+                        Session session = new Session(topic, time);
                         session.setSessionID(sessionID);
                         conf.setSession(session);
                         // Restore speaker usernames directly — no Speaker object needed
@@ -3042,15 +3027,15 @@ public class TestUser {
     public static void storeConferenceData() {
         try (Writer writer = new java.io.FileWriter("Conference.json")) {
             for (Conference c : conferences) {
-            writeConferenceRecord(writer,c.getEventID(),c.getTitle(), c.getDate(),c.getVenue(),c.getMaxTickets(), c.getSessionCount(),c.getSessions());
-            
-        } 
-    }catch (IOException e) {
+                writeConferenceRecord(writer, c.getEventID(), c.getTitle(), c.getDate(), c.getVenue(),
+                        c.getMaxTickets(), c.getSessionCount(), c.getSessions());
+
+            }
+        } catch (IOException e) {
             System.out.println("Error storing conference data: " + e.getMessage());
         }
     }
-  
-  
+
     // ─────────────────────────────────────────────────────────────────────────
     // ATTENDEE MENU
     // ─────────────────────────────────────────────────────────────────────────
@@ -3181,7 +3166,7 @@ public class TestUser {
         }
         System.out.println("\nProcessing payment...");
         System.out.println("Payment Success!");
-        
+
         Payment p = new Payment(a, eventId, tt.getPrice(ticketType), bookingNo);
         payments[ticketCount] = p;
         System.out.print(p.toString());
@@ -3525,14 +3510,14 @@ public class TestUser {
         }
     }
 
-       // speaker part
+    // speaker part
     static void speakerMenu(Speaker loggedInSpeaker) {
         boolean inMenu = true;
 
         while (inMenu) {
             System.out.println("\n╔══════════════════════════════╗");
             System.out.println("║       SPEAKER MENU           ║");
-            System.out.println("║  Logged in: " + String.format("%-17s", loggedInSpeaker.getAccessUsername()) + "║");
+            System.out.println("║  Logged in: " + String.format("%-17s", loggedInSpeaker.getUsername()) + "║");
             System.out.println("╠══════════════════════════════╣");
             System.out.println("║  1: View & Respond to        ║");
             System.out.println("║     Assigned Sessions        ║");
@@ -3592,7 +3577,7 @@ public class TestUser {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     Session session = conf.getSessions()[i];
-                    if (session.hasSpeaker(speaker.getAccessUsername())) {
+                    if (session.hasSpeaker(speaker.getUsername())) {
                         assignedSessions.add(session);
                     }
                 }
@@ -3613,7 +3598,7 @@ public class TestUser {
             System.out.println("----------------------------------------");
             for (int i = 0; i < assignedSessions.size(); i++) {
                 Session s = assignedSessions.get(i);
-                String status = s.getSpeakerStatus(speaker.getAccessUsername());
+                String status = s.getSpeakerStatus(speaker.getUsername());
                 System.out.println((i + 1) + ".   " + s.getSessionID() + "   | " +
                         s.getTopic() + " | " +
                         s.getTime() + " | " +
@@ -3629,7 +3614,7 @@ public class TestUser {
                 continueManaging = false;
             } else if (choice >= 1 && choice <= assignedSessions.size()) {
                 Session selectedSession = assignedSessions.get(choice - 1);
-                String currentStatus = selectedSession.getSpeakerStatus(speaker.getAccessUsername());
+                String currentStatus = selectedSession.getSpeakerStatus(speaker.getUsername());
 
                 if (!"pending".equals(currentStatus)) {
                     System.out.println("You have already " + currentStatus + " this session.");
@@ -3652,12 +3637,12 @@ public class TestUser {
                 scan.nextLine();
 
                 if (response == 1) {
-                    selectedSession.acceptInvitation(speaker.getAccessUsername());
+                    selectedSession.acceptInvitation(speaker.getUsername());
                     System.out.println("You have accepted the session: " + selectedSession.getTopic());
                 } else if (response == 2) {
                     System.out.print("Please provide a reason for rejection: ");
                     String reason = scan.nextLine();
-                    selectedSession.rejectInvitation(speaker.getAccessUsername(), reason);
+                    selectedSession.rejectInvitation(speaker.getUsername(), reason);
                     System.out.println("You have rejected the session: " + selectedSession.getTopic());
                 } else {
                     System.out.println("Invalid choice.");
@@ -3670,7 +3655,6 @@ public class TestUser {
             }
         }
     }
-
 
     // View my assigned sessions (view only)
     static void viewMyAssignedSessions(Speaker speaker) {
@@ -3775,7 +3759,7 @@ public class TestUser {
 
     // Update speaker bio
     static void updateSpeakerBio(Speaker speaker) {
-     
+
         System.out.println("\n--- Update Your Bio ---");
         System.out.println("Current Bio: " + speaker.getBio());
         System.out.print("Enter new bio: ");
