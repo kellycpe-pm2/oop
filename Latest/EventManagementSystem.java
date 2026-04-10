@@ -1,222 +1,175 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class EventManagementSystem {
-        // --------------------------array
-    private static final int MAX_EVENTS = 100;
+    private static List<Ticket> tickets = new java.util.ArrayList<>();
+    private static Payment[] payments = new Payment[100];
+
+    private static final int MAX_EVENTS = 300;
 
     private Event[] events = new Event[MAX_EVENTS];
     private int eventCount = 0;
 
-    // -------------------------- add method ---------------------------
+    private static int user_no = 0;
+    private User current_user;
+    private User[] user = new User[400];
 
-    // add any Event to the array
-    public boolean addEvent(Event event) {
-        if (event == null) {
-            System.out.println("Error: Event cannot be null !");
-            return false;
-        }
-        if (eventCount >= MAX_EVENTS) {
-            System.out.println("Error: Event list is full !");
-            return false;
-        }
-        events[eventCount] = event;
-        eventCount++;
-        System.out.println("Event [" + event.getEventID() + "] added to the system.");
-        return true;
+    // get methods for Events
+    // Get all events across every type (flat array)
+
+    public EventManagementSystem(User[] user, Event[] events, List<Ticket> tickets, Payment[] payments) {
+        this.user = user;
+        this.events = events;
+        EventManagementSystem.tickets = tickets;
+        EventManagementSystem.payments = payments;
+        EventManagementSystem.user_no = countUser_Num();
+        Payment.setBookingNo(Ticket.getTicketCount());
+
     }
 
-    // -------------------------- get methods ---------------------------
+    public EventManagementSystem() {
+        this(null, null, null, null);
+    }
 
-    // get all events (Concert + Workshop + Conference) combined
-    public Event[] getActiveEvents() {
-        Event[] active = new Event[eventCount];
-        for (int i = 0; i < eventCount; i++) {
-            active[i] = events[i];
+    // Getter Method
+
+    public Event[] getEvents() {
+        return events;
+    }
+
+    public User[] getUsers() {
+        return user;
+    }
+
+    public User getCuurent_User() {
+        return current_user;
+    }
+
+    public static Payment[] getPayments() {
+        return EventManagementSystem.payments;
+    }
+
+    public static List<Ticket> getTicket() {
+        return tickets;
+    }
+
+    public void setCuurent_User(Object current_User, int type) {
+        switch (type) {
+            case 1:
+                this.current_user = (Organizer) current_User;
+                break;
+            case 2:
+                this.current_user = (Speaker) current_User;
+
+                break;
+            case 3:
+                this.current_user = (Staff) current_User;
+
+                break;
+            case 4:
+                this.current_user = (Attendee) current_User;
+                break;
         }
+
+    }
+
+    public void setUsers(User[] alluser) {
+        this.user = alluser;
+    }
+
+    public void setEvents(Event[] events) {
+        this.events = events;
+    }
+
+    public static void setTickets(List<Ticket> tickets) {
+        EventManagementSystem.tickets = tickets;
+    }
+
+    public static void setPayment(Payment[] payments) {
+        EventManagementSystem.payments = payments;
+    }
+
+    // other method
+    public Event[] getActiveEvents() {
+        int total = eventCount;
+        Event[] active = new Event[total];
+        int idx = 0;
+        for (int i = 0; i < total; i++) {
+            active[idx++] = events[i];
+        }
+
         return active;
     }
 
-    // get only Concert events
+    public int countUser_Num() {
+        for (User current_user : user) {
+            if (current_user != null) {
+                user_no++;
+            }
+
+        }
+        if (user_no == 0) {
+            return 0;
+        } else {
+            return user_no--;
+
+        }
+    }
+
+    // Get only Concert events
     public Concert[] getActiveConcerts() {
-        int count = 0;
+        Concert[] result = new Concert[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Concert)
-                count++;
-        }
-        Concert[] result = new Concert[count];
-        int j = 0;
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Concert) {
-                result[j++] = (Concert) events[i];
+            if (events[i].isConcert()) {
+                result[i] = (Concert) events[i];
             }
         }
         return result;
     }
 
-    // get only Workshop events
+    // Get only Workshop events
     public Workshop[] getActiveWorkshops() {
-        int count = 0;
+        Workshop[] result = new Workshop[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Workshop)
-                count++;
-        }
-        Workshop[] result = new Workshop[count];
-        int j = 0;
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Workshop) {
-                result[j++] = (Workshop) events[i];
+            if (events[i].isWorkshop()) {
+                result[i] = (Workshop) events[i];
             }
         }
         return result;
     }
 
-    // get only Conference events
+    // Get only Conference events
     public Conference[] getActiveConferences() {
-        int count = 0;
+        Conference[] result = new Conference[eventCount];
         for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Conference)
-                count++;
-        }
-        Conference[] result = new Conference[count];
-        int j = 0;
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i] instanceof Conference) {
-                result[j++] = (Conference) events[i];
+            if (events[i].isConference()) {
+                result[i] = (Conference) events[i];
             }
         }
         return result;
     }
 
-    // get a single event by eventID (any type)
+    // Get a single event by eventID (searches all types)
     public Event getEventById(String eventID) {
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i] != null && events[i].getEventID().equals(eventID)) {
-                return events[i];
+        for (int type = 0; type < 3; type++) {
+            for (int i = 0; i < eventCount; i++) {
+                if (events[i] != null && events[i].hasEvent(eventID)) {
+                    return events[i];
+                }
             }
         }
         System.out.println("Error: Event [" + eventID + "] not found !");
         return null;
     }
 
-    // get total number of events stored
+    // Total number of events across all types
     public int getEventCount() {
         return eventCount;
     }
 
-    // validate the quantity set
-    public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
-        if (totalQuantity < quantityEarlyBird + quantityStandard + quantityVip) {
-            System.out.println(
-                    "Sum of ticket type quantities exceeds totalQuantity. Please reset the quantity of ticket.");
-            return false;
-        }
-        if (totalQuantity > quantityEarlyBird + quantityStandard + quantityVip) {
-            System.out.println(
-                    "Sum of ticket type quantities less than totalQuantity. Please reset the quantity of ticket.");
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    // validate date set
-    public boolean validationDate(LocalDate salesStart, LocalDate salesEnd, LocalDate earlyBirdEnd) {
-        if (salesStart.isAfter(salesEnd)) {
-            System.out.println("Sales start date must be before sales end date.");
-            return false;
-        }
-        if (earlyBirdEnd.isBefore(salesStart) || earlyBirdEnd.isAfter(salesEnd)) {
-            System.out.println("Early bird end date must be between sales start and sales end dates.");
-            return false;
-        }
-        return true;
-    }
-
-    // validate price
-    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
-        if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
-            System.out.println("Ticket prices cannot be negative.");
-            return false;
-        }
-        if (priceVip <= priceStandard) {
-            System.out.println("VIP price should be greater than Standard price.");
-            return false;
-        }
-        if (priceStandard <= priceEarlyBird) {
-            System.out.println("Standard price should be greater than Early Bird price.");
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validationPerks(String perks) {
-        if (perks == null || perks.trim().isEmpty()) {
-            System.out.println("Error: Perks cannot be empty !");
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public LocalDate validationSalesStartDate(String ssdate, LocalDate eventDate) {
-        if (ssdate == null || ssdate.trim().isEmpty()) {
-            System.out.println("Error: Sales Start Date cannot be empty !");
-            return null;
-        }
-        try {
-            LocalDate parsedDate = LocalDate.parse(ssdate.trim());
-            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
-                System.out.println("Error: Sales Start Date must before event date !");
-                return null;
-            }
-            return parsedDate;
-        } catch (DateTimeParseException e) {
-            System.out.println("Error: Date format must be YYYY-MM-DD !");
-            return null;
-        }
-    }
-
-    public LocalDate validationSalesEndDate(String sedate, LocalDate salesStartDate, LocalDate eventDate) {
-        if (sedate == null || sedate.trim().isEmpty()) {
-            System.out.println("Error: Sales End Date cannot be empty !");
-            return null;
-        }
-        try {
-            LocalDate parsedDate = LocalDate.parse(sedate.trim());
-            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
-                System.out.println("Error: Sales End Date must before event date !");
-                return null;
-            }
-            if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)){
-                System.out.println("Error: Sales End Date must after sales start date !");
-                return null; 
-            }
-            return parsedDate;
-        } catch (DateTimeParseException e) {
-            System.out.println("Error: Date format must be YYYY-MM-DD !");
-            return null;
-        }
-    }
-
-    public boolean validationInputEventId(Event[] events, String eventId) {
-        for (Event e : events) {
-            if (e != null && eventId.equals(e.getEventID())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public Event findEventById(Event[] events, String eventId) {
-        for (Event e : events) {
-            if (e != null && e.getEventID().equals(eventId)) {
-                return e;
-            }
-        }
-        return null;
-    }
-
+    // ------------------------------------------------------------------------Get
+    // event end here
     public boolean validationInputTicketType(int choice) {
         if (choice == 1 || choice == 2 || choice == 3) {
             return true;
@@ -224,26 +177,18 @@ public class EventManagementSystem {
         return false;
     }
 
-    public boolean payment(double amount) {
-        System.out.println("\nThe total amount = RM " + amount);
-        System.out.println(
-                "Payment Method\n1. Touch N Go\n2.Credit/Debit Card\n3.Online Banking\nSelect your payment method:");
-        return false;
+    // ==================================User part==============================
+    public void addNewUser(User user) {
+        this.user[user_no] = user;
+        user_no++;
+
     }
 
-    public Ticket purchaseTicket(Attendee attendee, Event event, String type) {
-        TicketType tt = event.getTicketType();
-        Ticket ticket = new Ticket(tt, type, null, event.getEventID(), LocalDate.now());
+    // ----------------------------------------------------------------------------------------
+    // Staff Part
+    // ---------------------------------------------------------------------------------------
 
-        if (ticket.validationTicket()) {
-            attendee.addTicket(ticket);
-            System.out.println("Purchase successful!");
-            return ticket;
-        } else {
-            System.out.println("Purchase failed.");
-            return null;
-        }
-    }
+    // ----------------------------------------------------------------------------------------
 
     // -------------------------- validation for event ---------------------------
 
@@ -329,71 +274,94 @@ public class EventManagementSystem {
         return true;
     }
 
+    public boolean validationInputEventId(String eventId) {
+        for (Event e : this.events) {
+            if (e != null && e.hasEvent(eventId)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
     // -------------------------- create event ---------------------------
 
+    // Creates a Concert and stores it in events[CONCERT][]
     public Concert createConcert(String title, String date, String venue, int maxTickets) {
-        if (!validationTitle(title)) {
+        if (!validationTitle(title))
             return null;
-        }
         LocalDate parsedDate = validationDate(date);
-        if (parsedDate == null) {
+        if (parsedDate == null)
+            return null;
+        if (!validationVenue(venue))
+            return null;
+        if (!validationMaxTickets(maxTickets))
+            return null;
+        if (eventCount >= MAX_EVENTS) {
+            System.out.println("Error: Concert list is full !");
             return null;
         }
-        if (!validationVenue(venue)) {
-            return null;
-        }
-        if (!validationMaxTickets(maxTickets)) {
-            return null;
-        }
+
         Concert c = new Concert(title, parsedDate, venue, maxTickets);
-        System.out.println("Concert created successfully : " + c.getEventID());
+        events[eventCount] = c;
+        eventCount++;
+        System.out.println("Concert created and stored successfully : " + c.getEventID());
         return c;
     }
 
+    // Creates a Workshop and stores it in events[WORKSHOP][]
     public Workshop createWorkshop(String title, String date, String venue, int maxTickets) {
-        if (!validationTitle(title)) {
+        if (!validationTitle(title))
             return null;
-        }
         LocalDate parsedDate = validationDate(date);
-        if (parsedDate == null) {
+        if (parsedDate == null)
+            return null;
+        if (!validationVenue(venue))
+            return null;
+        if (!validationMaxTickets(maxTickets))
+            return null;
+        if (eventCount >= MAX_EVENTS) {
+            System.out.println("Error: Workshop list is full !");
             return null;
         }
-        if (!validationVenue(venue)) {
-            return null;
-        }
-        if (!validationMaxTickets(maxTickets)) {
-            return null;
-        }
+
         Workshop w = new Workshop(title, parsedDate, venue, maxTickets);
-        System.out.println("Workshop created successfully : " + w.getEventID());
+        events[eventCount] = w;
+        eventCount++;
+        System.out.println("Workshop created and stored successfully : " + w.getEventID());
         return w;
     }
 
-    public Conference createConference(String title, String date, String venue, int maxTickets, String[] sessionTopics,
-            String[] sessionTimes) {
-        if (!validationTitle(title)) {
+    // Creates a Conference (with optional sessions) and stores it in
+    // events[CONFERENCE][]
+    public Conference createConference(String title, String date, String venue, int maxTickets,
+            String[] sessionTopics, String[] sessionTimes) {
+        if (!validationTitle(title))
             return null;
-        }
         LocalDate parsedDate = validationDate(date);
-        if (parsedDate == null) {
+        if (parsedDate == null)
+            return null;
+        if (!validationVenue(venue))
+            return null;
+        if (!validationMaxTickets(maxTickets))
+            return null;
+        if (eventCount >= MAX_EVENTS) {
+            System.out.println("Error: Conference list is full !");
             return null;
         }
-        if (!validationVenue(venue)) {
-            return null;
-        }
-        if (!validationMaxTickets(maxTickets)) {
-            return null;
-        }
+
         Conference conf = new Conference(title, parsedDate, venue, maxTickets);
-        // auto-create sessions if provided
         if (sessionTopics != null && sessionTimes != null) {
             conf.autoCreateSessions(sessionTopics, sessionTimes);
         }
-        System.out.println("Conference created successfully : " + conf.getEventID());
+        events[eventCount] = conf;
+        eventCount++;
+        System.out.println("Conference created and stored successfully : " + conf.getEventID());
         return conf;
     }
 
-    // overload — create conference without sessions
+    // Overload — create Conference without sessions
     public Conference createConference(String title, String date, String venue, int maxTickets) {
         return createConference(title, date, venue, maxTickets, null, null);
     }
@@ -409,8 +377,8 @@ public class EventManagementSystem {
             System.out.println("Error: Speaker not found !");
             return false;
         }
-        if (session.addSpeaker(speaker)) {
-            System.out.println("Speaker [" + speaker.getAccessUsername() + "] assigned to session ["
+        if (session.addSpeaker(speaker.getUsername())) {
+            System.out.println("Speaker [" + speaker.getUsername() + "] assigned to session ["
                     + session.getSessionID() + "] successfully.");
             return true;
         }
@@ -425,4 +393,174 @@ public class EventManagementSystem {
         return session.removeSpeaker(speakerUsername);
     }
 
+ // Upload/update session topic
+    public boolean uploadSessionTopic(String username, Session session, String newTopic) {
+        // Session.getSpeakers() returns String[] of usernames
+        String[] assigned = session.getSpeakers();
+        for (int i = 0; i < session.getSpeakerCount(); i++) {
+            if (assigned[i] != null && assigned[i].equals(username)) {
+                String status = session.getSpeakerStatus(username);
+                if ("accepted".equals(status)) {
+                    session.setTopic(newTopic);
+                    System.out.println("Session [" + session.getSessionID()
+                            + "] topic updated to: \"" + newTopic
+                            + "\" by speaker: " + username);
+                    return true;
+                } else if ("pending".equals(status)) {
+                    System.out.println(
+                            "You need to accept the session first before updating the topic.");
+                    return false;
+                } else {
+                    System.out.println(
+                            "You have rejected this session. Cannot update topic.");
+                    return false;
+                }
+            }
+        }
+        System.out.println("Speaker [" + username + "] is not assigned to session ["
+                + session.getSessionID() + "]. Cannot update topic.");
+        return false;
+    }
+
+    // ticket type part
+    // validate the quantity set
+    public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard,
+            int quantityVip) {
+        if (totalQuantity == quantityEarlyBird + quantityStandard + quantityVip) {
+            return true;
+        } else {
+            System.out.println(
+                    "Sum of ticket type quantities not equal to totalQuantity. Please reset the quantity of ticket.");
+            return false;
+        }
+    }
+
+    // validate price
+    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
+        if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
+            System.out.println("Ticket prices cannot be negative.");
+            return false;
+        }
+
+        if (priceVip <= priceStandard) {
+            System.out.println(
+                    "VIP price (RM" + priceVip + ") should be greater than Standard price (RM" + priceStandard + ").");
+            return false;
+        }
+
+        if (priceStandard <= priceEarlyBird) {
+            System.out.println("Standard price (RM" + priceStandard + ") should be greater than Early Bird price (RM"
+                    + priceEarlyBird + ").");
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean validationPerks(String perks) {
+        if (perks == null || perks.trim().isEmpty()) {
+            System.out.println("Error: Perks cannot be empty !");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public LocalDate validationSalesStartDate(String ssdate, LocalDate eventDate) {
+        if (ssdate == null || ssdate.trim().isEmpty()) {
+            System.out.println("Error: Sales Start Date cannot be empty !");
+            return null;
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(ssdate.trim());
+            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
+                System.out.println("Error: Sales Start Date must before event date !");
+                return null;
+            } else if (parsedDate.isBefore(LocalDate.now())) {
+                System.out.println("Error: Sales Start Date must in the future !");
+                return null;
+            }
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Date format must be YYYY-MM-DD !");
+            return null;
+        }
+    }
+
+    public LocalDate validationSalesEndDate(String sedate, LocalDate salesStartDate, LocalDate eventDate) {
+        if (sedate == null || sedate.trim().isEmpty()) {
+            System.out.println("Error: Sales End Date cannot be empty !");
+            return null;
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(sedate.trim());
+            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
+                System.out.println("Error: Sales End Date must before event date !");
+                return null;
+            } else if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)) {
+                System.out.println("Error: Sales End Date must after sales start date !");
+                return null;
+            } else if (parsedDate.isBefore(LocalDate.now())) {
+                System.out.println("Error: Sales End Date must in the future !");
+                return null;
+            }
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Date format must be YYYY-MM-DD !");
+            return null;
+        }
+    }
+
+    public Event findEventById(String eventId) {
+        for (Event e : this.events) {
+            if (e != null && e.hasEvent(eventId)) {
+                return e;
+            }
+        }
+
+        return null;
+
+    }
+
+    public Ticket purchaseTicket(TicketType tt, String eventId, String ticketTypeName, Payment payment,
+            int ticketCount) {
+        if (tt == null) {
+            System.out.println("Error: TicketType cannot be null!");
+            return null;
+        }
+
+        Ticket ticket = new Ticket(tt, current_user.getUsername(), ticketTypeName, true, eventId, ticketCount,
+                payment.getBookingId());
+        return ticket;
+    }
+
+    public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName) {
+        if (LocalDate.now().isAfter(tt.getSalesEnd()) || LocalDate.now().isBefore(tt.getSalesStart())) {
+            System.out
+                    .println("Error: Ticket cannot be purchased because the sales period haven't start/already over!");
+            return false;
+        } else if (ticketTypeName.toLowerCase().equals("earlybird")) {
+            if (LocalDate.now().isAfter(tt.getEarlyBirdEnd())) {
+                System.out.println("Error: Early Bird ticket cannot be purchased due to period is over!");
+                return false;
+            }
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    public String toString (){
+        return "User\t:"+current_user.toString();
+    }
+
+    public boolean equals(Object o){
+        if(this == o){return true;}
+        if(o == null){return false;}
+        if (o instanceof EventManagementSystem){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

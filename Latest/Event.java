@@ -6,12 +6,12 @@ public abstract class Event {
     private LocalDate date;
     private String venue;
     private int maxTickets;
-    private TicketType ticketType;
 
     // auto-generate eventID
     private static int eventCounter = 1;
 
     private static String generateEventID() {
+        
         return String.format("E%03d", eventCounter++);
     }
 
@@ -21,7 +21,6 @@ public abstract class Event {
         this.date = date;
         this.venue = venue;
         this.maxTickets = maxTickets;
-        this.ticketType=null;
     }
 
     // Getters
@@ -45,8 +44,8 @@ public abstract class Event {
         return maxTickets;
     }
 
-    public TicketType getTicketType() {
-        return ticketType;
+    public static int getEventCounter(){
+        return Event.eventCounter;
     }
 
     // Setters
@@ -70,16 +69,39 @@ public abstract class Event {
         this.maxTickets = maxTickets;
     }
 
-    public void setTicketType(TicketType ticketType) {
-        this.ticketType = ticketType;
-    }
-
     // abstract method — subclasses must implement
     public abstract void displayInfo();
+    
+    public abstract boolean isConcert();
+
+    public abstract boolean isConference();
+    
+    public abstract boolean isWorkshop();
 
     @Override
     public String toString() {
-        return String.format("%-6s %-20s %-12s %-20s %-8d",
-                eventID, title, date, venue, maxTickets);
+        return String.format("\t\t\t│ %-10s │ %-18s │ %-17s │ %-10s │",
+                            getEventID(),
+                            getTitle(),
+                            getVenue(),
+                            getDate());
+    }
+    public boolean equals(Object o) {
+       if(this == o){return true;}
+       if (o==null){
+            return false;
+        }
+        if (o instanceof Event) {
+            Event e = (Event) o;
+            return this.eventID.equals(e.eventID);
+        }
+        return false; // the object does not belong to Event
+    }
+
+    public boolean hasEvent(String eventId){
+        if (this.eventID.equals(eventId)){
+            return true;
+        }
+        return false;
     }
 }
