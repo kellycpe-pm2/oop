@@ -9,11 +9,12 @@ import java.util.List;
 
 public class Workshop extends Event {
 
-    // Speaker part
+    // Speaker names only — no dependency on Speaker class
     private static final int MAX_SPEAKERS = 1;
-    private Speaker[] speakers = new Speaker[MAX_SPEAKERS];
+    private String[] speakerNames = new String[MAX_SPEAKERS];
     private int speakerCount = 0;
-    private final String type="Workshop";
+    private final String type = "Workshop";
+
     public Workshop(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
         appendToFile(); // auto-save to Workshop.json on creation
@@ -26,84 +27,82 @@ public class Workshop extends Event {
 
     // ── Speaker management ──────────────────────────────────────────────────
 
-    public Speaker[] getSpeakers() {
-        return speakers;
+    public String[] getSpeakers() {
+        return speakerNames;
     }
 
     public int getSpeakerCount() {
         return speakerCount;
     }
 
-    // Assign a speaker to this workshop. Returns false if already assigned or full.
-    public boolean assignSpeaker(Speaker speaker) {
+    // Assign a speaker by name. Returns false if already assigned or full.
+    public boolean assignSpeaker(String speakerName) {
         if (speakerCount >= MAX_SPEAKERS) {
             System.out.println("Error: Workshop already has the maximum number of speakers.");
             return false;
         }
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(speaker.getAccessUsername())) {
-                System.out.println("Error: Speaker [" + speaker.getAccessUsername()
+            if (speakerNames[i].equals(speakerName)) {
+                System.out.println("Error: Speaker [" + speakerName
                         + "] is already assigned to this workshop.");
                 return false;
             }
         }
-        speakers[speakerCount++] = speaker;
-        System.out.println("Speaker [" + speaker.getAccessUsername()
+        speakerNames[speakerCount++] = speakerName;
+        System.out.println("Speaker [" + speakerName
                 + "] assigned to workshop [" + getEventID() + "] successfully.");
         return true;
     }
 
-    // Remove a speaker from this workshop by username.
-    public boolean removeSpeaker(String username) {
+    // Remove a speaker from this workshop by name.
+    public boolean removeSpeaker(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(username)) {
+            if (speakerNames[i].equals(speakerName)) {
                 for (int j = i; j < speakerCount - 1; j++) {
-                    speakers[j] = speakers[j + 1];
+                    speakerNames[j] = speakerNames[j + 1];
                 }
-                speakers[speakerCount - 1] = null;
+                speakerNames[speakerCount - 1] = null;
                 speakerCount--;
-                System.out.println("Speaker [" + username
+                System.out.println("Speaker [" + speakerName
                         + "] removed from workshop [" + getEventID() + "] successfully.");
                 return true;
             }
         }
-        System.out.println("Error: Speaker [" + username
+        System.out.println("Error: Speaker [" + speakerName
                 + "] not found in workshop [" + getEventID() + "].");
         return false;
     }
 
     // Replace an existing speaker with a new one (change speaker).
-    public boolean changeSpeaker(String oldUsername, Speaker newSpeaker) {
+    public boolean changeSpeaker(String oldSpeakerName, String newSpeakerName) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakers[i].getAccessUsername().equals(oldUsername)) {
+            if (speakerNames[i].equals(oldSpeakerName)) {
                 for (int j = 0; j < speakerCount; j++) {
-                    if (j != i && speakers[j].getAccessUsername()
-                            .equals(newSpeaker.getAccessUsername())) {
-                        System.out.println("Error: Speaker [" + newSpeaker.getAccessUsername()
+                    if (j != i && speakerNames[j].equals(newSpeakerName)) {
+                        System.out.println("Error: Speaker [" + newSpeakerName
                                 + "] is already assigned to this workshop.");
                         return false;
                     }
                 }
-                speakers[i] = newSpeaker;
-                System.out.println("Speaker [" + oldUsername + "] replaced with ["
-                        + newSpeaker.getAccessUsername()
-                        + "] in workshop [" + getEventID() + "] successfully.");
+                speakerNames[i] = newSpeakerName;
+                System.out.println("Speaker [" + oldSpeakerName + "] replaced with ["
+                        + newSpeakerName + "] in workshop [" + getEventID() + "] successfully.");
                 return true;
             }
         }
-        System.out.println("Error: Speaker [" + oldUsername
+        System.out.println("Error: Speaker [" + oldSpeakerName
                 + "] not found in workshop [" + getEventID() + "].");
         return false;
     }
 
-    /** Display speakers assigned to this workshop. */
+    // Display speakers assigned to this workshop.
     public void displaySpeakers() {
         System.out.println("  Speakers for Workshop: " + getTitle());
         if (speakerCount == 0) {
             System.out.println("    No speakers assigned.");
         } else {
             for (int i = 0; i < speakerCount; i++) {
-                System.out.println("    " + (i + 1) + ": " + speakers[i].getAccessUsername());
+                System.out.println("    " + (i + 1) + ": " + speakerNames[i]);
             }
         }
     }
@@ -124,8 +123,8 @@ public class Workshop extends Event {
     }
 
     // Helper: writes one workshop record
-    // Format: eventID / title / date / venue / maxTickets / speakerCount /
-    // [username x N]
+    // Format: eventID / title / date / venue / maxTickets / speakerCount / [name x
+    // N]
     private void writeWorkshopRecord(Writer writer) throws IOException {
         writer.write(getEventID() + "\n");
         writer.write(getTitle() + "\n");
@@ -134,7 +133,7 @@ public class Workshop extends Event {
         writer.write(getMaxTickets() + "\n");
         writer.write(speakerCount + "\n");
         for (int i = 0; i < speakerCount; i++) {
-            writer.write(speakers[i].getAccessUsername() + "\n");
+            writer.write(speakerNames[i] + "\n");
         }
     }
 
@@ -154,8 +153,7 @@ public class Workshop extends Event {
     /**
      * Reads all workshops from "Workshop.json".
      * Format per record:
-     * eventID, title, date, venue, maxTickets, speakerCount, [username x
-     * speakerCount]
+     * eventID, title, date, venue, maxTickets, speakerCount, [name x speakerCount]
      */
     public static List<Workshop> readWorkshopData() {
         List<Workshop> workshops = new ArrayList<>();
@@ -175,9 +173,7 @@ public class Workshop extends Event {
                     w.setEventID(eventID);
 
                     for (int s = 0; s < storedSpeakerCount; s++) {
-                        String username = lines.get(i++);
-                        Speaker sp = new Speaker(username, "", "", "");
-                        w.speakers[w.speakerCount++] = sp;
+                        w.speakerNames[w.speakerCount++] = lines.get(i++);
                     }
                     workshops.add(w);
                 }
@@ -235,27 +231,26 @@ public class Workshop extends Event {
     }
 
     public boolean isWorkshop() {
-            return true;
+        return true;
     }
 
-    public boolean isConcert(){
+    public boolean isConcert() {
         return false;
     }
 
-    public boolean isConference(){
+    public boolean isConference() {
         return false;
     }
 
     @Override
-   public String toString() {
-        return super.toString()+ String.format("%-14s│\n",type);
+    public String toString() {
+        return super.toString() + String.format("%-14s│\n", type);
     }
 
-    
     public boolean equals(Object o) {
-        if (super.equals(o)){
+        if (super.equals(o)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
