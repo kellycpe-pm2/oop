@@ -95,7 +95,7 @@ public abstract class Event {
             Event e = (Event) o;
             return this.eventID.equals(e.eventID);
         }
-        return false; // the object does not belong to Event
+        return false; // the object does Not belong to Event
     }
 
     public boolean hasEvent(String eventId){
