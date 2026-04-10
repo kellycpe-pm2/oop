@@ -24,7 +24,7 @@ public class EventManagementSystem {
         EventManagementSystem.tickets = tickets;
         EventManagementSystem.payments = payments;
         EventManagementSystem.user_no = countUser_Num();
-        Payment.setBookingNo(Ticket.getTicketCount());
+        Payment.setbookingNo(Ticket.getTicketCount());
 
     }
 
@@ -368,7 +368,7 @@ public class EventManagementSystem {
 
     // -------------------------- assign speaker ---------------------------
 
-    public boolean assignSpeaker(Session session, Speaker speaker) {
+    public boolean assignSpeaker(Session session, Speaker speaker, Conference conf) {
         if (session == null) {
             System.out.println("Error: Session not found !");
             return false;
@@ -377,9 +377,10 @@ public class EventManagementSystem {
             System.out.println("Error: Speaker not found !");
             return false;
         }
-        if (session.addSpeaker(speaker.getAccessUsername())) {
-            System.out.println("Speaker [" + speaker.getAccessUsername() + "] assigned to session ["
+        if (session.addSpeaker(speaker.getUsername())) {
+            System.out.println("Speaker [" + speaker.getUsername() + "] assigned to session ["
                     + session.getSessionID() + "] successfully.");
+            conf.setSession(session);
             return true;
         }
         return false;
@@ -390,6 +391,7 @@ public class EventManagementSystem {
             System.out.println("Error: Session not found !");
             return false;
         }
+        
         return session.removeSpeaker(speakerUsername);
     }
 
@@ -529,7 +531,7 @@ public class EventManagementSystem {
             return null;
         }
 
-        Ticket ticket = new Ticket(tt, current_user.getAccessUsername(), ticketTypeName, true, eventId, ticketCount,
+        Ticket ticket = new Ticket(tt, current_user.getUsername(), ticketTypeName, true, eventId, ticketCount,
                 payment.getBookingId());
         return ticket;
     }
