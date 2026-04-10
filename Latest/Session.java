@@ -55,7 +55,6 @@ public class Session {
     public String[] getSpeakers() {
         return speakerUsernames;
     }
-
     // ── Setters ──────────────────────────────────────────────────────────────
 
     public void setSessionID(String sessionID) {
@@ -93,7 +92,7 @@ public class Session {
         return true;
     }
 
-    /** Remove a speaker by username. Returns false if not found. */
+    /** Remove a speaker by username. Returns false if no found. */
     public boolean removeSpeaker(String username) {
         for (int i = 0; i < speakerCount; i++) {
             if (speakerUsernames[i].equals(username)) {
@@ -113,7 +112,7 @@ public class Session {
             }
         }
         System.out.println("Error: Speaker [" + username
-                + "] not found in session [" + sessionID + "].");
+                + "] No found in session [" + sessionID + "].");
         return false;
     }
 
@@ -134,7 +133,7 @@ public class Session {
                 return speakerStatus[i] != null ? speakerStatus[i] : "pending";
             }
         }
-        return "not_assigned";
+        return "Not_assigned";
     }
 
     /** Get the rejection reason for a speaker username. */
@@ -168,7 +167,7 @@ public class Session {
             }
         }
         System.out.println("Speaker [" + username
-                + "] not found in session [" + sessionID + "].");
+                + "] No found in session [" + sessionID + "].");
         return false;
     }
 
@@ -195,7 +194,7 @@ public class Session {
             }
         }
         System.out.println("Speaker [" + username
-                + "] not found in session [" + sessionID + "].");
+                + "] Not found in session [" + sessionID + "].");
         return false;
     }
 
@@ -207,7 +206,7 @@ public class Session {
         sb.append("[").append(sessionID).append("] Topic: ").append(topic)
                 .append("  Time: ").append(time).append("  Speakers: ");
         if (speakerCount == 0) {
-            sb.append("None");
+            sb.append("No");
         } else {
             for (int i = 0; i < speakerCount; i++) {
                 if (i > 0)
