@@ -1,73 +1,52 @@
 public class Speaker extends User {
 
     // instance variable
-    private static String[] bio = new String[100];
-    private static int no = 0;
+    private String bio;
+    private static int totalSpeakers;
     private final String role = "Speaker";
 
     // ------------------constructor-------------------------------
-    // default constructor
-    Speaker() {
+        // default constructor
+    public Speaker() {
         super();
+        this.bio = "No bio available"; 
     }
 
-    // parameterized constructor
-    Speaker(String username, String password, String email, String contactno, String bio) {
-        super(username, password, email, contactno);
-        Speaker.bio[no] = bio;
-        no++;
+    // parameterized constructor (without bio)
+    public Speaker(String username, String password, String email, String contactNo) {
+        super(username, password, email, contactNo);
+        this.bio = "No bio available";  
     }
 
-    Speaker(String username, String password, String email, String contactno) {
-        super(username, password, email, contactno);
-
+    // parameterized constructor (with bio)
+    public Speaker(String username, String password, String email, String contactNo, String bio) {
+        super(username, password, email, contactNo);  // FIXED: parameter name
+        this.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
+        totalSpeakers++;
     }
 
     // ------------------getter-------------------------------
-      public String getBio(int no) {
-        return Speaker.bio[no];
+      public String getBio() {
+        return bio;
     }
 
-    public String getBio() {
-        if (no > 0) {
-            return Speaker.bio[no - 1];
-        }
-        return "No bio available";
-    }
 
-    public static String[] getBioArray() {
-    return bio;
-}
 
-    @Override
-    public int getno() {
-        return Speaker.no;
-    }
 
 // ------------------setter-------------------------------
-// Set current speaker's bio
-public void setCurrentBio(String bio) {
-    if (no > 0) {
-        Speaker.bio[no - 1] = bio;
-    }
-}
-
 // Set the total number of speakers (for loading from file)
-public static void setSpeakerCount(int count) {
-    no = count;
-}
+    public static void setSpeakerCount(int count) {
+        totalSpeakers = count;
+    }
 
 // Set bio at specific index (for file operations)
-public static void setBioAtIndex(int index, String bioText) {
-    if (index >= 0 && index < no) {
-        Speaker.bio[index] = bioText;
+    public void setBioAtIndex(String bio) {
+        this.bio= bio;
     }
-}
 
-    // ------------------toString-------------------------------
-    public String toString(int no) {
-        return String.format("%-15s %-25s %-30s",
-                getAccessUsername(), Speaker.bio[no]);
+    public String toTableRow() {
+        String shortBio = (bio != null && bio.length() > 30) ? bio.substring(0, 27) + "..." : bio;
+        return String.format("%-15s %-25s %-30s", getUsername(), getEmail(), shortBio);
     }
 
     // ------------------displayInfo-------------------------------
@@ -75,15 +54,15 @@ public static void setBioAtIndex(int index, String bioText) {
         System.out.println("=== Speaker Info ===");
         System.out.printf("%-15s %-25s %-30s%n", "Username", "Email", "Bio");
         System.out.println("--------------------------------------------------------------------");
-        for (int i = 0; i <= no; i++) {
-            System.out.println(toString(i));
-        }
+        
+            System.out.println(toTableRow());
+        
     }
 
     public void displaySingleInfo() {
         System.out.println("=== Speaker Info ===");
-        System.out.println("Username: " + getAccessUsername());
-        System.out.println("Email: " + getAccessEmail());
+        System.out.println("Username: " + getUsername());
+        System.out.println("Email: " + getEmail());
         System.out.println("Bio: " + getBio());
     }
     // ------------------method-------------------------------
@@ -93,7 +72,7 @@ public static void setBioAtIndex(int index, String bioText) {
     // Find speaker by username from speaker array
     public static Speaker findSpeakerByUsername(String username, Speaker[] speakerArray, int speakerCount) {
         for (int i = 0; i < speakerCount; i++) {
-            if (speakerArray[i] != null && speakerArray[i].getAccessUsername().equals(username)) {
+            if (speakerArray[i] != null && speakerArray[i].getUsername().equals(username)) {
                 return speakerArray[i];
             }
         }
@@ -101,26 +80,22 @@ public static void setBioAtIndex(int index, String bioText) {
     }
 
     // ------------------upload bio-------------------------------
-    public boolean uploadBio(String username, String newBio) {
-    if (getAccessUsername() != null && getAccessUsername().equals(username)) {
-        if (no > 0) {
-            Speaker.bio[no - 1] = newBio;  // Update at current speaker's index
-            System.out.println("Bio updated successfully for: " + username);
+    public boolean uploadBio(String newBio) {
+        if (newBio != null && !newBio.trim().isEmpty()) {
+            this.bio = newBio;
+            System.out.println("Bio updated successfully for: " + getUsername());
             return true;
         }
+        System.out.println("Error: Bio cannot be empty");
+        return false;
     }
-    System.out.println("Speaker not found: " + username);
-    return false;
-}
 
     
 
     // --------------------------------------------------
 
     public String toString() {
-        int total_bio = no + 1;
-        return super.toString() + String.format("║          Position       :  %-31s║\n" +
-                "║          Total Bio      :  %-31d║\n", role, total_bio);
+        return super.toString() + String.format("║          Position       :  %-31s║\n", role);
     }
 
     public boolean checkClass(Object o) {
@@ -138,8 +113,8 @@ public static void setBioAtIndex(int index, String bioText) {
         }
     }
 
-    public boolean equals(String username) {
-        if (getAccessUsername().equals(username)) {
+    public boolean hasUser(String username) {
+        if (getUsername().equals(username)) {
             return true;
         }
         return false;
