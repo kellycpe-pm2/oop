@@ -8,21 +8,20 @@ public class Payment{
     double paymentAmount;
     private LocalDate paymentDate;
 
-    public Payment(Attendee a, String eventId, double paymentAmount, int bookingNo){
-        name=a.getAccessUsername();
+    public Payment(Attendee a, String eventId, double paymentAmount){
+        name=a.getUsername();
         this.eventId=eventId;
         this.paymentAmount=paymentAmount;
         paymentDate=LocalDate.now();
-        bookingNo++;
-        Payment.bookingNo=bookingNo;
         bookingId=generateBookingId(eventId);
+        
     }
 
     public String getBookingId(){
         return this.bookingId;
     }
 
-    public static void setBookingNo(int bookingNo){
+    public static void setbookingNo(int bookingNo){
         Payment.bookingNo=bookingNo;
     }
 
