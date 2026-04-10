@@ -1,10 +1,4 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Concert extends Event {
@@ -17,7 +11,6 @@ public class Concert extends Event {
 
     public Concert(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
-        appendToFile(); // auto-save to Concert.json on creation
     }
 
     // Private constructor used only when loading from file — skips auto-save
@@ -34,7 +27,9 @@ public class Concert extends Event {
     public int getSpeakerCount() {
         return speakerCount;
     }
-
+    public void setSpeakerCount(){
+        this.speakerCount++;
+    }
     // Assign a speaker by name. Returns false if already assigned or full.
     public boolean assignSpeaker(String speakerName) {
         if (speakerCount >= MAX_SPEAKERS) {
@@ -107,83 +102,6 @@ public class Concert extends Event {
         }
     }
 
-    // ── File I/O ─────────────────────────────────────────────────────────────
-
-    // Appends this concert's data to Concert.json
-    private void appendToFile() {
-        try {
-            File concertFile = new File("Concert.json");
-            concertFile.createNewFile();
-            try (Writer writer = new java.io.FileWriter(concertFile, true)) {
-                writeConcertRecord(writer);
-            }
-        } catch (IOException e) {
-            System.out.println("Error auto-saving concert data: " + e.getMessage());
-        }
-    }
-
-    // Helper: writes one concert record
-    // Format: eventID / title / date / venue / maxTickets / speakerCount / [name x
-    // N]
-    private void writeConcertRecord(Writer writer) throws IOException {
-        writer.write(getEventID() + "\n");
-        writer.write(getTitle() + "\n");
-        writer.write(getDate().toString() + "\n");
-        writer.write(getVenue() + "\n");
-        writer.write(getMaxTickets() + "\n");
-        writer.write(speakerCount + "\n");
-        for (int i = 0; i < speakerCount; i++) {
-            writer.write(speakerNames[i] + "\n");
-        }
-    }
-
-    // create Concert file
-    public void createConcertFile() {
-        try {
-            File concertFile = new File("Concert.json");
-            if (concertFile.createNewFile()) {
-                System.out.println("Please Waiting...");
-                System.out.println("Concert file created: " + concertFile.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("Error creating concert file: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Reads all concerts from "Concert.json".
-     * Format per record:
-     * eventID, title, date, venue, maxTickets, speakerCount, [name x speakerCount]
-     */
-    public static List<Concert> readConcertData() {
-        List<Concert> concerts = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("Concert.json"));
-            if (!lines.isEmpty()) {
-                int i = 0;
-                while (i < lines.size()) {
-                    String eventID = lines.get(i++);
-                    String title = lines.get(i++);
-                    LocalDate date = LocalDate.parse(lines.get(i++));
-                    String venue = lines.get(i++);
-                    int maxTickets = Integer.parseInt(lines.get(i++));
-                    int storedSpeakerCount = Integer.parseInt(lines.get(i++));
-
-                    Concert c = new Concert(title, date, venue, maxTickets, true);
-                    c.setEventID(eventID);
-
-                    for (int s = 0; s < storedSpeakerCount; s++) {
-                        c.speakerNames[c.speakerCount++] = lines.get(i++);
-                    }
-                    concerts.add(c);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading concert data: " + e.getMessage());
-        }
-        return concerts;
-    }
-
     // display all concerts
     public static void displayAllConcerts(List<Concert> concerts) {
         System.out.println("=== Concert Info ===");
@@ -194,24 +112,11 @@ public class Concert extends Event {
             c.displaySpeakers();
         }
     }
-
-    // store concert data to Concert.json
-    public static void storeConcertData(List<Concert> concerts) {
-        try (Writer writer = new java.io.FileWriter("Concert.json")) {
-            for (Concert c : concerts) {
-                c.writeConcertRecord(writer);
-            }
-        } catch (IOException e) {
-            System.out.println("Error storing concert data: " + e.getMessage());
-        }
-    }
-
     // remove a concert by eventID from the list and update Concert.json
     public static boolean removeConcert(List<Concert> concerts, String eventID) {
         for (int i = 0; i < concerts.size(); i++) {
             if (concerts.get(i).getEventID().equals(eventID)) {
                 concerts.remove(i);
-                storeConcertData(concerts);
                 System.out.println("Concert [" + eventID + "] removed successfully.");
                 return true;
             }
