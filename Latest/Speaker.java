@@ -1,7 +1,11 @@
+import java.util.HashMap;
+import java.util.Map;
+
 public class Speaker extends User {
 
     // instance variable
     private String bio;
+    private Map<String, String> sessionTopics;
     private static int totalSpeakers=0;
     private final String role = "Speaker";
 
@@ -10,27 +14,42 @@ public class Speaker extends User {
     public Speaker() {
         super();
         this.bio = "No bio available"; 
+        this.sessionTopics = new HashMap<>();
         totalSpeakers++;
     }
 
     // parameterized constructor (without bio)
     public Speaker(String username, String password, String email, String contactNo) {
         super(username, password, email, contactNo);
-        this.bio = "No bio available";  
+        this.bio = "No bio available"; 
+        this.sessionTopics = new HashMap<>(); 
         totalSpeakers++;
     }
 
     // parameterized constructor (with bio)
     public Speaker(String username, String password, String email, String contactNo, String bio) {
-        super(username, password, email, contactNo);  // FIXED: parameter name
+        super(username, password, email, contactNo);  
         this.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
+         this.sessionTopics = new HashMap<>();
         totalSpeakers++;
     }
 
     // ------------------getter-------------------------------
-      public String getBio() {
-        return bio;
+public String getBio() {
+    return bio;
+}
+
+ public Map<String, String> getSessionTopics() {
+        return sessionTopics;
     }
+
+    public String getUpdatedSessionTopic(String sessionId) {
+        if (sessionTopics != null && sessionTopics.containsKey(sessionId)) {
+            return sessionTopics.get(sessionId);
+        }
+        return null;
+    }
+
     // Getter for total speakers
     public static int getTotalSpeakers() {
         return totalSpeakers;
@@ -47,6 +66,21 @@ public static void setTotalSpeakers(int count) {
 // Set bio at specific index (for file operations)
     public void setBioAtIndex(String bio) {
         this.bio= bio;
+    }
+
+    public void setBio(String bio) {
+    this.bio = bio;
+}
+
+    public void setSessionTopics(Map<String, String> sessionTopics) {
+        this.sessionTopics = sessionTopics;
+    }
+    
+    public void addSessionTopic(String sessionId, String topic) {
+        if (this.sessionTopics == null) {
+            this.sessionTopics = new HashMap<>();
+        }
+        this.sessionTopics.put(sessionId, topic);
     }
 
     public String toTableRow() {
