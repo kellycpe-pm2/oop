@@ -62,6 +62,7 @@ public class TestUser {
         // no set as array to pass the value and change the value (only reference
         // variable will be affect)
         int[] no = { 0 };
+        
 
         // no is from 0 to 99
         // load data
@@ -166,11 +167,11 @@ public class TestUser {
             logincount++;
             System.out.print("\nPlease enter your name: ");
             name = scan.nextLine();
-
+            user.setUserName(name);
             if (logincount > 2) {
                 return false;
             }
-        } while (!validationNoExistName(name, user, alluser, no));
+        } while (!validationNoExistName( user, alluser, no));
 
         do {
 
@@ -403,7 +404,7 @@ public class TestUser {
 
     public static void createAccount(int[] no, User user, User[] alluser, String name, String password, String email,
             String contactNo) {
-        no[0]++;
+        
         if (password.equals(ORGANIZER_PSWD)) {
 
             alluser[no[0]] = new Organizer(name, password, email, contactNo);
@@ -588,19 +589,19 @@ public class TestUser {
 
     // validation for login
 
-    public static boolean validationNoExistName(String name, User user, User[] existUser, int[] no) {
+    public static boolean validationNoExistName( User user, User[] existUser, int[] no) {
         // check the user input is empty or not
-        if (validationEmpty(name)) {
+        if (validationEmpty(user.getUsername())) {
             return false;
         }
-        for (int j = 0; j < no[0]; j++) {
-            user.setUserName(name);
+        for (int j = 0; j < EventManagementSystem.getUser_No(); j++) {
             if (existUser[j] != null && user.equals(existUser[j])) {
                 no[0] = j;
                 // found user
                 return true;
             }
         }
+        user.setUserName(null);
         System.out.println("Error: The Username Is not Matched ! ");
 
         return false;
