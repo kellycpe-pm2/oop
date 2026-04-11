@@ -178,7 +178,7 @@ public class TestUser {
             password = scan.nextLine();
 
         } while (!validationLoginPwd(password, alluser, no));
-            user.setUserName(name);
+        user.setUserName(name);
         System.out.println("------------------------------------------------------------");
         return true;
     }
@@ -2381,7 +2381,7 @@ public class TestUser {
         }
     }
 
-   static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
+    static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
         speakerCount = 0;
         Speaker usertemp = new Speaker();
         for (int i = 0; i < totalUsers; i++) {
@@ -2438,7 +2438,7 @@ public class TestUser {
             System.out.println("Invalid selection.");
             return;
         }
-        ems.assignSpeaker(targetSession, speakerPool[spIdx],conf);
+        ems.assignSpeaker(targetSession, speakerPool[spIdx], conf);
 
         storeConferenceData();
 
@@ -2468,7 +2468,6 @@ public class TestUser {
         System.out.print("Enter Speaker Username to remove: ");
         String speakerUsername = scan.nextLine();
         ems.removeSpeaker(targetSession, speakerUsername);
-        conf.setSession(targetSession);
         storeConferenceData();
     }
 
@@ -2606,7 +2605,7 @@ public class TestUser {
      * Prompts the user to assign speakers one by one.
      * Pass either a Concert or Workshop (the other must be null).
      */
-      static void assignSpeakerToConcertOrWorkshop(Concert concert, Workshop workshop) {
+    static void assignSpeakerToConcertOrWorkshop(Concert concert, Workshop workshop) {
         // Refresh pool so speakers added this session are visible
         loadSpeakersFromUsers(ems.getUsers(), countUsers(ems.getUsers()));
         if (speakerCount == 0) {
@@ -2726,7 +2725,7 @@ public class TestUser {
     // -------------------------------------------------------------------------
     // VIEW ALL EVENTS
     // -------------------------------------------------------------------------
-  static void viewAllEvents() {
+    static void viewAllEvents() {
         if (eventCount == 0) {
             System.out.println("\n  No events created yet.");
             return;
@@ -2805,6 +2804,7 @@ public class TestUser {
         }
         System.out.println(bot);
     }
+
     // count non-null users in the array
     static int countUsers(User[] users) {
         int count = 0;
@@ -2814,7 +2814,6 @@ public class TestUser {
         }
         return count;
     }
-
 
     // helper: print numbered event list (used by other methods)
     static void listEvents() {
@@ -2921,7 +2920,7 @@ public class TestUser {
      * then per session: sessionID, topic, time, speakerCount, [username x
      * speakerCount]
      *
-     * Session now stores usernames directly (String[]), so No  Speaker object is
+     * Session now stores usernames directly (String[]), so No Speaker object is
      * needed.
      */
     private static void writeConferenceRecord(Writer writer, String eventID, String title, LocalDate date, String venue,
@@ -3032,14 +3031,9 @@ public class TestUser {
         }
     }
 
-
-
-
-
     // Concert
 
-
-       // -- File I/O -------------------------------------------------------------
+    // -- File I/O -------------------------------------------------------------
 
     // Appends this concert's data to Concert.json
     private static void appendToConcertFile(Concert c) {
@@ -3047,8 +3041,8 @@ public class TestUser {
             File concertFile = new File("Concert.json");
             concertFile.createNewFile();
             try (Writer writer = new java.io.FileWriter(concertFile, true)) {
-                    
-                    writeConcertRecord(writer,c);
+
+                writeConcertRecord(writer, c);
 
             }
         } catch (IOException e) {
@@ -3123,17 +3117,15 @@ public class TestUser {
     public static void storeConcertData(List<Concert> concerts) {
         try (Writer writer = new java.io.FileWriter("Concert.json")) {
             for (Concert c : concerts) {
-                writeConcertRecord(writer,c);
+                writeConcertRecord(writer, c);
             }
         } catch (IOException e) {
             System.out.println("Error storing concert data: " + e.getMessage());
         }
     }
 
+    // Workshop
 
-    //Workshop
-
-    
     // -- File I/O -------------------------------------------------------------
 
     // Appends this workshop's data to Workshop.json
@@ -3142,7 +3134,7 @@ public class TestUser {
             File workshopFile = new File("Workshop.json");
             workshopFile.createNewFile();
             try (Writer writer = new java.io.FileWriter(workshopFile, true)) {
-                writeWorkshopRecord(writer,w);
+                writeWorkshopRecord(writer, w);
             }
         } catch (IOException e) {
             System.out.println("Error auto-saving workshop data: " + e.getMessage());
@@ -3152,7 +3144,7 @@ public class TestUser {
     // Helper: writes one workshop record
     // Format: eventID / title / date / venue / maxTickets / speakerCount / [name x
     // N]
-    public static void writeWorkshopRecord(Writer writer,Workshop w) throws IOException {
+    public static void writeWorkshopRecord(Writer writer, Workshop w) throws IOException {
         writer.write(w.getEventID() + "\n");
         writer.write(w.getTitle() + "\n");
         writer.write(w.getDate().toString() + "\n");
@@ -3183,11 +3175,11 @@ public class TestUser {
      * eventID, title, date, venue, maxTickets, speakerCount, [name x speakerCount]
      */
 
-        // store workshop data to Workshop.json
+    // store workshop data to Workshop.json
     public static void storeWorkshopData(List<Workshop> workshops) {
         try (Writer writer = new java.io.FileWriter("Workshop.json")) {
             for (Workshop w : workshops) {
-                writeWorkshopRecord(writer,w);
+                writeWorkshopRecord(writer, w);
             }
         } catch (IOException e) {
             System.out.println("Error storing workshop data: " + e.getMessage());
@@ -3210,7 +3202,7 @@ public class TestUser {
 
                     Workshop w = new Workshop(title, date, venue, maxTickets);
                     w.setEventID(eventID);
-                    int idx=w.getSpeakerCount();
+                    int idx = w.getSpeakerCount();
                     for (int s = 0; s < storedSpeakerCount; s++) {
                         w.getSpeakers()[idx] = lines.get(i++);
                     }
@@ -3222,8 +3214,6 @@ public class TestUser {
         }
         return workshops;
     }
-
-
 
     // -------------------------------------------------------------------------
     // ATTENDEE MENU
@@ -3576,7 +3566,8 @@ public class TestUser {
                     LocalDate purchasedDate = LocalDate.parse(lines.get(i + 8));
                     String bookingId = lines.get(i + 9);
 
-                    Ticket t = new Ticket(ticketId, status, buyerName, eventId, ticketType, totalAmount, seatNumber, perks,
+                    Ticket t = new Ticket(ticketId, status, buyerName, eventId, ticketType, totalAmount, seatNumber,
+                            perks,
                             purchasedDate, bookingId);
                     tickets.add(t);
                     i += 10; // 10 lines per record
