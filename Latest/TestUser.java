@@ -1989,7 +1989,8 @@ public class TestUser {
             System.out.print("\nDo you want to assign speakers to this concert now? (1=Yes / 0=No): ");
             int assignnow = readInt();
             if (assignnow == 1) {
-                manageConcertSpeakers(c);
+                assignSpeakerToConcertOrWorkshop(c, null);
+                storeConcertData(concerts);
             }
 
         } else if (type == 2) {
@@ -2009,7 +2010,8 @@ public class TestUser {
             System.out.print("\nDo you want to assign speakers to this workshop now? (1=Yes / 0=No): ");
             int assignnow = readInt();
             if (assignnow == 1) {
-                manageWorkshopSpeakers(w);
+                assignSpeakerToConcertOrWorkshop(null, w);
+                storeWorkshopData(workshops);
             }
 
         } else {
