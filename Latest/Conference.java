@@ -28,7 +28,7 @@ public class Conference extends Event {
 
     // ── Session management ───────────────────────────────────────────────────
 
-    // update
+
     /**
      * Returns true if {@code newTime} (format "HHMM", e.g. "0900") is within
      * 60 minutes of any already-scheduled session in this conference.
