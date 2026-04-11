@@ -44,6 +44,24 @@ public class Session {
         return time;
     }
 
+    /**
+     * Parses the time field stored as "HHMM" (e.g. "0900", "1430") and returns
+     * the total number of minutes since midnight.
+     * Returns -1 if the value cannot be parsed so callers can skip the check.
+     */
+    public int getTimeInMinutes() {
+        try {
+            String t = this.time.trim();
+            if (t.length() != 4)
+                return -1;
+            int hours = Integer.parseInt(t.substring(0, 2));
+            int minutes = Integer.parseInt(t.substring(2, 4));
+            return hours * 60 + minutes;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
     public int getSpeakerCount() {
         return speakerCount;
     }
@@ -218,7 +236,9 @@ public class Session {
     }
 
     public boolean equals(Object o) {
-        if(this==o){return true;}
+        if (this == o) {
+            return true;
+        }
         if (o == null)
             return false;
         if (o instanceof Session) {
