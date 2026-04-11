@@ -3284,8 +3284,10 @@ public static List<Conference> readConferenceData() {
         writer.write(c.getSpeakerCount() + "\n");
         for (int i = 0; i < c.getSpeakerCount(); i++) {
             writer.write(c.getSpeakers()[i] + "\n");
-        }
+            writer.write(c.getSpeakerStatus(c.getSpeakers()[i]) + "\n");
+            writer.write(c.getRejectionReason(c.getSpeakers()[i]) + "\n");
     }
+}
 
     // create Concert file
     public static void createConcertFile() {
@@ -3312,6 +3314,7 @@ public static List<Conference> readConferenceData() {
             if (!lines.isEmpty()) {
                 int i = 0;
                 while (i < lines.size()) {
+                    if (i + 7 > lines.size()) break;
                     String eventID = lines.get(i++);
                     String title = lines.get(i++);
                     LocalDate date = LocalDate.parse(lines.get(i++));
@@ -3375,6 +3378,8 @@ public static List<Conference> readConferenceData() {
         writer.write(w.getSpeakerCount() + "\n");
         for (int i = 0; i < w.getSpeakerCount(); i++) {
             writer.write(w.getSpeakers()[i] + "\n");
+            writer.write(w.getRejectionReason(w.getSpeakers()[i]) + "\n");
+            writer.write(w.getSpeakerStatus(w.getSpeakers()[i]) + "\n");
         }
     }
 
@@ -3408,34 +3413,55 @@ public static List<Conference> readConferenceData() {
         }
     }
 
-    public static List<Workshop> readWorkshopData() {
-        List<Workshop> workshops = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
-            if (!lines.isEmpty()) {
-                int i = 0;
-                while (i < lines.size()) {
-                    String eventID = lines.get(i++);
-                    String title = lines.get(i++);
-                    LocalDate date = LocalDate.parse(lines.get(i++));
-                    String venue = lines.get(i++);
-                    int maxTickets = Integer.parseInt(lines.get(i++));
-                    int storedSpeakerCount = Integer.parseInt(lines.get(i++));
-
-                    Workshop w = new Workshop(title, date, venue, maxTickets);
-                    w.setEventID(eventID);
-                    int idx = w.getSpeakerCount();
-                    for (int s = 0; s < storedSpeakerCount; s++) {
-                        w.getSpeakers()[idx] = lines.get(i++);
-                    }
-                    workshops.add(w);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading workshop data: " + e.getMessage());
+public static List<Workshop> readWorkshopData() {
+    List<Workshop> workshops = new ArrayList<>();
+    try {
+        File workshopFile = new File("Workshop.json");
+        if (!workshopFile.exists()) {
+            return workshops;
         }
-        return workshops;
+        
+        List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
+        if (!lines.isEmpty()) {
+            int i = 0;
+            while (i + 6 < lines.size()) {
+                String eventID = lines.get(i++);
+                String title = lines.get(i++);
+                LocalDate date = LocalDate.parse(lines.get(i++));
+                String venue = lines.get(i++);
+                int maxTickets = Integer.parseInt(lines.get(i++));
+                int storedSpeakerCount = Integer.parseInt(lines.get(i++));
+
+                Workshop w = new Workshop(title, date, venue, maxTickets);
+                w.setEventID(eventID);
+
+                for (int s = 0; s < storedSpeakerCount; s++) {
+                    String speakerName = lines.get(i++);
+                    w.assignSpeaker(speakerName);
+                   
+                  
+                                    if (i + 1 < lines.size()) {
+                        String nextLine = lines.get(i);
+                        // Check if next line is a valid status string
+                        if (nextLine != null && (nextLine.equals("pending") || 
+                            nextLine.equals("accepted") || nextLine.equals("rejected"))) {
+                            String status = lines.get(i++);
+                            String reason = lines.get(i++);
+                            w.setSpeakerStatus(speakerName, status);
+                            w.setRejectionReason(speakerName, reason);
+                        }
+                    }
+                }
+                workshops.add(w);
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error reading workshop data: " + e.getMessage());
+    } catch (Exception e) {
+        System.out.println("Error parsing workshop data: " + e.getMessage());
     }
+    return workshops;
+}
 
     // -------------------------------------------------------------------------
     // ATTENDEE MENU
@@ -3922,8 +3948,9 @@ static void speakerMenu(Speaker loggedInSpeaker) {
         System.out.println("|  Logged in: " + String.format("%-17s", loggedInSpeaker.getUsername()) + "|");
         System.out.println("|------------------------------|");
         System.out.println("|  1: View & Respond to        |");
-        System.out.println("|     Assigned Sessions        |");
-        System.out.println("|  2: View My Sessions         |");
+        System.out.println("|     Assigned Activities      |");
+        System.out.println("|  2: View My Assigned         |");
+        System.out.println("|     Activities               |");
         System.out.println("|  3: Update Session Topic     |");
         System.out.println("|  4: Update Bio               |");
         System.out.println("|  5: View My Info             |");
@@ -3977,76 +4004,134 @@ static void speakerMenu(Speaker loggedInSpeaker) {
     }
 }
 
-// Manage assigned sessions (accept/reject)
+// Manage all assigned invitations (accept/reject for all event types)
 static void manageAssignedSessions(Speaker speaker) {
-    List<Session> assignedSessions = new java.util.ArrayList<>();
-
-    // Collect all sessions this speaker is assigned to
+    List<Object> pendingInvitations = new java.util.ArrayList<>();
+    List<String> invitationTypes = new java.util.ArrayList<>();
+    
+    // Collect all pending invitations from conferences, concerts, and workshops
     for (Event e : events) {
-        if (e != null && e.isConference()) {
-            Conference conf = (Conference) e;
-            for (int i = 0; i < conf.getSessionCount(); i++) {
-                Session session = conf.getSessions()[i];
-                if (session.hasSpeaker(speaker.getUsername())) {
-                    assignedSessions.add(session);
+        if (e != null) {
+            if (e.isConference()) {
+                Conference conf = (Conference) e;
+                for (int i = 0; i < conf.getSessionCount(); i++) {
+                    Session session = conf.getSessions()[i];
+                    if (session.hasSpeaker(speaker.getUsername())) {
+                        String status = session.getSpeakerStatus(speaker.getUsername());
+                        if ("pending".equals(status)) {
+                            pendingInvitations.add(session);
+                            invitationTypes.add("Conference Session");
+                        }
+                    }
+                }
+            } else if (e.isConcert()) {
+                Concert concert = (Concert) e;
+                if (concert.hasSpeaker(speaker.getUsername())) {
+                    String status = concert.getSpeakerStatus(speaker.getUsername());
+                    if ("pending".equals(status)) {
+                        pendingInvitations.add(concert);
+                        invitationTypes.add("Concert");
+                    }
+                }
+            } else if (e.isWorkshop()) {
+                Workshop workshop = (Workshop) e;
+                if (workshop.hasSpeaker(speaker.getUsername())) {
+                    String status = workshop.getSpeakerStatus(speaker.getUsername());
+                    if ("pending".equals(status)) {
+                        pendingInvitations.add(workshop);
+                        invitationTypes.add("Workshop");
+                    }
                 }
             }
         }
     }
 
-    if (assignedSessions.isEmpty()) {
-        System.out.println("\nYou are not assigned to any sessions.");
+    if (pendingInvitations.isEmpty()) {
+        System.out.println("\nYou have no pending invitations.");
         return;
     }
 
     boolean continueManaging = true;
     while (continueManaging) {
-        // Display all assigned sessions with current status
-        System.out.println("\n=== Your Assigned Sessions ===");
-        System.out.println("No. | Session ID | Topic | Time | Status");
-        System.out.println("----------------------------------------");
-        for (int i = 0; i < assignedSessions.size(); i++) {
-            Session s = assignedSessions.get(i);
-            String status = s.getSpeakerStatus(speaker.getUsername());
-            System.out.println((i + 1) + ".   " + s.getSessionID() + "   | " +
-                    s.getTopic() + " | " +
-                    s.getTime() + " | " +
-                    status);
+        System.out.println("\n╔════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                         YOUR PENDING INVITATIONS                                ║");
+        System.out.println("╠════╦══════════════╦══════════════════════════════╦═════════════════════════════╣");
+        System.out.println("║ No ║    Type      ║           Event Name          ║          Details            ║");
+        System.out.println("╠════╬══════════════╬══════════════════════════════╬═════════════════════════════╣");
+        
+        for (int i = 0; i < pendingInvitations.size(); i++) {
+            Object inv = pendingInvitations.get(i);
+            String type = invitationTypes.get(i);
+            String eventName = "";
+            String details = "";
+            
+            if (inv instanceof Session) {
+                Session s = (Session) inv;
+                eventName = getConferenceName(s);
+                details = "Topic: " + truncateString(s.getTopic(), 25) + " @ " + s.getTime();
+            } else if (inv instanceof Concert) {
+                Concert c = (Concert) inv;
+                eventName = truncateString(c.getTitle(), 26);
+                details = "Date: " + c.getDate() + " | Venue: " + truncateString(c.getVenue(), 20);
+            } else if (inv instanceof Workshop) {
+                Workshop w = (Workshop) inv;
+                eventName = truncateString(w.getTitle(), 26);
+                details = "Date: " + w.getDate() + " | Venue: " + truncateString(w.getVenue(), 20);
+            }
+            
+            System.out.printf("║ %-2d ║ %-12s ║ %-26s ║ %-29s ║\n", 
+                    (i + 1), type, eventName, details);
         }
-
+        
+        System.out.println("╚════╩══════════════╩══════════════════════════════╩═════════════════════════════╝");
         System.out.println("\n0. Back to Main Menu");
-        System.out.print("Select session number to respond (or 0 to exit): ");
+        System.out.print("Select invitation number to respond (or 0 to exit): ");
         
         int choice = -1;
         try {
             choice = scan.nextInt();
             scan.nextLine();
         } catch (InputMismatchException e) {
-            System.out.println("Error: Please enter a valid NUMBER (e.g., 1, 2, 3, or 0 to exit)");
-            scan.nextLine(); // Clear the invalid input
-            continue; // Go back to menu
+            System.out.println("Error: Please enter a valid NUMBER");
+            scan.nextLine();
+            continue;
         }
         
         if (choice == 0) {
             continueManaging = false;
-        } else if (choice >= 1 && choice <= assignedSessions.size()) {
-            Session selectedSession = assignedSessions.get(choice - 1);
-            String currentStatus = selectedSession.getSpeakerStatus(speaker.getUsername());
-
-            if (!"pending".equals(currentStatus)) {
-                System.out.println("You have already " + currentStatus + " this session.");
-                System.out.println("Press Enter to continue...");
-                scan.nextLine();
-                continue;
+        } else if (choice >= 1 && choice <= pendingInvitations.size()) {
+            Object selected = pendingInvitations.get(choice - 1);
+            
+            System.out.println("\n╔════════════════════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                           INVITATION DETAILS                                    ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════════════════════╣");
+            
+            if (selected instanceof Session) {
+                Session session = (Session) selected;
+                System.out.printf("║ %-68s ║\n", "Type: Conference Session");
+                System.out.printf("║ %-68s ║\n", "Conference: " + truncateString(getConferenceName(session), 50));
+                System.out.printf("║ %-68s ║\n", "Session ID: " + session.getSessionID());
+                System.out.printf("║ %-68s ║\n", "Topic: " + truncateString(session.getTopic(), 50));
+                System.out.printf("║ %-68s ║\n", "Time: " + session.getTime());
+            } else if (selected instanceof Concert) {
+                Concert concert = (Concert) selected;
+                System.out.printf("║ %-68s ║\n", "Type: Concert");
+                System.out.printf("║ %-68s ║\n", "Event ID: " + concert.getEventID());
+                System.out.printf("║ %-68s ║\n", "Title: " + truncateString(concert.getTitle(), 50));
+                System.out.printf("║ %-68s ║\n", "Date: " + concert.getDate());
+                System.out.printf("║ %-68s ║\n", "Venue: " + truncateString(concert.getVenue(), 50));
+            } else if (selected instanceof Workshop) {
+                Workshop workshop = (Workshop) selected;
+                System.out.printf("║ %-68s ║\n", "Type: Workshop");
+                System.out.printf("║ %-68s ║\n", "Event ID: " + workshop.getEventID());
+                System.out.printf("║ %-68s ║\n", "Title: " + truncateString(workshop.getTitle(), 50));
+                System.out.printf("║ %-68s ║\n", "Date: " + workshop.getDate());
+                System.out.printf("║ %-68s ║\n", "Venue: " + truncateString(workshop.getVenue(), 50));
             }
-
-            // Show session details and ask for response
-            System.out.println("\n=== Session Details ===");
-            System.out.println("Conference: " + getConferenceName(selectedSession));
-            System.out.println("Session ID: " + selectedSession.getSessionID());
-            System.out.println("Topic: " + selectedSession.getTopic());
-            System.out.println("Time: " + selectedSession.getTime());
-            System.out.println("\nDo you want to ACCEPT or REJECT this session?");
+            
+            System.out.println("╚════════════════════════════════════════════════════════════════════════════════╝");
+            
+            System.out.println("\nDo you want to ACCEPT or REJECT this invitation?");
             System.out.println("1. ACCEPT");
             System.out.println("2. REJECT");
             System.out.print("Enter your choice (1/2): ");
@@ -4062,68 +4147,155 @@ static void manageAssignedSessions(Speaker speaker) {
             }
 
             if (response == 1) {
-                selectedSession.acceptInvitation(speaker.getUsername());
-                System.out.println("You have accepted the session: " + selectedSession.getTopic());
+                if (selected instanceof Session) {
+                    ((Session) selected).acceptInvitation(speaker.getUsername());
+                    storeConferenceData();
+                } else if (selected instanceof Concert) {
+                    ((Concert) selected).acceptInvitation(speaker.getUsername());
+                    storeConcertData(concerts);
+                } else if (selected instanceof Workshop) {
+                    ((Workshop) selected).acceptInvitation(speaker.getUsername());
+                    storeWorkshopData(workshops);
+                }
+                System.out.println("\n You have accepted this invitation!");
             } else if (response == 2) {
                 System.out.print("Please provide a reason for rejection: ");
                 String reason = scan.nextLine();
-                selectedSession.rejectInvitation(speaker.getUsername(), reason);
-                System.out.println("You have rejected the session: " + selectedSession.getTopic());
+                if (selected instanceof Session) {
+                    ((Session) selected).rejectInvitation(speaker.getUsername(), reason);
+                    storeConferenceData();
+                } else if (selected instanceof Concert) {
+                    ((Concert) selected).rejectInvitation(speaker.getUsername(), reason);
+                    storeConcertData(concerts);
+                } else if (selected instanceof Workshop) {
+                    ((Workshop) selected).rejectInvitation(speaker.getUsername(), reason);
+                    storeWorkshopData(workshops);
+                }
+                System.out.println("\n✗ You have rejected this invitation.");
+                System.out.println("Reason: " + reason);
             } else {
                 System.out.println("Invalid choice. Please enter 1 or 2.");
                 continue;
             }
-            
-            // Save the conference data after status change
-            storeConferenceData();
 
             System.out.println("\nPress Enter to continue...");
             scan.nextLine();
         } else {
-            System.out.println("Invalid selection. Please enter a number between 0 and " + assignedSessions.size());
+            System.out.println("Invalid selection.");
         }
     }
 }
 
-    // View my assigned sessions (view only)
-    static void viewMyAssignedSessions(Speaker speaker) {
-        System.out.println("\n=== My Assigned Sessions ===");
-        boolean hasSessions = false;
-        for (Event e : events) {
-            if (e != null && e.isConference()) {
-                Conference conf = (Conference) e;
-                for (int i = 0; i < conf.getSessionCount(); i++) {
-                    Session session = conf.getSessions()[i];
-                    if (session.hasSpeaker(speaker.getUsername())) {
-                        hasSessions = true;
-                        String status = session.getSpeakerStatus(speaker.getUsername());
-                         // Check if speaker has a saved updated topic
+// Helper method to truncate long strings
+private static String truncateString(String str, int maxLength) {
+    if (str == null) return "";
+    if (str.length() <= maxLength) return str;
+    return str.substring(0, maxLength - 3) + "...";
+}
+
+    
+// View all assigned activities with status
+static void viewMyAssignedSessions(Speaker speaker) {
+    System.out.println("\n=== My Assigned Activities ===");
+    boolean hasActivities = false;
+    
+    // 1. Conference Sessions
+    System.out.println("\n--- Conference Sessions ---");
+    boolean hasSessions = false;
+    for (Event e : events) {
+        if (e != null && e.isConference()) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                Session session = conf.getSessions()[i];
+                if (session.hasSpeaker(speaker.getUsername())) {
+                    hasSessions = true;
+                    hasActivities = true;
+                    String status = session.getSpeakerStatus(speaker.getUsername());
+                    
                     String savedTopic = speaker.getUpdatedSessionTopic(session.getSessionID());
                     if (savedTopic != null) {
                         session.setTopic(savedTopic);
                     }
-                        System.out.println("\nConference: " + conf.getTitle());
-                        System.out.println("  Session ID: " + session.getSessionID());
-                        System.out.println("  Topic: " + session.getTopic());
-                        System.out.println("  Time: " + session.getTime());
-                        System.out.println("  Status: " + status);
-                        if ("rejected".equals(status)) {
-                            String reason = session.getRejectionReason(speaker.getUsername());
-                            if (!reason.isEmpty()) {
-                                System.out.println("  Rejection Reason: " + reason);
-                            }
+                    
+                    System.out.println("\n  Conference: " + conf.getTitle());
+                    System.out.println("    Session ID: " + session.getSessionID());
+                    System.out.println("    Topic: " + session.getTopic());
+                    System.out.println("    Time: " + session.getTime());
+                    System.out.println("    Status: " + status);
+                    if ("rejected".equals(status)) {
+                        String reason = session.getRejectionReason(speaker.getUsername());
+                        if (!reason.isEmpty()) {
+                            System.out.println("    Rejection Reason: " + reason);
                         }
                     }
-
                 }
             }
-
-        }
-
-        if (!hasSessions) {
-            System.out.println("You are not assigned to any sessions.");
         }
     }
+    if (!hasSessions) {
+        System.out.println("  No conference sessions assigned.");
+    }
+    
+    // 2. Concerts
+    System.out.println("\n--- Concerts ---");
+    boolean hasConcerts = false;
+    for (Event e : events) {
+        if (e != null && e.isConcert()) {
+            Concert concert = (Concert) e;
+            if (concert.hasSpeaker(speaker.getUsername())) {
+                hasConcerts = true;
+                hasActivities = true;
+                String status = concert.getSpeakerStatus(speaker.getUsername());
+                System.out.println("\n  Concert: " + concert.getTitle());
+                System.out.println("    Event ID: " + concert.getEventID());
+                System.out.println("    Date: " + concert.getDate());
+                System.out.println("    Venue: " + concert.getVenue());
+                System.out.println("    Status: " + status);
+                if ("rejected".equals(status)) {
+                    String reason = concert.getRejectionReason(speaker.getUsername());
+                    if (!reason.isEmpty()) {
+                        System.out.println("    Rejection Reason: " + reason);
+                    }
+                }
+            }
+        }
+    }
+    if (!hasConcerts) {
+        System.out.println("  No concerts assigned.");
+    }
+    
+    // 3. Workshops
+    System.out.println("\n--- Workshops ---");
+    boolean hasWorkshops = false;
+    for (Event e : events) {
+        if (e != null && e.isWorkshop()) {
+            Workshop workshop = (Workshop) e;
+            if (workshop.hasSpeaker(speaker.getUsername())) {
+                hasWorkshops = true;
+                hasActivities = true;
+                String status = workshop.getSpeakerStatus(speaker.getUsername());
+                System.out.println("\n  Workshop: " + workshop.getTitle());
+                System.out.println("    Event ID: " + workshop.getEventID());
+                System.out.println("    Date: " + workshop.getDate());
+                System.out.println("    Venue: " + workshop.getVenue());
+                System.out.println("    Status: " + status);
+                if ("rejected".equals(status)) {
+                    String reason = workshop.getRejectionReason(speaker.getUsername());
+                    if (!reason.isEmpty()) {
+                        System.out.println("    Rejection Reason: " + reason);
+                    }
+                }
+            }
+        }
+    }
+    if (!hasWorkshops) {
+        System.out.println("  No workshops assigned.");
+    }
+    
+    if (!hasActivities) {
+        System.out.println("\nYou are not assigned to any activities.");
+    }
+}
 
     // View editable sessions (accepted sessions only)
     static void viewEditableSessions(Speaker speaker) {
