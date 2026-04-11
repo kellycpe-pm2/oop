@@ -403,7 +403,7 @@ public class TestUser {
 
     public static void createAccount(int[] no, User user, User[] alluser, String name, String password, String email,
             String contactNo) {
-
+        no[0]++;
         if (password.equals(ORGANIZER_PSWD)) {
 
             alluser[no[0]] = new Organizer(name, password, email, contactNo);
@@ -422,7 +422,6 @@ public class TestUser {
 
         }
         ems.addNewUser(alluser[no[0]]);
-        no[0]++;
 
     }
 
