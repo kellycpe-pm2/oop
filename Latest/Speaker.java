@@ -2,7 +2,7 @@ public class Speaker extends User {
 
     // instance variable
     private String bio;
-    private static int totalSpeakers;
+    private static int totalSpeakers=0;
     private final String role = "Speaker";
 
     // ------------------constructor-------------------------------
@@ -10,12 +10,14 @@ public class Speaker extends User {
     public Speaker() {
         super();
         this.bio = "No bio available"; 
+        totalSpeakers++;
     }
 
     // parameterized constructor (without bio)
     public Speaker(String username, String password, String email, String contactNo) {
         super(username, password, email, contactNo);
         this.bio = "No bio available";  
+        totalSpeakers++;
     }
 
     // parameterized constructor (with bio)
@@ -29,15 +31,18 @@ public class Speaker extends User {
       public String getBio() {
         return bio;
     }
-
+    // Getter for total speakers
+    public static int getTotalSpeakers() {
+        return totalSpeakers;
+    }
 
 
 
 // ------------------setter-------------------------------
 // Set the total number of speakers (for loading from file)
-    public static void setSpeakerCount(int count) {
-        totalSpeakers = count;
-    }
+public static void setTotalSpeakers(int count) {
+    totalSpeakers = count;
+}
 
 // Set bio at specific index (for file operations)
     public void setBioAtIndex(String bio) {
