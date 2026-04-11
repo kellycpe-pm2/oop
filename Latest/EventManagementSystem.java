@@ -380,7 +380,6 @@ public class EventManagementSystem {
         if (session.addSpeaker(speaker.getUsername())) {
             System.out.println("Speaker [" + speaker.getUsername() + "] assigned to session ["
                     + session.getSessionID() + "] successfully.");
-            conf.setSession(session);
             return true;
         }
         return false;
@@ -391,11 +390,11 @@ public class EventManagementSystem {
             System.out.println("Error: Session not found !");
             return false;
         }
-        
+
         return session.removeSpeaker(speakerUsername);
     }
 
- // Upload/update session topic
+    // Upload/update session topic
     public boolean uploadSessionTopic(String username, Session session, String newTopic) {
         // Session.getSpeakers() returns String[] of usernames
         String[] assigned = session.getSpeakers();
@@ -552,16 +551,20 @@ public class EventManagementSystem {
         }
     }
 
-    public String toString (){
-        return "User\t:"+current_user.toString();
+    public String toString() {
+        return "User\t:" + current_user.toString();
     }
 
-    public boolean equals(Object o){
-        if(this == o){return true;}
-        if(o == null){return false;}
-        if (o instanceof EventManagementSystem){
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
-        }else{
+        }
+        if (o == null) {
+            return false;
+        }
+        if (o instanceof EventManagementSystem) {
+            return true;
+        } else {
             return false;
         }
     }
