@@ -5,10 +5,9 @@ import java.util.List;
 public class EventManagementSystem {
     private static List<Ticket> tickets = new java.util.ArrayList<>();
     private static Payment[] payments = new Payment[100];
-
     private static final int MAX_EVENTS = 300;
-
     private Event[] events = new Event[MAX_EVENTS];
+    
     private int eventCount = 0;
 
     private static int user_no = 0;
@@ -23,8 +22,11 @@ public class EventManagementSystem {
         this.events = events;
         EventManagementSystem.tickets = tickets;
         EventManagementSystem.payments = payments;
+
         EventManagementSystem.user_no = countUser_Num();
-        Payment.setbookingNo(Ticket.getTicketCount());
+        //count the how many booking no have already store in the file
+        //no do the payment file, so use the ticket to count , because the total ticket is equals to total booking
+        Payment.setbookingNo(countbooking());
 
     }
 
@@ -96,10 +98,22 @@ public class EventManagementSystem {
         Event[] active = new Event[total];
         int idx = 0;
         for (int i = 0; i < total; i++) {
-            active[idx++] = events[i];
+            if (active[i]!=null)
+                active[idx++] = events[i];
         }
 
         return active;
+    }
+
+    public static int countbooking(){
+        int count=0;
+        for (Ticket ticket : tickets){
+            if (ticket !=null){
+                count++;
+
+            }
+        }
+            return count;
     }
 
     public int countUser_Num() {
@@ -109,45 +123,7 @@ public class EventManagementSystem {
             }
 
         }
-        if (user_no == 0) {
-            return 0;
-        } else {
-            return user_no--;
-
-        }
-    }
-
-    // Get only Concert events
-    public Concert[] getActiveConcerts() {
-        Concert[] result = new Concert[eventCount];
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i].isConcert()) {
-                result[i] = (Concert) events[i];
-            }
-        }
-        return result;
-    }
-
-    // Get only Workshop events
-    public Workshop[] getActiveWorkshops() {
-        Workshop[] result = new Workshop[eventCount];
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i].isWorkshop()) {
-                result[i] = (Workshop) events[i];
-            }
-        }
-        return result;
-    }
-
-    // Get only Conference events
-    public Conference[] getActiveConferences() {
-        Conference[] result = new Conference[eventCount];
-        for (int i = 0; i < eventCount; i++) {
-            if (events[i].isConference()) {
-                result[i] = (Conference) events[i];
-            }
-        }
-        return result;
+        return user_no;
     }
 
     // Get a single event by eventID (searches all types)
@@ -183,12 +159,6 @@ public class EventManagementSystem {
         user_no++;
 
     }
-
-    // ----------------------------------------------------------------------------------------
-    // Staff Part
-    // ---------------------------------------------------------------------------------------
-
-    // ----------------------------------------------------------------------------------------
 
     // -------------------------- validation for event ---------------------------
 
