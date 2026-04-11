@@ -22,24 +22,54 @@ public class Conference extends Event {
         return sessions;
     }
 
-   
-    public void setSession (Session session){
+    public void setSession(Session session) {
         this.sessions[sessionCount++] = session;
     }
-    
-    
+
     // ── Session management ───────────────────────────────────────────────────
 
-//update
+    // update
+    /**
+     * Returns true if {@code newTime} (format "HHMM", e.g. "0900") is within
+     * 60 minutes of any already-scheduled session in this conference.
+     */
+    private boolean isTimeConflict(String newTime) {
+        int newMinutes;
+        try {
+            String t = newTime.trim();
+            if (t.length() != 4)
+                return false;
+            newMinutes = Integer.parseInt(t.substring(0, 2)) * 60
+                    + Integer.parseInt(t.substring(2, 4));
+        } catch (Exception e) {
+            return false;
+        }
+        for (int i = 0; i < sessionCount; i++) {
+            int existing = sessions[i].getTimeInMinutes();
+            if (existing == -1)
+                continue;
+            if (Math.abs(newMinutes - existing) < 60) {
+                return true; // gap < 1 hour → conflict
+            }
+        }
+        return false;
+    }
+
     /** Create a new session and persist to Conference.json. */
     public Session createSession(String topic, String time) {
-        if (sessionCount < MAX_SESSIONS) {
-            Session s = new Session(topic, time);
-            sessions[sessionCount++] = s;
-            return s;
+        if (sessionCount >= MAX_SESSIONS) {
+            System.out.println("Cannot add more sessions. Limit reached.");
+            return null;
         }
-        System.out.println("Cannot add more sessions. Limit reached.");
-        return null;
+        if (isTimeConflict(time)) {
+            System.out.println("Error: Session time [" + time
+                    + "] conflicts with an existing session."
+                    + " Sessions must be at least 1 hour apart.");
+            return null;
+        }
+        Session s = new Session(topic, time);
+        sessions[sessionCount++] = s;
+        return s;
     }
 
     /** Convenience method: create multiple sessions at once. */
@@ -85,6 +115,7 @@ public class Conference extends Event {
             }
         }
     }
+
     public static boolean removeConference(List<Conference> conferences, String eventID) {
         for (int i = 0; i < conferences.size(); i++) {
             if (conferences.get(i).getEventID().equals(eventID)) {
@@ -128,9 +159,9 @@ public class Conference extends Event {
     }
 
     public boolean equals(Object o) {
-        if (super.equals(o)){
+        if (super.equals(o)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
