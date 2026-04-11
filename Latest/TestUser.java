@@ -72,7 +72,6 @@ public class TestUser {
         loadAllEvents(); // load all events and ticket types from files on startup
         tickets.clear();
         tickets = readTicketFile();
-        bookingNo = Integer.parseInt(tickets.get(tickets.size() - 1).getBookingId().substring(5));
 
         // check the ticket status
         Staff.checkTotal_CheckIn(tickets);
@@ -2393,7 +2392,7 @@ public class TestUser {
         }
 
         // IMPORTANT: Update the static 'no' variable in Speaker class
-        Speaker.setSpeakerCount(speakerCount);
+        Speaker.setTotalSpeakers(speakerCount);
 
         if (speakerCount > 0) {
             System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
