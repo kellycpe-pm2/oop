@@ -87,6 +87,26 @@ public class Session {
         this.time = time;
     }
 
+    // Set speaker status by username
+public void setSpeakerStatusByUsername(String username, String status) {
+    for (int i = 0; i < speakerCount; i++) {
+        if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+            speakerStatus[i] = status;
+            return;
+        }
+    }
+}
+
+// Set rejection reason by username
+public void setRejectionReasonByUsername(String username, String reason) {
+    for (int i = 0; i < speakerCount; i++) {
+        if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+            rejectionReason[i] = reason;
+            return;
+        }
+    }
+}
+
     // ── Speaker management ───────────────────────────────────────────────────
 
     /** Add a speaker by username. Returns false if full or already assigned. */
