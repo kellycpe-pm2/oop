@@ -56,6 +56,10 @@ public class EventManagementSystem {
         return tickets;
     }
 
+    public static int getUser_No(){
+        return user_no;
+    }
+
     public void setCuurent_User(Object current_User, int type) {
         switch (type) {
             case 1:
