@@ -5,7 +5,10 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Map;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -189,6 +192,7 @@ public class TestUser {
         String contactNo;
         String password;
         String password2;
+        String bio = "No bio available";
         System.out.println("\n----------------------------------------------------------------");
         System.out.println("|                       SIGN UP SYSTEM                         |");
         System.out.println("----------------------------------------------------------------");
@@ -226,12 +230,27 @@ public class TestUser {
 
         } while (!validationPassword2(password, password2));
 
+    // Ask for bio only if signing up as speaker
+    if (password.equals(SPEAKER_PSWD)) {
+        System.out.print("\nPlease enter your Bio (optional): ");
+        bio = scan.nextLine();
+        if (bio == null || bio.trim().isEmpty()) {
+            bio = "No bio available";
+        }
+    }
+
         System.out.println("------------------------------------------------------------");
 
         // create and store data
         user.setUserName(name);
         createAccount(no, user, alluser, name, password, email, contactNo);
         storeUserData(name, password, email, contactNo);
+
+        
+            // Save bio to speaker.json if speaker
+    if (password.equals(SPEAKER_PSWD)) {
+        saveSpeakerBio(name, bio);
+    }
 
     }
 
@@ -438,6 +457,29 @@ public class TestUser {
             System.out.println("Error creating user file: " + e.getMessage());
         }
     }
+
+// Load bio for a specific speaker by username
+public static String loadSpeakerBio(String username) {
+    try {
+        File bioFile = new File("speaker.json");
+        if (!bioFile.exists()) {
+            return "No bio available";
+        }
+        
+        List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+        for (int i = 0; i < lines.size(); i += 2) {
+            if (i + 1 < lines.size()) {
+                if (lines.get(i).equals(username)) {
+                    return lines.get(i + 1);
+                }
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading speaker bio: " + e.getMessage());
+    }
+    return "No bio available";
+}
+
 
     // validation for signup
     public static boolean validationExist(String name, User[] existUser) {
@@ -2391,14 +2433,155 @@ public class TestUser {
             }
         }
 
-        // IMPORTANT: Update the static 'no' variable in Speaker class
+        // Update the static 'no' variable in Speaker class
         Speaker.setTotalSpeakers(speakerCount);
+
+        // Load bios from speaker.json
+        loadAllSpeakerBios();
 
         if (speakerCount > 0) {
             System.out.println(speakerCount + " speaker(s) loaded from user accounts.");
         }
     }
 
+    // Helper class to store speaker data
+static class SpeakerData {
+    String bio = "No bio available";
+    Map<String, String> sessionTopics = new HashMap<>();
+}
+
+// Save speaker bio and session topics to speaker.json
+public static void saveSpeakerData(String username, String bio, Map<String, String> sessionTopics) {
+    try {
+        // Load existing data
+        Map<String, SpeakerData> allSpeakerData = loadAllSpeakerData();
+        
+        // Update or create speaker data
+        SpeakerData data = allSpeakerData.getOrDefault(username, new SpeakerData());
+        data.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
+        data.sessionTopics = sessionTopics;
+        allSpeakerData.put(username, data);
+        
+        // Write all data back to file
+        try (Writer writer = new FileWriter("speaker.json")) {
+            for (Map.Entry<String, SpeakerData> entry : allSpeakerData.entrySet()) {
+                writer.write(entry.getKey() + "\n");
+                writer.write(entry.getValue().bio + "\n");
+                // Save session topics
+                writer.write(entry.getValue().sessionTopics.size() + "\n");
+                for (Map.Entry<String, String> topic : entry.getValue().sessionTopics.entrySet()) {
+                    writer.write(topic.getKey() + "\n");
+                    writer.write(topic.getValue() + "\n");
+                }
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error saving speaker data: " + e.getMessage());
+    }
+}
+
+// Load all speaker data from speaker.json
+public static Map<String, SpeakerData> loadAllSpeakerData() {
+    Map<String, SpeakerData> allSpeakerData = new HashMap<>();
+    try {
+        File dataFile = new File("speaker.json");
+        if (!dataFile.exists()) {
+            return allSpeakerData;
+        }
+        
+        List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+        int i = 0;
+        while (i < lines.size()) {
+            if (i + 1 >= lines.size()) break;
+            
+            String username = lines.get(i++);
+            String bio = lines.get(i++);
+            
+            SpeakerData data = new SpeakerData();
+            data.bio = bio;
+            
+            // Check if there's a topic count (new format)
+            if (i < lines.size()) {
+                try {
+                    int topicCount = Integer.parseInt(lines.get(i));
+                    i++; // move past topicCount
+                    
+                    for (int j = 0; j < topicCount && i + 1 < lines.size(); j++) {
+                        String sessionId = lines.get(i++);
+                        String topic = lines.get(i++);
+                        data.sessionTopics.put(sessionId, topic);
+                    }
+                } catch (NumberFormatException e) {
+                   
+                }
+            }
+            
+            allSpeakerData.put(username, data);
+        }
+    } catch (IOException e) {
+        System.out.println("Error loading speaker data: " + e.getMessage());
+    }
+    return allSpeakerData;
+}
+
+// Save speaker bio only (for backward compatibility)
+public static void saveSpeakerBio(String username, String bio) {
+    Map<String, SpeakerData> allData = loadAllSpeakerData();
+    SpeakerData data = allData.getOrDefault(username, new SpeakerData());
+    data.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
+    allData.put(username, data);
+    saveAllSpeakerData(allData);
+}
+
+// Save all speaker data to file
+public static void saveAllSpeakerData(Map<String, SpeakerData> allData) {
+    try (Writer writer = new FileWriter("speaker.json")) {
+        for (Map.Entry<String, SpeakerData> entry : allData.entrySet()) {
+            writer.write(entry.getKey() + "\n");
+            writer.write(entry.getValue().bio + "\n");
+            writer.write(entry.getValue().sessionTopics.size() + "\n");
+            for (Map.Entry<String, String> topic : entry.getValue().sessionTopics.entrySet()) {
+                writer.write(topic.getKey() + "\n");
+                writer.write(topic.getValue() + "\n");
+            }
+        }
+    } catch (IOException e) {
+        System.out.println("Error saving speaker data: " + e.getMessage());
+    }
+}
+
+// Save updated session topic for a speaker
+public static void saveSpeakerSessionTopic(String username, String sessionId, String newTopic) {
+    Map<String, SpeakerData> allData = loadAllSpeakerData();
+    SpeakerData data = allData.getOrDefault(username, new SpeakerData());
+    data.sessionTopics.put(sessionId, newTopic);
+    allData.put(username, data);
+    saveAllSpeakerData(allData);
+}
+
+// Load session topic for a speaker
+public static String loadSpeakerSessionTopic(String username, String sessionId) {
+    Map<String, SpeakerData> allData = loadAllSpeakerData();
+    SpeakerData data = allData.get(username);
+    if (data != null && data.sessionTopics.containsKey(sessionId)) {
+        return data.sessionTopics.get(sessionId);
+    }
+    return null;
+}
+
+// Update loadAllSpeakerBios to also load session topics
+public static void loadAllSpeakerBios() {
+    Map<String, SpeakerData> allData = loadAllSpeakerData();
+    for (int j = 0; j < speakerCount; j++) {
+        String username = speakerPool[j].getUsername();
+        SpeakerData data = allData.get(username);
+        if (data != null) {
+            speakerPool[j].setBio(data.bio);
+            // Store session topics in a map within the speaker object
+            speakerPool[j].setSessionTopics(data.sessionTopics);
+        }
+    }
+}
     // -- Conference session speaker management (original, renamed) -------------
 
     // assign a speaker from the pool to a conference session
@@ -3730,61 +3913,69 @@ public static List<Conference> readConferenceData() {
     }
 
     // speaker part
-    static void speakerMenu(Speaker loggedInSpeaker) {
-        boolean inMenu = true;
+static void speakerMenu(Speaker loggedInSpeaker) {
+    boolean inMenu = true;
 
-        while (inMenu) {
-            System.out.println("\n--------------------------------");
-            System.out.println("|       SPEAKER MENU           |");
-            System.out.println("|  Logged in: " + String.format("%-17s", loggedInSpeaker.getUsername()) + "|");
-            System.out.println("|------------------------------|");
-            System.out.println("|  1: View & Respond to        |");
-            System.out.println("|     Assigned Sessions        |");
-            System.out.println("|  2: View My Sessions         |");
-            System.out.println("|  3: Update Session Topic     |");
-            System.out.println("|  4: Update Bio               |");
-            System.out.println("|  5: View My Info             |");
-            System.out.println("|  0: Back to Main Menu        |");
-            System.out.println("--------------------------------");
-            System.out.print("Enter option: ");
-            int choice = scan.nextInt();
+    while (inMenu) {
+        System.out.println("\n--------------------------------");
+        System.out.println("|       SPEAKER MENU           |");
+        System.out.println("|  Logged in: " + String.format("%-17s", loggedInSpeaker.getUsername()) + "|");
+        System.out.println("|------------------------------|");
+        System.out.println("|  1: View & Respond to        |");
+        System.out.println("|     Assigned Sessions        |");
+        System.out.println("|  2: View My Sessions         |");
+        System.out.println("|  3: Update Session Topic     |");
+        System.out.println("|  4: Update Bio               |");
+        System.out.println("|  5: View My Info             |");
+        System.out.println("|  0: Back to Main Menu        |");
+        System.out.println("--------------------------------");
+        System.out.print("Enter option: ");
+        
+        int choice = -1;
+        try {
+            choice = scan.nextInt();
             scan.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("\nError: Please enter a valid NUMBER (0, 1, 2, 3, 4, or 5)");
+            scan.nextLine(); // Clear the invalid input
+            continue; // Go back to menu
+        }
 
-            switch (choice) {
-                case 1:
-                    // View assigned sessions and choose to accept/reject
-                    manageAssignedSessions(loggedInSpeaker);
-                    break;
+        switch (choice) {
+            case 1:
+                // View assigned sessions and choose to accept/reject
+                manageAssignedSessions(loggedInSpeaker);
+                break;
 
-                case 2:
-                    // View all my sessions (with status only)
-                    viewMyAssignedSessions(loggedInSpeaker);
-                    break;
+            case 2:
+                // View all my sessions (with status only)
+                viewMyAssignedSessions(loggedInSpeaker);
+                break;
 
-                case 3:
-                    // Update session topic
-                    updateSessionTopic(loggedInSpeaker);
-                    break;
+            case 3:
+                // Update session topic
+                updateSessionTopic(loggedInSpeaker);
+                break;
 
-                case 4:
-                    // Update Bio
-                    updateSpeakerBio(loggedInSpeaker);
-                    break;
+            case 4:
+                // Update Bio
+                updateSpeakerBio(loggedInSpeaker);
+                break;
 
-                case 5:
-                    // View My Info
-                    loggedInSpeaker.displaySingleInfo();
-                    break;
+            case 5:
+                // View My Info
+                loggedInSpeaker.displaySingleInfo();
+                break;
 
-                case 0:
-                    inMenu = false;
-                    break;
+            case 0:
+                inMenu = false;
+                break;
 
-                default:
-                    System.out.println("Invalid option. Try again.");
-            }
+            default:
+                System.out.println("\n Invalid option. Please enter 0, 1, 2, 3, 4, or 5.");
         }
     }
+}
 
 // Manage assigned sessions (accept/reject)
 static void manageAssignedSessions(Speaker speaker) {
@@ -3825,9 +4016,17 @@ static void manageAssignedSessions(Speaker speaker) {
 
         System.out.println("\n0. Back to Main Menu");
         System.out.print("Select session number to respond (or 0 to exit): ");
-        int choice = scan.nextInt();
-        scan.nextLine();
-
+        
+        int choice = -1;
+        try {
+            choice = scan.nextInt();
+            scan.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Please enter a valid NUMBER (e.g., 1, 2, 3, or 0 to exit)");
+            scan.nextLine(); // Clear the invalid input
+            continue; // Go back to menu
+        }
+        
         if (choice == 0) {
             continueManaging = false;
         } else if (choice >= 1 && choice <= assignedSessions.size()) {
@@ -3851,8 +4050,16 @@ static void manageAssignedSessions(Speaker speaker) {
             System.out.println("1. ACCEPT");
             System.out.println("2. REJECT");
             System.out.print("Enter your choice (1/2): ");
-            int response = scan.nextInt();
-            scan.nextLine();
+            
+            int response = -1;
+            try {
+                response = scan.nextInt();
+                scan.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Please enter a valid NUMBER (1 for ACCEPT, 2 for REJECT)");
+                scan.nextLine();
+                continue;
+            }
 
             if (response == 1) {
                 selectedSession.acceptInvitation(speaker.getUsername());
@@ -3863,16 +4070,17 @@ static void manageAssignedSessions(Speaker speaker) {
                 selectedSession.rejectInvitation(speaker.getUsername(), reason);
                 System.out.println("You have rejected the session: " + selectedSession.getTopic());
             } else {
-                System.out.println("Invalid choice.");
+                System.out.println("Invalid choice. Please enter 1 or 2.");
+                continue;
             }
             
-            // ✅ IMPORTANT: Save the conference data after status change
+            // Save the conference data after status change
             storeConferenceData();
 
             System.out.println("\nPress Enter to continue...");
             scan.nextLine();
         } else {
-            System.out.println("Invalid selection. Please try again.");
+            System.out.println("Invalid selection. Please enter a number between 0 and " + assignedSessions.size());
         }
     }
 }
@@ -3889,6 +4097,11 @@ static void manageAssignedSessions(Speaker speaker) {
                     if (session.hasSpeaker(speaker.getUsername())) {
                         hasSessions = true;
                         String status = session.getSpeakerStatus(speaker.getUsername());
+                         // Check if speaker has a saved updated topic
+                    String savedTopic = speaker.getUpdatedSessionTopic(session.getSessionID());
+                    if (savedTopic != null) {
+                        session.setTopic(savedTopic);
+                    }
                         System.out.println("\nConference: " + conf.getTitle());
                         System.out.println("  Session ID: " + session.getSessionID());
                         System.out.println("  Topic: " + session.getTopic());
@@ -3944,59 +4157,65 @@ static void manageAssignedSessions(Speaker speaker) {
     }
 
     // Update session topic
-    static void updateSessionTopic(Speaker speaker) {
-        viewEditableSessions(speaker);
+   static void updateSessionTopic(Speaker speaker) {
+    viewEditableSessions(speaker);
 
-        System.out.print("\nEnter Session ID to update topic: ");
-        String sessionId = scan.nextLine();
+    System.out.print("\nEnter Session ID to update topic: ");
+    String sessionId = scan.nextLine();
 
-        // Find the session
-        Session targetSession = null;
-        for (Event e : events) {
-            if (e != null && e.isConference()) {
-                Conference conf = (Conference) e;
-                for (int i = 0; i < conf.getSessionCount(); i++) {
-                    Session s = conf.getSessions()[i];
-                    if (s.getSessionID().equals(sessionId)) {
-                        targetSession = s;
-                        break;
-                    }
+    // Find the session
+    Session targetSession = null;
+    for (Event e : events) {
+        if (e != null && e.isConference()) {
+            Conference conf = (Conference) e;
+            for (int i = 0; i < conf.getSessionCount(); i++) {
+                Session s = conf.getSessions()[i];
+                if (s.getSessionID().equals(sessionId)) {
+                    targetSession = s;
+                    break;
                 }
             }
-            if (targetSession != null)
-                break;
         }
-
-        if (targetSession == null) {
-            System.out.println("Session not found!");
-            return;
-        }
-
-        System.out.print("Enter new topic: ");
-        String newTopic = scan.nextLine();
-
-        ems.uploadSessionTopic(speaker.getUsername(), targetSession, newTopic);
+        if (targetSession != null)
+            break;
     }
 
+    if (targetSession == null) {
+        System.out.println("Session not found!");
+        return;
+    }
+
+    System.out.print("Enter new topic: ");
+    String newTopic = scan.nextLine();
+
+    // Update the session topic in memory
+    ems.uploadSessionTopic(speaker.getUsername(), targetSession, newTopic);
+    
+    // Save the updated topic to speaker.json
+    saveSpeakerSessionTopic(speaker.getUsername(), sessionId, newTopic);
+    
+    System.out.println("Session topic updated and saved successfully!");
+}
     // Update speaker bio
-    static void updateSpeakerBio(Speaker speaker) {
+ static void updateSpeakerBio(Speaker speaker) {
+    System.out.println("\n--- Update Your Bio ---");
+    System.out.println("Current Bio: " + speaker.getBio());
+    System.out.print("Enter new bio: ");
+    String newBio = scan.nextLine();
 
-        System.out.println("\n--- Update Your Bio ---");
-        System.out.println("Current Bio: " + speaker.getBio());
-        System.out.print("Enter new bio: ");
-        String newBio = scan.nextLine();
-
-        if (newBio != null && !newBio.trim().isEmpty()) {
-            boolean success = speaker.uploadBio(newBio);
-            if (success) {
-                System.out.println("Bio updated successfully!");
-            } else {
-                System.out.println("Failed to update bio.");
-            }
+    if (newBio != null && !newBio.trim().isEmpty()) {
+        boolean success = speaker.uploadBio(newBio);
+        if (success) {
+            // Save to speaker.json
+            saveSpeakerBio(speaker.getUsername(), newBio);
+            System.out.println("Bio updated successfully!");
         } else {
-            System.out.println("Bio cannot be empty. Update cancelled.");
+            System.out.println("Failed to update bio.");
         }
+    } else {
+        System.out.println("Bio cannot be empty. Update cancelled.");
     }
+}
 
     // Helper method to get conference name
     static String getConferenceName(Session session) {
