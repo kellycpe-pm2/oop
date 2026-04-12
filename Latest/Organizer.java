@@ -1,7 +1,7 @@
 public class Organizer extends User {
 
     // instance variable
-    private final String role = "Organizer";
+    private final String ROLE = "Organizer";
 
     // ------------------constructor-------------------------------
     Organizer() {
@@ -15,7 +15,7 @@ public class Organizer extends User {
     // ------------------toString-------------------------------
 
     public String toString() {
-        return super.toString() + String.format("|          Position       :  %-31s|\n", role);
+        return super.toString() + String.format("|          Position       :  %-31s|\n", ROLE);
     }
 
     // ------------------displayProfile-------------------------------
