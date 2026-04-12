@@ -7,7 +7,7 @@ public class Speaker extends User {
     private String bio;
     private Map<String, String> sessionTopics;
     private static int totalSpeakers=0;
-    private final String role = "Speaker";
+    private final String ROLE = "Speaker";
 
     // ------------------constructor-------------------------------
         // default constructor
@@ -134,7 +134,7 @@ public static void setTotalSpeakers(int count) {
     // --------------------------------------------------
 
     public String toString() {
-        return super.toString() + String.format("║          Position       :  %-31s║\n", role);
+        return super.toString() + String.format("║          Position       :  %-31s║\n", ROLE);
     }
 
     public boolean checkClass(Object o) {
