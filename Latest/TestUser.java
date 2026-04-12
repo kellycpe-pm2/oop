@@ -4053,11 +4053,11 @@ static void manageAssignedSessions(Speaker speaker) {
 
     boolean continueManaging = true;
     while (continueManaging) {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                         YOUR PENDING INVITATIONS                                ║");
-        System.out.println("╠════╦══════════════╦══════════════════════════════╦═════════════════════════════╣");
-        System.out.println("║ No ║    Type      ║           Event Name          ║          Details            ║");
-        System.out.println("╠════╬══════════════╬══════════════════════════════╬═════════════════════════════╣");
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                         YOUR PENDING INVITATIONS                                 ║");
+        System.out.println("╠════╦══════════════╦══════════════════════════╦═══════════════════════════════════╣");
+        System.out.println("║ No ║    Type      ║         Event Name       ║            Details                ║");
+        System.out.println("╠════╬══════════════╬══════════════════════════╬═══════════════════════════════════╣");
         
         for (int i = 0; i < pendingInvitations.size(); i++) {
             Object inv = pendingInvitations.get(i);
@@ -4068,22 +4068,22 @@ static void manageAssignedSessions(Speaker speaker) {
             if (inv instanceof Session) {
                 Session s = (Session) inv;
                 eventName = getConferenceName(s);
-                details = "Topic: " + truncateString(s.getTopic(), 25) + " @ " + s.getTime();
+                details = "Topic: " + truncateString(s.getTopic(), 24) + " @ " + s.getTime();
             } else if (inv instanceof Concert) {
                 Concert c = (Concert) inv;
-                eventName = truncateString(c.getTitle(), 26);
+                eventName = truncateString(c.getTitle(), 24);
                 details = "Date: " + c.getDate() + " | Venue: " + truncateString(c.getVenue(), 20);
             } else if (inv instanceof Workshop) {
                 Workshop w = (Workshop) inv;
-                eventName = truncateString(w.getTitle(), 26);
+                eventName = truncateString(w.getTitle(), 24);
                 details = "Date: " + w.getDate() + " | Venue: " + truncateString(w.getVenue(), 20);
             }
             
-            System.out.printf("║ %-2d ║ %-12s ║ %-26s ║ %-29s ║\n", 
+            System.out.printf("║ %-2d ║ %-12s ║ %-24s ║ %-33s ║\n", 
                     (i + 1), type, eventName, details);
         }
         
-        System.out.println("╚════╩══════════════╩══════════════════════════════╩═════════════════════════════╝");
+        System.out.println("╚════╩══════════════╩══════════════════════════╩═══════════════════════════════════╝");
         System.out.println("\n0. Back to Main Menu");
         System.out.print("Select invitation number to respond (or 0 to exit): ");
         
