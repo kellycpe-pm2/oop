@@ -223,17 +223,6 @@ public void setRejectionReason(String speakerName, String reason) {
             }
         }
     }
-
-    // display all concerts
-    public static void displayAllConcerts(List<Concert> concerts) {
-        System.out.println("=== Concert Info ===");
-        System.out.printf("%-6s %-20s %-12s %-20s %-8s%n", "ID", "Title", "Date", "Venue", "MaxTix");
-        System.out.println("------------------------------------------------------------------");
-        for (Concert c : concerts) {
-            System.out.println(c.toString());
-            c.displaySpeakers();
-        }
-    }
     
     // remove a concert by eventID from the list and update Concert.json
     public static boolean removeConcert(List<Concert> concerts, String eventID) {
@@ -247,18 +236,7 @@ public void setRejectionReason(String speakerName, String reason) {
         System.out.println("Error: Concert [" + eventID + "] not found !");
         return false;
     }
-
-    @Override
-    public void displayInfo() {
-        System.out.println("=== Concert Info ===");
-        System.out.printf("%-6s %-20s %-12s %-20s %-8s%n",
-                "ID", "Title", "Date", "Venue", "MaxTickets");
-        System.out.println("------------------------------------------------------------------");
-        System.out.println(this.toString());
-        displaySpeakers();
-    }
-
-    @Override
+    
     public String toString() {
         return super.toString() + String.format("%-14s│\n", TYPE);
     }
