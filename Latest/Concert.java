@@ -12,7 +12,7 @@ public class Concert extends Event {
     private String[] speakerStatus = new String[MAX_SPEAKERS];
     private String[] rejectionReason = new String[MAX_SPEAKERS];
     
-    private final String type = "Concert";
+    private final String TYPE = "Concert";
 
     public Concert(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
@@ -260,7 +260,7 @@ public void setRejectionReason(String speakerName, String reason) {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("%-14s│\n", type);
+        return super.toString() + String.format("%-14s│\n", TYPE);
     }
 
     public boolean isConcert() {
