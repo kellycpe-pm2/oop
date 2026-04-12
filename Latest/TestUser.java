@@ -1401,7 +1401,7 @@ public static String loadSpeakerBio(String username) {
     public static void sale_report() {
 
         System.out.println("\n\t\t----------------------------------------------------------------------------------");
-        System.out.println("\t\t|                                  SALES REPORT             v                     |");
+        System.out.println("\t\t|                                  SALES REPORT                                   |");
         System.out.printf("\t\t|                              Generated    :%-35s |\n", LocalDate.now());
         System.out.println("\t\t----------------------------------------------------------------------------------");
 
