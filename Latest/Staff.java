@@ -1,7 +1,7 @@
 import java.util.List;
 public class Staff extends User{
     private static int total_Checkin_counter=0;
-    private final String role= "Staff";
+    private final String ROLE= "Staff";
     public Staff(){
         super();
     }
@@ -20,7 +20,7 @@ public class Staff extends User{
 
     public String toString(){
             return super.toString()+String.format("|          Position       :  %-31s|\n"+
-                                                  "|          Total Check-In :  %-31d|\n",role,total_Checkin_counter);
+                                                  "|          Total Check-In :  %-31d|\n",ROLE,total_Checkin_counter);
  
 
     }
