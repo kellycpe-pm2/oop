@@ -28,7 +28,7 @@ public class Workshop extends Event {
     private void initializeStatusArrays() {
         for (int i = 0; i < MAX_SPEAKERS; i++) {
             speakerStatus[i] = "pending";
-            rejectionReason[i] = "";
+            rejectionReason[i] = "no";
         }
     }
 
@@ -56,10 +56,10 @@ public class Workshop extends Event {
     public String getRejectionReason(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
             if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
-                return rejectionReason[i] != null ? rejectionReason[i] : "";
+                return rejectionReason[i] != null ? rejectionReason[i] : "no";
             }
         }
-        return "";
+        return "no";
     }
     
     // Add these methods after getRejectionReason() method
@@ -151,7 +151,7 @@ public void setRejectionReason(String speakerName, String reason) {
         }
         speakerNames[speakerCount] = speakerName;
         speakerStatus[speakerCount] = "pending";
-        rejectionReason[speakerCount] = "";
+        rejectionReason[speakerCount] = "no";
         speakerCount++;
         System.out.println("Speaker [" + speakerName
                 + "] assigned to workshop [" + getEventID() + "] successfully.");
@@ -169,7 +169,7 @@ public void setRejectionReason(String speakerName, String reason) {
                 }
                 speakerNames[speakerCount - 1] = null;
                 speakerStatus[speakerCount - 1] = "pending";
-                rejectionReason[speakerCount - 1] = "";
+                rejectionReason[speakerCount - 1] = "no";
                 speakerCount--;
                 System.out.println("Speaker [" + speakerName
                         + "] removed from workshop [" + getEventID() + "] successfully.");
@@ -194,7 +194,7 @@ public void setRejectionReason(String speakerName, String reason) {
                 }
                 speakerNames[i] = newSpeakerName;
                 speakerStatus[i] = "pending";
-                rejectionReason[i] = "";
+                rejectionReason[i] = "no";
                 System.out.println("Speaker [" + oldSpeakerName + "] replaced with ["
                         + newSpeakerName + "] in workshop [" + getEventID() + "] successfully.");
                 return true;
