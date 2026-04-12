@@ -5,7 +5,7 @@ public class Conference extends Event {
     private Session[] sessions;
     private int sessionCount;
     private static final int MAX_SESSIONS = 10;
-    private final String type = "Conference";
+    private final String TYPE = "Conference";
 
     public Conference(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
@@ -132,18 +132,8 @@ public class Conference extends Event {
     // ── Overrides ────────────────────────────────────────────────────────────
 
     @Override
-    public void displayInfo() {
-        System.out.println("=== Conference Info ===");
-        System.out.printf("%-6s %-20s %-12s %-20s %-8s%n",
-                "ID", "Title", "Date", "Venue", "MaxTix");
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println(this.toString());
-        displaySessions();
-    }
-
-    @Override
     public String toString() {
-        return super.toString() + String.format("%-14s│\n", type);
+        return super.toString() + String.format("%-14s│\n", TYPE);
     }
 
     public boolean isConference() {
