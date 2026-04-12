@@ -11,7 +11,6 @@ public abstract class Event {
     private static int eventCounter = 1;
 
     private static String generateEventID() {
-        
         return String.format("E%03d", eventCounter++);
     }
 
