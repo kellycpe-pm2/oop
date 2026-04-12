@@ -20,6 +20,8 @@ public class EventManagementSystem {
     public EventManagementSystem(User[] user, Event[] events, List<Ticket> tickets, Payment[] payments) {
         this.user = user;
         this.events = events;
+        this.eventCount=getCountEvent();
+
         EventManagementSystem.tickets = tickets;
         EventManagementSystem.payments = payments;
 
@@ -96,17 +98,14 @@ public class EventManagementSystem {
         EventManagementSystem.payments = payments;
     }
 
-    // other method
-    public Event[] getActiveEvents() {
-        int total = eventCount;
-        Event[] active = new Event[total];
-        int idx = 0;
-        for (int i = 0; i < total; i++) {
-            if (active[i]!=null)
-                active[idx++] = events[i];
+    public int getCountEvent(){
+        int count=0;
+        for (Event event : events){
+            if(event !=null){
+                count++;
+            }
         }
-
-        return active;
+        return count;
     }
 
     public static int countbooking(){
