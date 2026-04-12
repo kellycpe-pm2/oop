@@ -1,6 +1,6 @@
 public class Attendee extends User{
     // constructor
-    private final String role= "Attendee";
+    private final String ROLE= "Attendee";
     public Attendee(){
         super();
     }
@@ -10,7 +10,7 @@ public class Attendee extends User{
     }
 
     public String toString(){
-            return super.toString()+String.format("║          Position       :  %-31s║\n",role);
+            return super.toString()+String.format("║          Position       :  %-31s║\n",ROLE);
     }
 
     public boolean checkClass(Object o){
