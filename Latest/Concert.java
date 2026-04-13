@@ -19,12 +19,6 @@ public class Concert extends Event {
         initializeStatusArrays();
     }
 
-    // Private constructor used only when loading from file — skips auto-save
-    private Concert(String title, LocalDate date, String venue, int maxTickets, boolean fromFile) {
-        super(title, date, venue, maxTickets);
-        initializeStatusArrays();
-    }
-    
     private void initializeStatusArrays() {
         for (int i = 0; i < MAX_SPEAKERS; i++) {
             speakerStatus[i] = "pending";
