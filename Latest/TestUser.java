@@ -2072,7 +2072,7 @@ public static String loadSpeakerBio(String username) {
                 do {
                     System.out.print("  Session " + (i + 1) + " Time (HHMM 0000-2359): ");
                     times[i] = scan.nextLine();
-                } while (!ems.validationSessionTime(times[i]));
+                } while (!validationSessionTime(times[i]));
             }
 
             Conference conf = new Conference(title, parsedDate, venue, maxTix);
@@ -2288,7 +2288,7 @@ public static String loadSpeakerBio(String username) {
         do {
             System.out.print("Session Time (HHMM 0000-2359): ");
             time = scan.nextLine();
-        } while (!ems.validationSessionTime(time));
+        } while (!validationSessionTime(time));
 
         Session s = conf.createSession(topic, time);
         updateInFile(conf);
@@ -2423,6 +2423,37 @@ public static String loadSpeakerBio(String username) {
                 System.out.println("Error creating speaker file: " + e.getMessage());
             }
         }
+    }
+
+
+
+ // validate session time (must be HHMM format, 0000 - 2359)
+    public static boolean validationSessionTime(String time) {
+        if (time == null || time.trim().isEmpty()) {
+            System.out.println("Error: Session time cannot be empty !");
+            return false;
+        }
+        if (time.trim().length() != 4) {
+            System.out.println("Error: Session time must be 4 digits in HHMM format (e.g. 0900, 1430) !");
+            return false;
+        }
+        for (int i = 0; i < 4; i++) {
+            if (!Character.isDigit(time.trim().charAt(i))) {
+                System.out.println("Error: Session time must contain digits only (e.g. 0900, 1430) !");
+                return false;
+            }
+        }
+        int hh = Integer.parseInt(time.trim().substring(0, 2));
+        int mm = Integer.parseInt(time.trim().substring(2, 4));
+        if (hh < 0 || hh > 23) {
+            System.out.println("Error: Hour must be between 00 and 23 !");
+            return false;
+        }
+        if (mm < 0 || mm > 59) {
+            System.out.println("Error: Minute must be between 00 and 59 !");
+            return false;
+        }
+        return true;
     }
 
     static void loadSpeakersFromUsers(User[] alluser, int totalUsers) {
