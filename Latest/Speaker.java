@@ -35,12 +35,8 @@ public class Speaker extends User {
     }
 
     // ------------------getter-------------------------------
-public String getBio() {
-    return bio;
-}
-
- public Map<String, String> getSessionTopics() {
-        return sessionTopics;
+    public String getBio() {
+        return bio;
     }
 
     public String getUpdatedSessionTopic(String sessionId) {
@@ -59,44 +55,19 @@ public String getBio() {
 
 // ------------------setter-------------------------------
 // Set the total number of speakers (for loading from file)
-public static void setTotalSpeakers(int count) {
-    totalSpeakers = count;
-}
-
-// Set bio at specific index (for file operations)
-    public void setBioAtIndex(String bio) {
-        this.bio= bio;
+    public static void setTotalSpeakers(int count) {
+        totalSpeakers = count;
     }
 
     public void setBio(String bio) {
-    this.bio = bio;
-}
+        this.bio = bio;
+    }
 
     public void setSessionTopics(Map<String, String> sessionTopics) {
         this.sessionTopics = sessionTopics;
     }
-    
-    public void addSessionTopic(String sessionId, String topic) {
-        if (this.sessionTopics == null) {
-            this.sessionTopics = new HashMap<>();
-        }
-        this.sessionTopics.put(sessionId, topic);
-    }
-
-    public String toTableRow() {
-        String shortBio = (bio != null && bio.length() > 30) ? bio.substring(0, 27) + "..." : bio;
-        return String.format("%-15s %-25s %-30s", getUsername(), getEmail(), shortBio);
-    }
 
     // ------------------displayInfo-------------------------------
-    public void displayInfo() {
-        System.out.println("=== Speaker Info ===");
-        System.out.printf("%-15s %-25s %-30s%n", "Username", "Email", "Bio");
-        System.out.println("--------------------------------------------------------------------");
-        
-            System.out.println(toTableRow());
-        
-    }
 
     public void displaySingleInfo() {
         System.out.println("=== Speaker Info ===");
@@ -105,18 +76,6 @@ public static void setTotalSpeakers(int count) {
         System.out.println("Bio: " + getBio());
     }
     // ------------------method-------------------------------
-
-    
-
-    // Find speaker by username from speaker array
-    public static Speaker findSpeakerByUsername(String username, Speaker[] speakerArray, int speakerCount) {
-        for (int i = 0; i < speakerCount; i++) {
-            if (speakerArray[i] != null && speakerArray[i].getUsername().equals(username)) {
-                return speakerArray[i];
-            }
-        }
-        return null;
-    }
 
     // ------------------upload bio-------------------------------
     public boolean uploadBio(String newBio) {
