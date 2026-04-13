@@ -23,14 +23,14 @@ public class TicketType {
     private List<String> earlyBirdSeats;
 
     // constructor
-    public TicketType(String eventId, int totalQuantity, int totalearlyBird,int totalsandrand,int totalvip, int availableQuantity, int availableEarlyBird, int availableStandard, int availableVip,
+    public TicketType(String eventId, int totalQuantity, int totalEarlyBird,int totalStandard,int totalVip, int availableQuantity, int availableEarlyBird, int availableStandard, int availableVip,
             double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart,
             LocalDate salesEnd) {
         this.eventId = eventId;
         this.totalQuantity = totalQuantity;
-        this.quantityOfAllTicketType[0]=totalearlyBird;
-        this.quantityOfAllTicketType[1]=totalsandrand;
-        this.quantityOfAllTicketType[2]=totalvip;
+        this.quantityOfAllTicketType[0]=totalEarlyBird;
+        this.quantityOfAllTicketType[1]=totalStandard;
+        this.quantityOfAllTicketType[2]=totalVip;
         this.availableQuantity = availableQuantity;
         this.availableEarlyBird = availableEarlyBird;
         this.availableStandard = availableStandard;
