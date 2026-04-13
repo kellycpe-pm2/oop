@@ -165,14 +165,15 @@ public class TestUser {
         System.out.println("|                       LOGIN SYSTEM                           |");
         System.out.println("----------------------------------------------------------------");
         do {
-
+            if (logincount > 2) {
+                return false;
+            }
             logincount++;
             System.out.print("\nPlease enter your name: ");
             name = scan.nextLine();
             user.setUserName(name);
-            if (logincount > 2) {
-                return false;
-            }
+
+            
         } while (!validationNoExistName( user, alluser, no));
 
         do {
@@ -257,7 +258,7 @@ public class TestUser {
     public static void accessmenu(User user, User[] alluser, int[] no) {
         // Find the actual stored user object by username
         User storedUser = null;
-        for (int i = 0; i < no[0]; i++) {
+        for (int i = 0; i < ems.getUser_No(); i++) {
             if (alluser[i].hasUser(user.getUsername())) {
                 storedUser = alluser[i];
                 break;
@@ -493,7 +494,7 @@ public static String loadSpeakerBio(String username) {
             return false;
         }
 
-        for (int i = 0; i < existUser.length; i++) {
+        for (int i = 0; i < ems.getUser_No(); i++) {
             if (existUser[i] != null && name.equals(existUser[i].getUsername())) {
                 System.out.println("Error: The Username Has Already Exist ! ");
                 return false;
@@ -635,7 +636,7 @@ public static String loadSpeakerBio(String username) {
         if (validationEmpty(user.getUsername())) {
             return false;
         }
-        for (int j = 0; j < EventManagementSystem.getUser_No(); j++) {
+        for (int j = 0; j < ems.getUser_No(); j++) {
             if (existUser[j] != null && user.equals(existUser[j])) {
                 no[0] = j;
                 // found user
