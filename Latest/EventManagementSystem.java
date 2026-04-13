@@ -91,11 +91,11 @@ public class EventManagementSystem {
         this.events = events;
     }
 
-    public static void setTickets(List<Ticket> tickets) {
+    public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
     }
 
-    public static void setPayment(Payment[] payments) {
+    public void setPayment(Payment[] payments) {
         this.payments = payments;
     }
 
