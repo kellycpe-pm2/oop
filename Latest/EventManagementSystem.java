@@ -115,11 +115,6 @@ public class EventManagementSystem {
         return null;
     }
 
-    // Total number of events across all types
-    public int getEventCount() {
-        return eventCount;
-    }
-
     // ------------------------------------------------------------------------Get
     // event end here
 
@@ -355,6 +350,8 @@ public class EventManagementSystem {
 
         Ticket ticket = new Ticket(tt, current_user.getUsername(), ticketTypeName, true, eventId, ticketCount,
                 payment.getBookingId());
+        tickets.add(ticket);
+        payments[tickets.size()-1]=payment;
         return ticket;
     }
 
