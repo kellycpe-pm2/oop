@@ -246,15 +246,6 @@ public void setRejectionReason(String speakerName, String reason) {
     }
 
     @Override
-    public void displayInfo() {
-        System.out.println("=== Workshop Info ===");
-        System.out.printf("%-6s %-20s %-12s %-20s %-8s%n",
-                "ID", "Title", "Date", "Venue", "MaxTix");
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println(this.toString());
-        displaySpeakers();
-    }
-
     public boolean isWorkshop() {
         return true;
     }
