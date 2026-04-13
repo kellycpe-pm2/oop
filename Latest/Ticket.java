@@ -19,9 +19,12 @@ public class Ticket {
     private static int ticketCount=0;
 
 
-    // constructor
+    // no args constructor
+    public Ticket(){
+        this(" ", true, " ", " ", " ", 0.0, " ", " ", LocalDate.now(), " ");
+    }
+    
     // Constructor for creating NEW ticket
-
     public Ticket(TicketType tt, String buyerName, String ticketType, boolean status, String eventId, int ticketCount,String bookingId) {
         this.tt = tt;
         this.buyerName =buyerName;
