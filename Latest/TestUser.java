@@ -38,7 +38,7 @@ public class TestUser {
     static int ticketCount = 0;
     static int bookingNo;
 
-    // in-memory lists â€” loaded from / saved to JSON files
+    // in-memory lists loaded from / saved to JSON files
     static List<Concert> concerts = new java.util.ArrayList<>();
     static List<Workshop> workshops = new java.util.ArrayList<>();
     static List<Conference> conferences = new java.util.ArrayList<>();
@@ -1676,10 +1676,10 @@ public static String loadSpeakerBio(String username) {
             writer.write("\t\t----------------------------------------------------------------------------------\n");
 
             writer.close();
-            System.out.println("\n\t\tâœ… Sales Report exported successfully!");
+            System.out.println("\n\t\t Sales Report exported successfully!");
             System.out.println("\t\t   File: " + filename);
         } catch (IOException e) {
-            System.out.println("\t\tâŒ Error exporting sales report: " + e.getMessage());
+            System.out.println("\t\t Error exporting sales report: " + e.getMessage());
         }
         waitForEnter();
     }
@@ -1836,7 +1836,7 @@ public static String loadSpeakerBio(String username) {
             System.out.println("\t\t   Sales Report: " + salesFilename);
             System.out.println("\t\t   Event Report: " + eventFilename);
         } catch (IOException e) {
-            System.out.println("\t\tâŒ Error exporting reports: " + e.getMessage());
+            System.out.println("\t\t Error exporting reports: " + e.getMessage());
         }
         waitForEnter();
     }
@@ -2058,7 +2058,7 @@ public static String loadSpeakerBio(String username) {
             }
 
         } else {
-            // Conference â€” ask how many sessions to create right away
+            // Conference ask how many sessions to create right away
             System.out.print("How many sessions to create now? (0 to skip): ");
             int numSessions = readInt();
 
@@ -3043,7 +3043,7 @@ public static void loadAllSpeakerBios() {
                     speakerCol = w.getSpeakers()[0];
                 }
             }
-            // Conference: speakers belong to individual sessions â€” leave column empty
+            // Conference: speakers belong to individual sessions leave column empty
             // Truncate name if too long to avoid breaking column alignment
             if (speakerCol.length() > 12) {
                 speakerCol = speakerCol.substring(0, 9) + "...";
@@ -3218,7 +3218,7 @@ private static void writeConferenceRecord(Writer writer, String eventID, String 
                 writer.write(usernames[sp] + "\n");
             }
             
-            // âœ… NEW: Save speaker status and rejection reason for each speaker
+            // NEW: Save speaker status and rejection reason for each speaker
             for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
                 writer.write(session.getSpeakerStatus(usernames[sp]) + "\n");
                 writer.write(session.getRejectionReason(usernames[sp]) + "\n");
@@ -3245,7 +3245,7 @@ private static void writeConferenceRecord(Writer writer, String eventID, String 
 
     /**
      * Reads all conferences from "Conference.json".
-     * Session speaker slots are restored as plain usernames (String) â€” No Speaker
+     * Session speaker slots are restored as plain usernames (String) No Speaker
      * object is constructed.
      */
 public static List<Conference> readConferenceData() {
@@ -4084,7 +4084,7 @@ public static List<Workshop> readWorkshopData() {
                     String perks = lines.get(i + 12);
                     LocalDate salesStart = LocalDate.parse(lines.get(i + 13));
                     LocalDate salesEnd = LocalDate.parse(lines.get(i + 14));
-                    // earlyBirdEnd is not stored â€” constructor computes it as
+                    // earlyBirdEnd is not stored constructor computes it as
                     // salesStart.plusDays(1)
 
                     TicketType tt = new TicketType(eventId, totalQuantity, quantityEarlyBird, quantityStandard,
@@ -4253,7 +4253,7 @@ static void manageAssignedSessions(Speaker speaker) {
 
     boolean continueManaging = true;
     while (continueManaging) {
-        System.out.println("\n-----------------------------------------------------------------------------------â•—");
+        System.out.println("\n------------------------------------------------------------------------------------—");
         System.out.println("|                         YOUR PENDING INVITATIONS                                 |");
         System.out.println("|----------------------------------------------------------------------------------|");
         System.out.println("| No |    Type      |         Event Name       |            Details                |");
@@ -4283,7 +4283,7 @@ static void manageAssignedSessions(Speaker speaker) {
                     (i + 1), type, eventName, details);
         }
         
-        System.out.println("-----â•©--------------â•©--------------------------â•©------------------------------------");
+        System.out.println("---------------------------------------------------------------------------------------");
         System.out.println("\n0. Back to Main Menu");
         System.out.print("Select invitation number to respond (or 0 to exit): ");
         
@@ -4302,7 +4302,7 @@ static void manageAssignedSessions(Speaker speaker) {
         } else if (choice >= 1 && choice <= pendingInvitations.size()) {
             Object selected = pendingInvitations.get(choice - 1);
             
-            System.out.println("\n---------------------------------------------------------------------------------â•—");
+            System.out.println("\n----------------------------------------------------------------------------------—");
             System.out.println("|                           INVITATION DETAILS                                    |");
             System.out.println("----------------------------------------------------------------------------------");
             
@@ -4371,7 +4371,7 @@ static void manageAssignedSessions(Speaker speaker) {
                     ((Workshop) selected).rejectInvitation(speaker.getUsername(), reason);
                     storeWorkshopData(workshops);
                 }
-                System.out.println("\nâœ— You have rejected this invitation.");
+                System.out.println("\n-— You have rejected this invitation.");
                 System.out.println("Reason: " + reason);
             } else {
                 System.out.println("Invalid choice. Please enter 1 or 2.");
