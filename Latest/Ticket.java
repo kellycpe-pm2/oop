@@ -170,16 +170,6 @@ public class Ticket {
     }
 }
 
-
-    public TicketType findTicketTypeById(TicketType[] ticketTypes, String eventId) {
-        for (TicketType tt : ticketTypes) {
-            if (tt != null &&  tt.getEventId().equals(eventId)) {
-                return tt;
-            }
-        }
-        return null;
-    }
-
     public String toString(){
                 return String.format(
                              "║          Booking ID     :  %-31s║\n"+
