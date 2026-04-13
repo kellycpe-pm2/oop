@@ -14,7 +14,7 @@ public class Ticket {
     private String buyerName;
     private String ticketType;
     private String bookingId;
-    String perks;
+    private String perks;
     private LocalDate purchaseDate;
     private static int ticketCount=0;
 
