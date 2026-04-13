@@ -69,8 +69,6 @@ public abstract class Event {
     }
 
     // abstract method — subclasses must implement
-    public abstract void displayInfo();
-    
     public abstract boolean isConcert();
 
     public abstract boolean isConference();
