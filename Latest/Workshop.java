@@ -18,12 +18,6 @@ public class Workshop extends Event {
         super(title, date, venue, maxTickets);
         initializeStatusArrays();
     }
-
-    // Private constructor used only when loading from file — skips auto-save
-    private Workshop(String title, LocalDate date, String venue, int maxTickets, boolean fromFile) {
-        super(title, date, venue, maxTickets);
-        initializeStatusArrays();
-    }
     
     private void initializeStatusArrays() {
         for (int i = 0; i < MAX_SPEAKERS; i++) {
