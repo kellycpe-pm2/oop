@@ -3,14 +3,15 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class EventManagementSystem {
-    private static List<Ticket> tickets = new java.util.ArrayList<>();
-    private static Payment[] payments = new Payment[100];
-    private static final int MAX_EVENTS = 300;
+ 
+    private List<Ticket> tickets = new java.util.ArrayList<>();
+    private Payment[] payments = new Payment[100];
+    private final int MAX_EVENTS = 300;
     private Event[] events = new Event[MAX_EVENTS];
     
     private int eventCount = 0;
 
-    private static int user_no = 0;
+    private int user_no = 0;
     private User current_user;
     private User[] user = new User[400];
 
@@ -22,10 +23,10 @@ public class EventManagementSystem {
         this.events = events;
         this.eventCount=getCountEvent();
 
-        EventManagementSystem.tickets = tickets;
-        EventManagementSystem.payments = payments;
+        this.tickets = tickets;
+        this.payments = payments;
 
-        EventManagementSystem.user_no = countUser_Num();
+        this.user_no = countUser_Num();
         //count the how many booking no have already store in the file
         //no do the payment file, so use the ticket to count , because the total ticket is equals to total booking
         Payment.setbookingNo(countbooking());
@@ -50,16 +51,16 @@ public class EventManagementSystem {
         return current_user;
     }
 
-    public static Payment[] getPayments() {
-        return EventManagementSystem.payments;
+    public Payment[] getPayments() {
+        return this.payments;
     }
 
-    public static List<Ticket> getTicket() {
-        return tickets;
+    public List<Ticket> getTicket() {
+        return this.tickets;
     }
 
-    public static int getUser_No(){
-        return user_no;
+    public int getUser_No(){
+        return this.user_no;
     }
 
     public void setCuurent_User(Object current_User, int type) {
@@ -91,11 +92,11 @@ public class EventManagementSystem {
     }
 
     public static void setTickets(List<Ticket> tickets) {
-        EventManagementSystem.tickets = tickets;
+        this.tickets = tickets;
     }
 
     public static void setPayment(Payment[] payments) {
-        EventManagementSystem.payments = payments;
+        this.payments = payments;
     }
 
     public int getCountEvent(){
@@ -108,7 +109,7 @@ public class EventManagementSystem {
         return count;
     }
 
-    public static int countbooking(){
+    public int countbooking(){
         int count=0;
         for (Ticket ticket : tickets){
             if (ticket !=null){
@@ -159,7 +160,7 @@ public class EventManagementSystem {
     // ==================================User part==============================
     public void addNewUser(User user) {
         this.user[user_no] = user;
-        user_no++;
+        this.user_no++;
 
     }
 
@@ -537,7 +538,7 @@ public class EventManagementSystem {
         }
         if (o instanceof EventManagementSystem) {
             return true;
-        } else {
+        }else{
             return false;
         }
     }
