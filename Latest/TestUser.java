@@ -3636,8 +3636,7 @@ public static List<Workshop> readWorkshopData() {
         Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, p, ticketCount);
 
         if (ticket != null) {
-            scan.nextLine();
-            System.out.println("\nPurchase completed successfully!");
+            System.out.println("\n\nPurchase completed successfully!");
             scan.nextLine();
             ticket.displayTicketDetails();
             tickets.add(ticket);
