@@ -10,11 +10,21 @@ public class Staff extends User{
         super(username, password, email, contactNo);
     }
 
+
+    public static int getTotal_Checkin_counter(){
+        return Staff.total_Checkin_counter;
+    }
+
     public static void increase_total_Checkin_counter(){
         Staff.total_Checkin_counter++;
     }
     
-    public static int gettotal_Checkin_counter(){
+    public static int checkTotal_CheckIn( List <Ticket> tickets){
+        for (Ticket ticket : tickets){
+           if (ticket != null && !ticket.getStatus()) {
+                Staff.total_Checkin_counter++;
+            }
+        }
         return Staff.total_Checkin_counter;
     }
 
@@ -23,14 +33,6 @@ public class Staff extends User{
                                                   "|          Total Check-In :  %-31d|\n",ROLE,total_Checkin_counter);
  
 
-    }
-    public static int checkTotal_CheckIn( List <Ticket> tickets){
-        for (Ticket ticket : tickets){
-           if (ticket != null && !ticket.getStatus()) {
-                Staff.total_Checkin_counter++;
-            }
-        }
-        return Staff.total_Checkin_counter;
     }
 
     public boolean checkClass(Object o) {
