@@ -122,12 +122,6 @@ public class EventManagementSystem {
 
     // ------------------------------------------------------------------------Get
     // event end here
-    public boolean validationInputTicketType(int choice) {
-        if (choice == 1 || choice == 2 || choice == 3) {
-            return true;
-        }
-        return false;
-    }
 
     // ==================================User part==============================
     public void addNewUser(User user) {
@@ -189,35 +183,6 @@ public class EventManagementSystem {
         } else {
             return true;
         }
-    }
-
-    // validate session time (must be HHMM format, 0000 - 2359)
-    public boolean validationSessionTime(String time) {
-        if (time == null || time.trim().isEmpty()) {
-            System.out.println("Error: Session time cannot be empty !");
-            return false;
-        }
-        if (time.trim().length() != 4) {
-            System.out.println("Error: Session time must be 4 digits in HHMM format (e.g. 0900, 1430) !");
-            return false;
-        }
-        for (int i = 0; i < 4; i++) {
-            if (!Character.isDigit(time.trim().charAt(i))) {
-                System.out.println("Error: Session time must contain digits only (e.g. 0900, 1430) !");
-                return false;
-            }
-        }
-        int hh = Integer.parseInt(time.trim().substring(0, 2));
-        int mm = Integer.parseInt(time.trim().substring(2, 4));
-        if (hh < 0 || hh > 23) {
-            System.out.println("Error: Hour must be between 00 and 23 !");
-            return false;
-        }
-        if (mm < 0 || mm > 59) {
-            System.out.println("Error: Minute must be between 00 and 59 !");
-            return false;
-        }
-        return true;
     }
 
     public boolean validationInputEventId(String eventId) {
