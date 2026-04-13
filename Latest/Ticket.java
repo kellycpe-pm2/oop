@@ -131,7 +131,7 @@ public class Ticket {
         System.out.println("Booking ID        : " + bookingId);
         System.out.println("Event ID          : " + eventId);
         System.out.println("Seat Number       : " + seatNumber);
-        System.out.println("Ticket Type       :" + ticketType);
+        System.out.println("Ticket Type       : " + ticketType);
         System.out.println("Price             : " + totalAmount);
         System.out.println("Perks             : " + perks);
         System.out.println("Purchase Date     : " + purchaseDate);
