@@ -3655,7 +3655,7 @@ public static List<Workshop> readWorkshopData() {
         System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %16s |%n",
                 "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Available Ticket");
         System.out.println(
-                "  â”œ----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|------------------|");
+                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|------------------|");
         for (int i = 0; i < eventCount; i++) {
             Event e = events[i];
             String type = e.getClass().getSimpleName();
@@ -3760,7 +3760,7 @@ public static List<Workshop> readWorkshopData() {
                 String ssdate;
                 LocalDate salesStartDate;
                 do {
-                    System.out.print("Sales Start Date (YYYY-MM-DD) : ");
+                    System.out.print("\nSales Start Date (YYYY-MM-DD) : ");
                     ssdate = scan.nextLine();
                     salesStartDate = ems.validationSalesStartDate(ssdate,
                             ems.findEventById(tt.getEventId()).getDate());
@@ -3771,7 +3771,7 @@ public static List<Workshop> readWorkshopData() {
                 String sedate;
                 LocalDate salesEndDate;
                 do {
-                    System.out.print("Sales End Date (YYYY-MM-DD) : ");
+                    System.out.print("\nSales End Date (YYYY-MM-DD) : ");
                     sedate = scan.nextLine();
                     salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(),
                             ems.getEventById(tt.getEventId()).getDate());
