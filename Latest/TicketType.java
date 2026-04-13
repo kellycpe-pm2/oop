@@ -23,6 +23,10 @@ public class TicketType {
     private List<String> earlyBirdSeats;
 
     // constructor
+    public TicketType(){
+        this(" ", 0, 0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, " ", null, null);
+    }
+    
     public TicketType(String eventId, int totalQuantity, int totalEarlyBird,int totalStandard,int totalVip, int availableQuantity, int availableEarlyBird, int availableStandard, int availableVip,
             double priceEarlyBird, double priceStandard, double priceVip, String perks, LocalDate salesStart,
             LocalDate salesEnd) {
