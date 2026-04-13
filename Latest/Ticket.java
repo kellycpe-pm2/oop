@@ -21,7 +21,7 @@ public class Ticket {
 
     // no args constructor
     public Ticket(){
-        this(" ", true, " ", " ", " ", 0.0, " ", " ", LocalDate.now(), " ");
+        this(" ", true, " ", " ", " ", 0.0, " ", " ", null, " ");
     }
     
     // Constructor for creating NEW ticket
