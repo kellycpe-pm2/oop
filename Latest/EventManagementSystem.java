@@ -29,7 +29,7 @@ public class EventManagementSystem {
         this.user_no = countUser_Num();
         //count the how many booking no have already store in the file
         //no do the payment file, so use the ticket to count , because the total ticket is equals to total booking
-        Payment.setbookingNo(countbooking());
+        Payment.setbookingNo(countBookingNo());
 
     }
 
@@ -39,10 +39,6 @@ public class EventManagementSystem {
 
     // Getter Method
 
-    public Event[] getEvents() {
-        return events;
-    }
-
     public User[] getUsers() {
         return user;
     }
@@ -51,19 +47,11 @@ public class EventManagementSystem {
         return current_user;
     }
 
-    public Payment[] getPayments() {
-        return this.payments;
-    }
-
-    public List<Ticket> getTicket() {
-        return this.tickets;
-    }
-
     public int getUser_No(){
         return this.user_no;
     }
 
-    public void setCuurent_User(Object current_User, int type) {
+    public void setCuurent_User(User current_User, int type) {
         switch (type) {
             case 1:
                 this.current_user = (Organizer) current_User;
@@ -83,22 +71,6 @@ public class EventManagementSystem {
 
     }
 
-    public void setUsers(User[] alluser) {
-        this.user = alluser;
-    }
-
-    public void setEvents(Event[] events) {
-        this.events = events;
-    }
-
-    public void setTickets(List<Ticket> tickets) {
-        this.tickets = tickets;
-    }
-
-    public void setPayment(Payment[] payments) {
-        this.payments = payments;
-    }
-
     public int getCountEvent(){
         int count=0;
         for (Event event : events){
@@ -109,7 +81,7 @@ public class EventManagementSystem {
         return count;
     }
 
-    public int countbooking(){
+    public int countBookingNo(){
         int count=0;
         for (Ticket ticket : tickets){
             if (ticket !=null){
@@ -397,95 +369,7 @@ public class EventManagementSystem {
         return false;
     }
 
-    // ticket type part
-    // validate the quantity set
-    public boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard,
-            int quantityVip) {
-        if (totalQuantity == quantityEarlyBird + quantityStandard + quantityVip) {
-            return true;
-        } else {
-            System.out.println(
-                    "Sum of ticket type quantities not equal to totalQuantity. Please reset the quantity of ticket.");
-            return false;
-        }
-    }
-
-    // validate price
-    public boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
-        if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
-            System.out.println("Ticket prices cannot be negative.");
-            return false;
-        }
-
-        if (priceVip <= priceStandard) {
-            System.out.println(
-                    "VIP price (RM" + priceVip + ") should be greater than Standard price (RM" + priceStandard + ").");
-            return false;
-        }
-
-        if (priceStandard <= priceEarlyBird) {
-            System.out.println("Standard price (RM" + priceStandard + ") should be greater than Early Bird price (RM"
-                    + priceEarlyBird + ").");
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean validationPerks(String perks) {
-        if (perks == null || perks.trim().isEmpty()) {
-            System.out.println("Error: Perks cannot be empty !");
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public LocalDate validationSalesStartDate(String ssdate, LocalDate eventDate) {
-        if (ssdate == null || ssdate.trim().isEmpty()) {
-            System.out.println("Error: Sales Start Date cannot be empty !");
-            return null;
-        }
-        try {
-            LocalDate parsedDate = LocalDate.parse(ssdate.trim());
-            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
-                System.out.println("Error: Sales Start Date must before event date !");
-                return null;
-            } else if (parsedDate.isBefore(LocalDate.now())) {
-                System.out.println("Error: Sales Start Date must in the future !");
-                return null;
-            }
-            return parsedDate;
-        } catch (DateTimeParseException e) {
-            System.out.println("Error: Date format must be YYYY-MM-DD !");
-            return null;
-        }
-    }
-
-    public LocalDate validationSalesEndDate(String sedate, LocalDate salesStartDate, LocalDate eventDate) {
-        if (sedate == null || sedate.trim().isEmpty()) {
-            System.out.println("Error: Sales End Date cannot be empty !");
-            return null;
-        }
-        try {
-            LocalDate parsedDate = LocalDate.parse(sedate.trim());
-            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
-                System.out.println("Error: Sales End Date must before event date !");
-                return null;
-            } else if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)) {
-                System.out.println("Error: Sales End Date must after sales start date !");
-                return null;
-            } else if (parsedDate.isBefore(LocalDate.now())) {
-                System.out.println("Error: Sales End Date must in the future !");
-                return null;
-            }
-            return parsedDate;
-        } catch (DateTimeParseException e) {
-            System.out.println("Error: Date format must be YYYY-MM-DD !");
-            return null;
-        }
-    }
-
+ 
     public Event findEventById(String eventId) {
         for (Event e : this.events) {
             if (e != null && e.hasEvent(eventId)) {
@@ -507,22 +391,6 @@ public class EventManagementSystem {
         Ticket ticket = new Ticket(tt, current_user.getUsername(), ticketTypeName, true, eventId, ticketCount,
                 payment.getBookingId());
         return ticket;
-    }
-
-    public boolean validationPurchaseTicket(TicketType tt, String ticketTypeName) {
-        if (LocalDate.now().isAfter(tt.getSalesEnd()) || LocalDate.now().isBefore(tt.getSalesStart())) {
-            System.out
-                    .println("Error: Ticket cannot be purchased because the sales period haven't start/already over!");
-            return false;
-        } else if (ticketTypeName.toLowerCase().equals("earlybird")) {
-            if (LocalDate.now().isAfter(tt.getEarlyBirdEnd())) {
-                System.out.println("Error: Early Bird ticket cannot be purchased due to period is over!");
-                return false;
-            }
-            return true;
-        } else {
-            return true;
-        }
     }
 
     public String toString() {
