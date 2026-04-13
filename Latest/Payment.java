@@ -5,7 +5,7 @@ public class Payment{
     private String bookingId;
     private static int bookingNo;
     private String eventId;
-    double paymentAmount;
+    private double paymentAmount;
     private LocalDate paymentDate;
 
     public Payment(Attendee a, String eventId, double paymentAmount){
