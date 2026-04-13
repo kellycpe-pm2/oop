@@ -172,7 +172,7 @@ public class TestUser {
             logincount++;
             System.out.print("\nPlease enter your name: ");
             name = scan.nextLine();
-            user.setUserName(name);
+            user.setUsername(name);
 
             
         } while (!validationNoExistName( user, alluser, no));
@@ -183,7 +183,7 @@ public class TestUser {
             password = scan.nextLine();
 
         } while (!validationLoginPwd(password, alluser, no));
-        user.setUserName(name);
+        user.setUsername(name);
         System.out.println("------------------------------------------------------------");
         return true;
     }
@@ -244,7 +244,7 @@ public class TestUser {
         System.out.println("------------------------------------------------------------");
 
         // create and store data
-        user.setUserName(name);
+        user.setUsername(name);
         createAccount(no, user, alluser, name, password, email, contactNo);
         storeUserData(name, password, email, contactNo);
 
@@ -644,7 +644,7 @@ public static String loadSpeakerBio(String username) {
                 return true;
             }
         }
-        user.setUserName(null);
+        user.setUsername(null);
         System.out.println("Error: The Username Is not Matched ! ");
 
         return false;
@@ -814,7 +814,7 @@ public static String loadSpeakerBio(String username) {
                 boolean ticketFound = false;
                 for (Ticket ticket : tickets) {
 
-                    usertemp.setUserName(ticket.getBuyerName());
+                    usertemp.setUsername(ticket.getBuyerName());
 
                     if (ticket.hasTicket(ticketId)) {
                         ticketFound = true;
@@ -857,7 +857,7 @@ public static String loadSpeakerBio(String username) {
                     if (ticket.getBookingId().equals(bookingId)) {
                         bookingFound = true;
                         currentTicket = ticket;
-                        usertemp.setUserName(ticket.getBuyerName());
+                        usertemp.setUsername(ticket.getBuyerName());
                         // Find attendee by buyer name
                         for (int i = 0; i < no[2]; i++) {
                             if (alluser[i].equals(usertemp)) {
@@ -944,7 +944,7 @@ public static String loadSpeakerBio(String username) {
         System.out.println("\t\t|                           CHECK-IN LIST                                        |");
         System.out.printf("\t\t|                               %-48s |\n", LocalDate.now());
         System.out.println("\t\t----------------------------------------------------------------------------------");
-        if (Staff.gettotal_Checkin_counter() == 0) {
+        if (Staff.getTotal_Checkin_counter() == 0) {
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
             System.out.println(
@@ -962,7 +962,7 @@ public static String loadSpeakerBio(String username) {
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
-                    usertemp.setUserName(ticket.getBuyerName());
+                    usertemp.setUsername(ticket.getBuyerName());
 
                     if (alluser.length == 0) {
                         for (User user : alluser) {
@@ -1096,7 +1096,7 @@ public static String loadSpeakerBio(String username) {
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
-                    usertamp.setUserName(ticket.getBuyerName());
+                    usertamp.setUsername(ticket.getBuyerName());
 
                     if (alluser.length == 0) {
                         for (User user : alluser) {
@@ -1135,7 +1135,7 @@ public static String loadSpeakerBio(String username) {
             waitForEnter();
             waitForEnter();
 
-            int checkinRate = (Staff.gettotal_Checkin_counter() * 100) / tickets.size();
+            int checkinRate = (Staff.getTotal_Checkin_counter() * 100) / tickets.size();
             String rateText = checkinRate + "%";
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
@@ -1148,7 +1148,7 @@ public static String loadSpeakerBio(String username) {
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Check-ins          :             %-32d |\n",
-                    Staff.gettotal_Checkin_counter());
+                    Staff.getTotal_Checkin_counter());
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Attendees          :             %-32d |\n", tickets.size());
@@ -1589,7 +1589,7 @@ public static String loadSpeakerBio(String username) {
             Attendee usertemp = new Attendee();
             int no = 1;
             for (Ticket ticket : tickets) {
-                usertemp.setUserName(ticket.getBuyerName());
+                usertemp.setUsername(ticket.getBuyerName());
                 if (ticket != null) {
                     for (User user : alluser) {
                         if (user.equals(usertemp)) {
