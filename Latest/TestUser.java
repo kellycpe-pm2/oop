@@ -12,6 +12,7 @@ import java.util.Map;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class TestUser {
@@ -1962,7 +1963,7 @@ public static String loadSpeakerBio(String username) {
             } catch (Exception e) {
                 System.out.println("Invalid input. Please retry.");
             }
-        } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
+        } while (!validationQuantityTicket(maxTix, qeb, qsd, qvip));
 
         double peb = 0.0;
         double psd = 0.0;
@@ -1981,7 +1982,7 @@ public static String loadSpeakerBio(String username) {
                 pvip = scan.nextDouble();
                 scan.nextLine();
 
-                if (ems.validationPrice(peb, psd, pvip)) {
+                if (validationPrice(peb, psd, pvip)) {
                     validInput = true;
                 }
             } catch (Exception e) {
@@ -1994,14 +1995,14 @@ public static String loadSpeakerBio(String username) {
         do {
             System.out.print("\nPerks Provided: (if no just enter -) ");
             perks = scan.nextLine();
-        } while (!ems.validationPerks(perks));
+        } while (!validationPerks(perks));
 
         String ssdate;
         LocalDate salesStartDate;
         do {
             System.out.print("Sales Start Date (YYYY-MM-DD) : ");
             ssdate = scan.nextLine();
-            salesStartDate = ems.validationSalesStartDate(ssdate, parsedDate);
+            salesStartDate = validationSalesStartDate(ssdate, parsedDate);
         } while (salesStartDate == null);
 
         String sedate;
@@ -2009,7 +2010,7 @@ public static String loadSpeakerBio(String username) {
         do {
             System.out.print("Sales End Date (YYYY-MM-DD) : ");
             sedate = scan.nextLine();
-            salesEndDate = ems.validationSalesEndDate(sedate, salesStartDate, parsedDate);
+            salesEndDate = validationSalesEndDate(sedate, salesStartDate, parsedDate);
         } while (salesEndDate == null);
 
         System.out.println("Ticket type created.");
@@ -3569,7 +3570,7 @@ public static List<Workshop> readWorkshopData() {
             }
         }
 
-        if (!ems.validationPurchaseTicket(tt, ticketType)) {
+        if (!validationPurchaseTicket(tt, ticketType)) {
             System.out.println("Sorry, the ticket type is not available for this period.");
             return;
         }
@@ -3724,7 +3725,7 @@ public static List<Workshop> readWorkshopData() {
                     } catch (Exception e) {
                         System.out.println("Invalid input. Please retry.");
                     }
-                } while (!ems.validationQuantityTicket(maxTix, qeb, qsd, qvip));
+                } while (!validationQuantityTicket(maxTix, qeb, qsd, qvip));
                 tt.setTotalQuantity(maxTix, qeb, qsd, qvip);
                 tt.updateQuantityWithSoldTickets(qeb, qsd, qvip);
                 break;
@@ -3741,7 +3742,7 @@ public static List<Workshop> readWorkshopData() {
                         psd = Double.parseDouble(scan.nextLine().trim());
                         System.out.print("Price Vip (RM):");
                         pvip = Double.parseDouble(scan.nextLine().trim());
-                        if (ems.validationPrice(peb, psd, pvip))
+                        if (validationPrice(peb, psd, pvip))
                             validPrice = true;
                     } catch (Exception e) {
                         System.out.println("Invalid input. Please enter numbers only.");
@@ -3754,7 +3755,7 @@ public static List<Workshop> readWorkshopData() {
                 do {
                     System.out.print("\nPerks Provided: (if no just enter -) ");
                     perks = scan.nextLine();
-                } while (!ems.validationPerks(perks));
+                } while (!validationPerks(perks));
                 tt.setPerks(perks);
                 break;
             case 4:
@@ -3763,7 +3764,7 @@ public static List<Workshop> readWorkshopData() {
                 do {
                     System.out.print("\nSales Start Date (YYYY-MM-DD) : ");
                     ssdate = scan.nextLine();
-                    salesStartDate = ems.validationSalesStartDate(ssdate,
+                    salesStartDate = validationSalesStartDate(ssdate,
                             ems.findEventById(tt.getEventId()).getDate());
                 } while (salesStartDate == null);
                 tt.setSalesStart(salesStartDate);
@@ -3774,7 +3775,7 @@ public static List<Workshop> readWorkshopData() {
                 do {
                     System.out.print("\nSales End Date (YYYY-MM-DD) : ");
                     sedate = scan.nextLine();
-                    salesEndDate = ems.validationSalesEndDate(sedate, tt.getSalesStart(),
+                    salesEndDate = validationSalesEndDate(sedate, tt.getSalesStart(),
                             ems.getEventById(tt.getEventId()).getDate());
                 } while (salesEndDate == null);
                 tt.setSalesEnd(salesEndDate);
@@ -3853,7 +3854,7 @@ public static List<Workshop> readWorkshopData() {
     }
 
     // create TicketType file
-    public void createTicektTypeFile() {
+    public static void createTicektTypeFile() {
         try {
             File ttFile = new File("TicketType.json");
             if (ttFile.createNewFile()) {
@@ -3864,6 +3865,113 @@ public static List<Workshop> readWorkshopData() {
             System.out.println("Error creating ticket type file: " + e.getMessage());
         }
     }
+
+    public static boolean validationPurchaseTicket(TicketType tt, String ticketTypeName) {
+        if (LocalDate.now().isAfter(tt.getSalesEnd()) || LocalDate.now().isBefore(tt.getSalesStart())) {
+            System.out
+                    .println("Error: Ticket cannot be purchased because the sales period haven't start/already over!");
+            return false;
+        } else if (ticketTypeName.toLowerCase().equals("earlybird")) {
+            if (LocalDate.now().isAfter(tt.getEarlyBirdEnd())) {
+                System.out.println("Error: Early Bird ticket cannot be purchased due to period is over!");
+                return false;
+            }
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+
+       // ticket type part
+    // validate the quantity set
+    public static boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard,
+            int quantityVip) {
+        if (totalQuantity == quantityEarlyBird + quantityStandard + quantityVip) {
+            return true;
+        } else {
+            System.out.println(
+                    "Sum of ticket type quantities not equal to totalQuantity. Please reset the quantity of ticket.");
+            return false;
+        }
+    }
+
+    // validate price
+    public static boolean validationPrice(double priceEarlyBird, double priceStandard, double priceVip) {
+        if (priceEarlyBird < 0 || priceStandard < 0 || priceVip < 0) {
+            System.out.println("Ticket prices cannot be negative.");
+            return false;
+        }
+
+        if (priceVip <= priceStandard) {
+            System.out.println(
+                    "VIP price (RM" + priceVip + ") should be greater than Standard price (RM" + priceStandard + ").");
+            return false;
+        }
+
+        if (priceStandard <= priceEarlyBird) {
+            System.out.println("Standard price (RM" + priceStandard + ") should be greater than Early Bird price (RM"
+                    + priceEarlyBird + ").");
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean validationPerks(String perks) {
+        if (perks == null || perks.trim().isEmpty()) {
+            System.out.println("Error: Perks cannot be empty !");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static LocalDate validationSalesStartDate(String ssdate, LocalDate eventDate) {
+        if (ssdate == null || ssdate.trim().isEmpty()) {
+            System.out.println("Error: Sales Start Date cannot be empty !");
+            return null;
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(ssdate.trim());
+            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
+                System.out.println("Error: Sales Start Date must before event date !");
+                return null;
+            } else if (parsedDate.isBefore(LocalDate.now())) {
+                System.out.println("Error: Sales Start Date must in the future !");
+                return null;
+            }
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Date format must be YYYY-MM-DD !");
+            return null;
+        }
+    }
+
+    public static LocalDate validationSalesEndDate(String sedate, LocalDate salesStartDate, LocalDate eventDate) {
+        if (sedate == null || sedate.trim().isEmpty()) {
+            System.out.println("Error: Sales End Date cannot be empty !");
+            return null;
+        }
+        try {
+            LocalDate parsedDate = LocalDate.parse(sedate.trim());
+            if (parsedDate.isAfter(eventDate) || parsedDate.isEqual(eventDate)) {
+                System.out.println("Error: Sales End Date must before event date !");
+                return null;
+            } else if (parsedDate.isBefore(salesStartDate) || parsedDate.isEqual(salesStartDate)) {
+                System.out.println("Error: Sales End Date must after sales start date !");
+                return null;
+            } else if (parsedDate.isBefore(LocalDate.now())) {
+                System.out.println("Error: Sales End Date must in the future !");
+                return null;
+            }
+            return parsedDate;
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Date format must be YYYY-MM-DD !");
+            return null;
+        }
+    }
+
 
     // Reads all ticket type from "TicketType.json"
     public static List<TicketType> readTicektTypeData() {
