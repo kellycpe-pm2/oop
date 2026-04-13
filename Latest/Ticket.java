@@ -58,25 +58,6 @@ public class Ticket {
         this.bookingId=bookingId;
     }
 
-
-    public boolean validationTicket() {
-
-        if (!tt.reduceQuantity(ticketType)) {
-            System.out.println("No tickets available for ticket type: " + ticketType);
-            return false;
-        }
-
-        this.seatNumber = tt.getSeat(ticketType);
-        if (seatNumber == null) {
-            System.out.println("No seats available for TicketType: " + ticketType);
-            return false;
-        }
-
-        this.totalAmount = tt.getPrice(ticketType);
-
-        return true; // success
-    }
-
     public double getTotalAmount(){
         return this.totalAmount;
     }
@@ -124,7 +105,24 @@ public class Ticket {
         this.status=status;
     }
 
+    public boolean validationTicket() {
 
+        if (!tt.reduceQuantity(ticketType)) {
+            System.out.println("No tickets available for ticket type: " + ticketType);
+            return false;
+        }
+
+        this.seatNumber = tt.getSeat(ticketType);
+        if (seatNumber == null) {
+            System.out.println("No seats available for TicketType: " + ticketType);
+            return false;
+        }
+
+        this.totalAmount = tt.getPrice(ticketType);
+
+        return true; // success
+    }
+    
     // display ticket details
     public void displayTicketDetails() {
         System.out.println("Ticket");
