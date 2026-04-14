@@ -13,6 +13,7 @@ public class Attendee extends User{
 
     public Attendee(String username, String password, String email, String contactNo) {
         super(username, password, email, contactNo);
+        this.eventCount=0;
         this.totalSpent=0.0;
         this.membershipTier="Bronze";
     }
@@ -55,7 +56,6 @@ public class Attendee extends User{
             if (hasUser(t.getBuyerName())) {
                 t.displayTicketDetails();
                 System.out.println();
-                eventCount++;
             }
         }
 
