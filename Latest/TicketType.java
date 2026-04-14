@@ -108,6 +108,17 @@ public class TicketType {
     }
 
     // setter method
+    public void setEventId(String eventId){
+        this.eventId=eventId;
+    }
+
+    public void setAvailableQuantity(int availableQuantity, int availableEarlyBird, int availableStandard, int availableVip){
+        this.availableQuantity=availableQuantity;
+        this.availableEarlyBird=availableEarlyBird;
+        this.availableStandard=availableStandard;
+        this.availableVip=availableVip;
+    }
+    
     public void setTotalQuantity(int totalQuantity, int quantityEarlyBird, int quantityStandard, int quantityVip) {
         this.totalQuantity = totalQuantity;
         this.quantityOfAllTicketType[0] = quantityEarlyBird;
