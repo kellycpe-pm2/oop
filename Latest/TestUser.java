@@ -172,7 +172,7 @@ public class TestUser {
             logincount++;
             System.out.print("\nPlease enter your name: ");
             name = scan.nextLine();
-            user.setUsername(name);
+            user.setUserName(name);
 
             
         } while (!validationNoExistName( user, alluser, no));
@@ -183,7 +183,7 @@ public class TestUser {
             password = scan.nextLine();
 
         } while (!validationLoginPwd(password, alluser, no));
-        user.setUsername(name);
+        user.setUserName(name);
         System.out.println("------------------------------------------------------------");
         return true;
     }
@@ -244,7 +244,7 @@ public class TestUser {
         System.out.println("------------------------------------------------------------");
 
         // create and store data
-        user.setUsername(name);
+        user.setUserName(name);
         createAccount(no, user, alluser, name, password, email, contactNo);
         storeUserData(name, password, email, contactNo);
 
@@ -306,6 +306,13 @@ public class TestUser {
             staffMenu(staff, alluser, no);
         } else {
             Attendee attendee = (Attendee) storedUser;
+            
+            for (Ticket t : tickets) {
+                if (attendee.hasUser(t.getBuyerName())) {
+                    attendee.addToTotalSpent(t.getTotalAmount());
+                }
+            }
+            
             System.out.println(attendee.toString() +
                     "|                                                           |\n" +
                     "-------------------------------------------------------------");
@@ -644,7 +651,7 @@ public static String loadSpeakerBio(String username) {
                 return true;
             }
         }
-        user.setUsername(null);
+        user.setUserName(null);
         System.out.println("Error: The Username Is not Matched ! ");
 
         return false;
@@ -814,7 +821,7 @@ public static String loadSpeakerBio(String username) {
                 boolean ticketFound = false;
                 for (Ticket ticket : tickets) {
 
-                    usertemp.setUsername(ticket.getBuyerName());
+                    usertemp.setUserName(ticket.getBuyerName());
 
                     if (ticket.hasTicket(ticketId)) {
                         ticketFound = true;
@@ -857,7 +864,7 @@ public static String loadSpeakerBio(String username) {
                     if (ticket.getBookingId().equals(bookingId)) {
                         bookingFound = true;
                         currentTicket = ticket;
-                        usertemp.setUsername(ticket.getBuyerName());
+                        usertemp.setUserName(ticket.getBuyerName());
                         // Find attendee by buyer name
                         for (int i = 0; i < no[2]; i++) {
                             if (alluser[i].equals(usertemp)) {
@@ -944,7 +951,7 @@ public static String loadSpeakerBio(String username) {
         System.out.println("\t\t|                           CHECK-IN LIST                                        |");
         System.out.printf("\t\t|                               %-48s |\n", LocalDate.now());
         System.out.println("\t\t----------------------------------------------------------------------------------");
-        if (Staff.getTotal_Checkin_counter() == 0) {
+        if (Staff.gettotal_Checkin_counter() == 0) {
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
             System.out.println(
@@ -962,7 +969,7 @@ public static String loadSpeakerBio(String username) {
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
-                    usertemp.setUsername(ticket.getBuyerName());
+                    usertemp.setUserName(ticket.getBuyerName());
 
                     if (alluser.length == 0) {
                         for (User user : alluser) {
@@ -1096,7 +1103,7 @@ public static String loadSpeakerBio(String username) {
             for (Ticket ticket : tickets) {
                 if (ticket != null) {
 
-                    usertamp.setUsername(ticket.getBuyerName());
+                    usertamp.setUserName(ticket.getBuyerName());
 
                     if (alluser.length == 0) {
                         for (User user : alluser) {
@@ -1135,7 +1142,7 @@ public static String loadSpeakerBio(String username) {
             waitForEnter();
             waitForEnter();
 
-            int checkinRate = (Staff.getTotal_Checkin_counter() * 100) / tickets.size();
+            int checkinRate = (Staff.gettotal_Checkin_counter() * 100) / tickets.size();
             String rateText = checkinRate + "%";
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
@@ -1148,7 +1155,7 @@ public static String loadSpeakerBio(String username) {
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Check-ins          :             %-32d |\n",
-                    Staff.getTotal_Checkin_counter());
+                    Staff.gettotal_Checkin_counter());
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Attendees          :             %-32d |\n", tickets.size());
@@ -1589,7 +1596,7 @@ public static String loadSpeakerBio(String username) {
             Attendee usertemp = new Attendee();
             int no = 1;
             for (Ticket ticket : tickets) {
-                usertemp.setUsername(ticket.getBuyerName());
+                usertemp.setUserName(ticket.getBuyerName());
                 if (ticket != null) {
                     for (User user : alluser) {
                         if (user.equals(usertemp)) {
@@ -3582,7 +3589,7 @@ public static List<Workshop> readWorkshopData() {
                     purchaseTicket(attendee);
                     break;
                 case 3:
-                    viewTicketHistory(attendee);
+                    attendee.TicketPurchasedHistory(tickets);
                     break;
                 case 0:
                     inMenu = false;
@@ -3703,31 +3710,6 @@ public static List<Workshop> readWorkshopData() {
             scan.nextLine();
         } else {
             System.out.println("Purchase failed. Please try again.");
-        }
-    }
-
-    static void viewTicketHistory(Attendee attendee) {
-        int count = 0;
-
-        if (tickets.isEmpty()) {
-            System.out.println("No tickets purchased in the system.");
-            return;
-        }
-
-        System.out.println("\n--- All Tickets History for " + attendee.getUsername() + " ---");
-
-        for (Ticket t : tickets) {
-            if (attendee.hasUser(t.getBuyerName())) {
-                t.displayTicketDetails();
-                System.out.println();
-                count++;
-            }
-        }
-
-        if (count == 0) {
-            System.out.println("No tickets purchased by " + attendee.getUsername() + " yet.");
-        } else {
-            System.out.println("Found " + count + " ticket(s) for " + attendee.getUsername());
         }
     }
 
