@@ -61,6 +61,26 @@ public class Ticket {
         this.bookingId=bookingId;
     }
 
+    public String getTicketType(){
+        return this.ticketType;
+    }
+
+    public String getTicketId(){
+        return this.ticketId;
+    }
+
+    public boolean getStatus(){
+        return this.status;
+    }
+
+    public String getEventId(){
+        return this.eventId;
+    }
+
+    public String getSeatNum(){
+        return this.seatNumber;
+    }
+
     public double getTotalAmount(){
         return this.totalAmount;
     }
@@ -69,29 +89,10 @@ public class Ticket {
         return this.buyerName;
     }
 
-    public boolean getStatus(){
-        return this.status;
-    }
-
-    public String getSeatNum(){
-        return this.seatNumber;
-    }
-
-    public String getTicketType(){
+    public String getType(){
         return this.ticketType;
     }
 
-    public String getEventId(){
-        return this.eventId;
-    }
-
-    public LocalDate getPurchasedDate(){
-        return this.purchaseDate;
-    }
-
-    public String getTicketId(){
-        return this.ticketId;
-    }
     public String getBookingId(){
         return this.bookingId;
     }
@@ -100,12 +101,61 @@ public class Ticket {
         return this.perks;
     }
 
+    public LocalDate getPurchasedDate(){
+        return this.purchaseDate;
+    }
+
     public static int getTicketCount(){
         return Ticket.ticketCount;
     }
+
+    public void setTicketType(TicketType tt){
+        this.tt=tt;
+    }
+
+    public void setTicketId(String ticketId){
+        this.ticketId=ticketId;
+    }
+
     public void setStatus(boolean status){
         updateTicketStatus(this.ticketId);
         this.status=status;
+    }
+
+    public void setEventId(String eventId){
+        this.eventId=eventId;
+    }
+
+    public void setSeatNum(String seatNumber){
+        this.seatNumber=seatNumber;
+    }
+
+    public void setTotalAmount(double totalAmount){
+        this.totalAmount=totalAmount;
+    }
+
+    public void setBuyerName(String buyerName){
+        this.buyerName=buyerName;
+    }
+
+    public void setType(String ticketType){
+        this.ticketType=ticketType;
+    }
+
+    public void setBookingId(String bookingId){
+        this.bookingId=bookingId;
+    }
+
+    public void setPerks(String perks){
+        this.perks=perks;
+    }
+
+    public void setPurchasedDate(LocalDate purchaseDate){
+        this.purchaseDate=purchaseDate;
+    }
+
+    public static void setTicketCount(int ticketCount){
+        Ticket.ticketCount=ticketCount;
     }
 
     public boolean validationTicket() {
