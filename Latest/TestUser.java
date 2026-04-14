@@ -305,14 +305,17 @@ public class TestUser {
             waitForEnter();
             staffMenu(staff, alluser, no);
         } else {
+            int count=0;
             Attendee attendee = (Attendee) storedUser;
             
             for (Ticket t : tickets) {
                 if (attendee.hasUser(t.getBuyerName())) {
                     attendee.addToTotalSpent(t.getTotalAmount());
+                    count++;
                 }
             }
-            
+            attendee.setEventCount(count);
+
             System.out.println(attendee.toString() +
                     "|                                                           |\n" +
                     "-------------------------------------------------------------");
