@@ -43,6 +43,9 @@ public class Workshop extends Event {
     public int getSpeakerCount() {
         return speakerCount;
     }
+    public void setSpeakerCount(int speakerCount) {
+       this.speakerCount = speakerCount;
+    }
 
     // Get speaker status by name
     public String getSpeakerStatus(String speakerName) {
