@@ -81,7 +81,7 @@ public abstract class Event {
 
     @Override
     public String toString() {
-        return String.format("\t\t\t| %-10s |,| %-18s |,| %-17s |,| %-10s |",
+        return String.format("\t\t\t| %-10s | %-18s | %-17s | %-10s |",
                 getEventID(),
                 getTitle(),
                 getVenue(),
