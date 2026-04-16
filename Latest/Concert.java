@@ -3,16 +3,20 @@ import java.util.List;
 
 public class Concert extends Event {
 
-    // Speaker names only 
+    // Speaker names only
     private static final int MAX_SPEAKERS = 1;
     private String[] speakerNames = new String[MAX_SPEAKERS];
     private int speakerCount = 0;
-    
+
     // Speaker status tracking
     private String[] speakerStatus = new String[MAX_SPEAKERS];
     private String[] rejectionReason = new String[MAX_SPEAKERS];
-    
+
     private final String TYPE = "Concert";
+
+    public Concert() {
+        this(" ", LocalDate.now(), " ", 0);
+    }
 
     public Concert(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
@@ -32,14 +36,18 @@ public class Concert extends Event {
         return speakerNames;
     }
 
+    public void setSpeakers(String[] speakerNames) {
+        this.speakerNames = speakerNames;
+    }
+
     public int getSpeakerCount() {
         return speakerCount;
     }
-    
-    public void setSpeakerCount(){
+
+    public void setSpeakerCount() {
         this.speakerCount++;
     }
-    
+
     // Get speaker status by name
     public String getSpeakerStatus(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
@@ -49,7 +57,7 @@ public class Concert extends Event {
         }
         return "not_assigned";
     }
-    
+
     // Get rejection reason by name
     public String getRejectionReason(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
@@ -59,25 +67,25 @@ public class Concert extends Event {
         }
         return "no";
     }
+
     // Add these methods after getRejectionReason() method
-public void setSpeakerStatus(String speakerName, String status) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
-            speakerStatus[i] = status;
-            return;
+    public void setSpeakerStatus(String speakerName, String status) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
+                speakerStatus[i] = status;
+                return;
+            }
         }
     }
-}
 
-public void setRejectionReason(String speakerName, String reason) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
-            rejectionReason[i] = reason;
-            return;
+    public void setRejectionReason(String speakerName, String reason) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
+                rejectionReason[i] = reason;
+                return;
+            }
         }
     }
-}
-
 
     // Accept invitation
     public boolean acceptInvitation(String speakerName) {
@@ -99,7 +107,7 @@ public void setRejectionReason(String speakerName, String reason) {
         System.out.println("Speaker [" + speakerName + "] not found in this concert.");
         return false;
     }
-    
+
     // Reject invitation with reason
     public boolean rejectInvitation(String speakerName, String reason) {
         for (int i = 0; i < speakerCount; i++) {
@@ -122,7 +130,7 @@ public void setRejectionReason(String speakerName, String reason) {
         System.out.println("Speaker [" + speakerName + "] not found in this concert.");
         return false;
     }
-    
+
     // Check if speaker is assigned
     public boolean hasSpeaker(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
@@ -132,7 +140,7 @@ public void setRejectionReason(String speakerName, String reason) {
         }
         return false;
     }
-    
+
     // Assign a speaker by name. Returns false if already assigned or full.
     public boolean assignSpeaker(String speakerName) {
         if (speakerCount >= MAX_SPEAKERS) {
@@ -209,7 +217,7 @@ public void setRejectionReason(String speakerName, String reason) {
             System.out.println("    No speakers assigned.");
         } else {
             for (int i = 0; i < speakerCount; i++) {
-                System.out.println("    " + (i + 1) + ": " + speakerNames[i] + 
+                System.out.println("    " + (i + 1) + ": " + speakerNames[i] +
                         " [" + speakerStatus[i] + "]");
                 if ("rejected".equals(speakerStatus[i]) && !rejectionReason[i].isEmpty()) {
                     System.out.println("       Reason: " + rejectionReason[i]);
@@ -217,7 +225,7 @@ public void setRejectionReason(String speakerName, String reason) {
             }
         }
     }
-    
+
     // remove a concert by eventID from the list and update Concert.json
     public static boolean removeConcert(List<Concert> concerts, String eventID) {
         for (int i = 0; i < concerts.size(); i++) {
@@ -230,7 +238,7 @@ public void setRejectionReason(String speakerName, String reason) {
         System.out.println("Error: Concert [" + eventID + "] not found !");
         return false;
     }
-    
+
     public String toString() {
         return super.toString() + String.format("%-14s│\n", TYPE);
     }
