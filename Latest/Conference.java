@@ -16,7 +16,7 @@ public class Conference extends Event {
         this.sessions = new Session[MAX_SESSIONS];
         this.sessionCount = 0;
     }
-    // ── Getters ──────────────────────────────────────────────────────────────
+    //  Getters 
 
     public int getSessionCount() {
         return sessionCount;
@@ -34,7 +34,7 @@ public class Conference extends Event {
         this.sessions[sessionCount++] = session;
     }
 
-    // ── Session management ───────────────────────────────────────────────────
+    //  Session management 
 
     /**
      * Returns true if {@code newTime} (format "HHMM", e.g. "0900") is within
@@ -56,7 +56,7 @@ public class Conference extends Event {
             if (existing == -1)
                 continue;
             if (Math.abs(newMinutes - existing) < 60) {
-                return true; // gap < 1 hour → conflict
+                return true; // gap < 1 hour â†’ conflict
             }
         }
         return false;
@@ -110,7 +110,7 @@ public class Conference extends Event {
         return false;
     }
 
-    // ── Display helpers ──────────────────────────────────────────────────────
+    //  Display helpers 
 
     public void displaySessions() {
         System.out.println("  Sessions for Conference: " + getTitle());
@@ -136,11 +136,11 @@ public class Conference extends Event {
         return false;
     }
 
-    // ── Overrides ────────────────────────────────────────────────────────────
+    //  Overrides 
 
     @Override
     public String toString() {
-        return super.toString() + String.format("%-14s│\n", TYPE);
+        return super.toString() + String.format("%-14s|\n", TYPE);
     }
 
     public boolean isConference() {
