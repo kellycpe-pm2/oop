@@ -546,7 +546,7 @@ public class TestUser {
         // check the first character of email
         if (!((int) emailArray[0] >= 65 && (int) emailArray[0] <= 90)
                 && !((int) emailArray[0] >= 97 && (int) emailArray[0] <= 122)) {
-            System.out.println("Input Error: The first Character Connot Be Symbols ! ");
+            System.out.println("Input Error: The first Character Cannot Be Symbols ! ");
             return false;
         }
         // check the email format
