@@ -30,7 +30,7 @@ public class Concert extends Event {
         }
     }
 
-    // ── Speaker management ──────────────────────────────────────────────────
+    // Speaker management 
 
     public String[] getSpeakers() {
         return speakerNames;
@@ -240,7 +240,7 @@ public class Concert extends Event {
     }
 
     public String toString() {
-        return super.toString() + String.format("%-14s│\n", TYPE);
+        return super.toString() + String.format("%-14s|\n", TYPE);
     }
 
     public boolean isConcert() {
