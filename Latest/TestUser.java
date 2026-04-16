@@ -951,7 +951,7 @@ public class TestUser {
         System.out.println("\t\t|                           CHECK-IN LIST                                        |");
         System.out.printf("\t\t|                               %-48s |\n", LocalDate.now());
         System.out.println("\t\t----------------------------------------------------------------------------------");
-        if (Staff.gettotal_Checkin_counter() == 0) {
+        if (Staff.getTotal_Checkin_counter() == 0) {
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
             System.out.println(
@@ -1142,7 +1142,7 @@ public class TestUser {
             waitForEnter();
             waitForEnter();
 
-            int checkinRate = (Staff.gettotal_Checkin_counter() * 100) / tickets.size();
+            int checkinRate = (Staff.getTotal_Checkin_counter() * 100) / tickets.size();
             String rateText = checkinRate + "%";
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
@@ -1155,7 +1155,7 @@ public class TestUser {
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Check-ins          :             %-32d |\n",
-                    Staff.gettotal_Checkin_counter());
+                    Staff.getTotal_Checkin_counter());
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Attendees          :             %-32d |\n", tickets.size());
