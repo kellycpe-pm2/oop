@@ -12,7 +12,7 @@ public class Speaker extends User {
     // ------------------constructor-------------------------------
         // default constructor
     public Speaker() {
-        super();
+        this (null, null, null,null);
         this.bio = "No bio available"; 
         this.sessionTopics = new HashMap<>();
         totalSpeakers++;
@@ -50,8 +50,10 @@ public class Speaker extends User {
     public static int getTotalSpeakers() {
         return totalSpeakers;
     }
-
-
+	
+	public Map<String, String> getSessionTopics(){
+		return this.sessionTopics;
+	}
 
 // ------------------setter-------------------------------
 // Set the total number of speakers (for loading from file)
@@ -93,7 +95,7 @@ public class Speaker extends User {
     // --------------------------------------------------
 
     public String toString() {
-        return super.toString() + String.format("║          Position       :  %-31s║\n", ROLE);
+        return super.toString() + String.format("â•‘          Position       :  %-31sâ•‘\n", ROLE);
     }
 
     public boolean checkClass(Object o) {
