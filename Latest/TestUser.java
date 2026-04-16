@@ -714,7 +714,7 @@ public class TestUser {
                 System.out.println("|     3. View Pending Attendees List                         |");
                 System.out.println("-------------------------------------------------------------|");
                 System.out.println("|       REPORT MENU:                                         |");
-                System.out.println("|     5. View Event Report                                   |");
+                System.out.println("|     4. View Event Report                                   |");
                 System.out.println("|     5. View Sales Report                                   |");
                 System.out.println("|     6. View All Check-ins Report                           |");
                 System.out.println("-------------------------------------------------------------|");
