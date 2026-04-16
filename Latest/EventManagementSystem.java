@@ -38,9 +38,12 @@ public class EventManagementSystem {
     }
 
     // Getter Method
-
+	public Event [] getEvents(){
+		return this.events;
+	}
+    
     public User[] getUsers() {
-        return user;
+        return this.user;
     }
 
     public User getCuurent_User() {
@@ -49,6 +52,24 @@ public class EventManagementSystem {
 
     public int getUser_No(){
         return this.user_no;
+    }
+
+    public int getCountEvent(){
+        int count=0;
+        for (Event event : events){
+            if(event !=null){
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public List <Ticket> getTickets(){
+    	return this.tickets;
+    }
+    
+    public Payment [] getPayments(){
+    	return this.payments;	
     }
 
     public void setCuurent_User(User current_User, int type) {
@@ -71,14 +92,28 @@ public class EventManagementSystem {
 
     }
 
-    public int getCountEvent(){
-        int count=0;
-        for (Event event : events){
-            if(event !=null){
-                count++;
-            }
-        }
-        return count;
+	public void setEvents( Event [] events){
+		this.events= events;
+	}
+    
+    public void setUsers(User [] user) {
+        this.user = user;
+    }
+
+    public void setUser_No(int user_no){
+        this.user_no= user_no;
+    }
+
+    public void setCountEvent(int eventCount){
+        this.eventCount=eventCount;
+    }
+    
+    public void setTickets(List <Ticket> tickets ){
+    	this.tickets= tickets;
+    }
+    
+    public void setPayments(Payment [] payments){
+    	this.payments = payments;	
     }
 
     public int countBookingNo(){
@@ -198,7 +233,7 @@ public class EventManagementSystem {
         return conf;
     }
 
-    // Overload — create Conference without sessions
+    // Overload â€” create Conference without sessions
     public Conference createConference(String title, String date, String venue, int maxTickets) {
         return createConference(title, date, venue, maxTickets, null, null);
     }
