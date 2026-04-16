@@ -95,7 +95,7 @@ public class Speaker extends User {
     // --------------------------------------------------
 
     public String toString() {
-        return super.toString() + String.format("â•‘          Position       :  %-31sâ•‘\n", ROLE);
+        return super.toString() + String.format("|          Position       :  %-31s|\n", ROLE);
     }
 
     public boolean checkClass(Object o) {
