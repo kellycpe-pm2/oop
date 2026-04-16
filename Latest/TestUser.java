@@ -951,7 +951,7 @@ public class TestUser {
         System.out.println("\t\t|                           CHECK-IN LIST                                        |");
         System.out.printf("\t\t|                               %-48s |\n", LocalDate.now());
         System.out.println("\t\t----------------------------------------------------------------------------------");
-        if (Staff.gettotal_Checkin_counter() == 0) {
+        if (Staff.getTotal_Checkin_counter() == 0) {
             System.out.println(
                     "\n\t\t\t----------------------------------------------------------------------------------");
             System.out.println(
@@ -1142,20 +1142,15 @@ public class TestUser {
             waitForEnter();
             waitForEnter();
 
-            int checkinRate = (Staff.gettotal_Checkin_counter() * 100) / tickets.size();
+            int checkinRate = (Staff.getTotal_Checkin_counter() * 100) / tickets.size();
             String rateText = checkinRate + "%";
-            System.out.println(
-                    "\n\t\t\t----------------------------------------------------------------------------------");
-            System.out.println(
-                    "\t\t\t|                                 CHECK-IN STATISTICS                            |");
-            System.out.println(
-                    "\t\t\t----------------------------------------------------------------------------------");
-            System.out.println(
-                    "\t\t\t|                                                                                |");
-            System.out.println(
-                    "\t\t\t|                                                                                |");
+            System.out.println("\n\t\t\t----------------------------------------------------------------------------------");
+            System.out.println("\t\t\t|                                 CHECK-IN STATISTICS                            |");
+            System.out.println("\t\t\t----------------------------------------------------------------------------------");
+            System.out.println("\t\t\t|                                                                                |");
+            System.out.println("\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Check-ins          :             %-32d |\n",
-                    Staff.gettotal_Checkin_counter());
+                    Staff.getTotal_Checkin_counter());
             System.out.println(
                     "\t\t\t|                                                                                |");
             System.out.printf("\t\t\t|        Total Attendees          :             %-32d |\n", tickets.size());
@@ -4232,8 +4227,7 @@ public class TestUser {
 
         boolean continueManaging = true;
         while (continueManaging) {
-            System.out
-                    .println("\n------------------------------------------------------------------------------------—");
+            System.out.println("------------------------------------------------------------------------------------");
             System.out.println("|                         YOUR PENDING INVITATIONS                                 |");
             System.out.println("|----------------------------------------------------------------------------------|");
             System.out.println("| No |    Type      |         Event Name       |            Details                |");
@@ -4263,8 +4257,7 @@ public class TestUser {
                         (i + 1), type, eventName, details);
             }
 
-            System.out
-                    .println("---------------------------------------------------------------------------------------");
+            System.out.println("---------------------------------------------------------------------------------------");
             System.out.println("\n0. Back to Main Menu");
             System.out.print("Select invitation number to respond (or 0 to exit): ");
 
@@ -4282,13 +4275,9 @@ public class TestUser {
                 continueManaging = false;
             } else if (choice >= 1 && choice <= pendingInvitations.size()) {
                 Object selected = pendingInvitations.get(choice - 1);
-
-                System.out.println(
-                        "\n----------------------------------------------------------------------------------—");
-                System.out
-                        .println("|                           INVITATION DETAILS                                    |");
-                System.out
-                        .println("----------------------------------------------------------------------------------");
+ 				System.out.println("\n----------------------------------------------------------------------------------");
+                System.out.println("|                           INVITATION DETAILS                                    |");
+                System.out.println("----------------------------------------------------------------------------------");
 
                 if (selected instanceof Session) {
                     Session session = (Session) selected;
@@ -4313,8 +4302,7 @@ public class TestUser {
                     System.out.printf("| %-68s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
                 }
 
-                System.out
-                        .println("----------------------------------------------------------------------------------");
+                System.out.println("----------------------------------------------------------------------------------");
 
                 System.out.println("\nDo you want to ACCEPT or REJECT this invitation?");
                 System.out.println("1. ACCEPT");
@@ -4356,7 +4344,7 @@ public class TestUser {
                         ((Workshop) selected).rejectInvitation(speaker.getUsername(), reason);
                         storeWorkshopData(workshops);
                     }
-                    System.out.println("\n-— You have rejected this invitation.");
+              		System.out.println("\n-- You have rejected this invitation.");     
                     System.out.println("Reason: " + reason);
                 } else {
                     System.out.println("Invalid choice. Please enter 1 or 2.");
