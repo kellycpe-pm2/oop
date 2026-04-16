@@ -72,7 +72,7 @@ public abstract class Event {
         this.maxTickets = maxTickets;
     }
 
-    // abstract method — subclasses must implement
+    // abstract method â€” subclasses must implement
     public abstract boolean isConcert();
 
     public abstract boolean isConference();
@@ -81,7 +81,7 @@ public abstract class Event {
 
     @Override
     public String toString() {
-        return String.format("\t\t\t│ %-10s │ %-18s │ %-17s │ %-10s │",
+        return String.format("\t\t\t| %-10s |,| %-18s |,| %-17s |,| %-10s |",
                 getEventID(),
                 getTitle(),
                 getVenue(),
