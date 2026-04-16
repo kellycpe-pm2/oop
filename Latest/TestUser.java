@@ -1168,18 +1168,18 @@ public class TestUser {
                     "\t\t\t|                                 Check-in Rate                                  |");
             System.out.println(
                     "\t\t\t|            ----------------------------------------------------------------    |");
-            System.out.print("\t\t\t|            | ");
+            System.out.print("\t\t\t|            |       ");
             int displaybar = (int) ((double) (checkinRate * 49) / 100);
             for (int i = 0; i < 49; i++) {
-                if (i <= displaybar) {
-                    System.out.print("||");
+                if (i < displaybar) {
+                    System.out.print("=");
                 } else {
                     System.out.print(" ");
                 }
 
             }
 
-            System.out.println("  |    |");
+            System.out.println("      |    |");
             System.out.println(
                     "\t\t\t|            ----------------------------------------------------------------    |");
             System.out.println(
@@ -1371,20 +1371,18 @@ public class TestUser {
                     "\t\t\t|                                 Check-in Rate                                  |");
             System.out.println(
                     "\t\t\t|            ----------------------------------------------------------------    |");
-            System.out.print("\t\t\t|            | ");
-
-            int displaybar = (int) ((double) checkinRate / 100 * 49);
-
+            System.out.print("\t\t\t|            |       ");
+            int displaybar = (int) ((double) (checkinRate * 49) / 100);
             for (int i = 0; i < 49; i++) {
-                if (displaybar >= i) {
-                    System.out.print("||");
+                if (i < displaybar) {
+                    System.out.print("=");
                 } else {
                     System.out.print(" ");
                 }
 
             }
 
-            System.out.println("  |    |");
+            System.out.println("      |    |");
             System.out.println(
                     "\t\t\t|            ----------------------------------------------------------------    |");
             System.out.println(
@@ -1409,7 +1407,7 @@ public class TestUser {
     public static void sale_report() {
 
         System.out.println("\n\t\t----------------------------------------------------------------------------------");
-        System.out.println("\t\t|                                  SALES REPORT                                   |");
+        System.out.println("\t\t|                                  SALES REPORT                                  |");
         System.out.printf("\t\t|                              Generated    :%-35s |\n", LocalDate.now());
         System.out.println("\t\t----------------------------------------------------------------------------------");
 
@@ -1628,7 +1626,7 @@ public class TestUser {
             FileWriter writer = new FileWriter(filename);
 
             writer.write("\t\t----------------------------------------------------------------------------------\n");
-            writer.write("\t\t|                                SALES REPORT                                   |\n");
+            writer.write("\t\t|                                SALES REPORT                                    |\n");
             writer.write("\t\t---------------------------------------------------------------------------------|\n");
             writer.write("\t\t|  Generated: "
                     + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -4592,3 +4590,4 @@ public class TestUser {
     }
 
 }
+
