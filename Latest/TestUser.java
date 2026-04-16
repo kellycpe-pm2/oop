@@ -172,7 +172,7 @@ public class TestUser {
             logincount++;
             System.out.print("\nPlease enter your name: ");
             name = scan.nextLine();
-            user.setUserName(name);
+            user.setUserName(name.strip());
 
         } while (!validationNoExistName(user, alluser, no));
 
@@ -182,7 +182,7 @@ public class TestUser {
             password = scan.nextLine();
 
         } while (!validationLoginPwd(password, alluser, no));
-        user.setUserName(name);
+        user.setUserName(name.strip());
         System.out.println("------------------------------------------------------------");
         return true;
     }
@@ -503,7 +503,7 @@ public class TestUser {
         }
 
         for (int i = 0; i < ems.getUser_No(); i++) {
-            if (existUser[i] != null && name.equals(existUser[i].getUsername())) {
+            if (existUser[i] != null && name.strip().equals(existUser[i].getUsername())) {
                 System.out.println("Error: The Username Has Already Exist ! ");
                 return false;
             }
@@ -513,7 +513,7 @@ public class TestUser {
     }
 
     public static boolean validationName(String name) {
-        char[] namearray = name.toCharArray();
+        char[] namearray = name.strip().toCharArray();
         if (validationEmpty(name)) {
             return false;
 
