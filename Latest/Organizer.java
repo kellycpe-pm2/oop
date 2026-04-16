@@ -2,14 +2,32 @@ public class Organizer extends User {
 
     // instance variable
     private final String ROLE = "Organizer";
+    private static int OReventcount;
 
     // ------------------constructor-------------------------------
-    Organizer() {
+    public Organizer() {
         super();
     }
 
-    Organizer(String username, String password, String email, String contactNo) {
+    public Organizer(String username, String password, String email, String contactNo) {
         super(username, password, email, contactNo);
+    }
+
+    // ------------------OReventcount getter/setter-------------------------------
+
+    // Counts non-null events directly from TestUser.events array.
+    public static int getOReventcount() {
+        int count = 0;
+        for (Event e : TestUser.events) {
+            if (e != null)
+                count++;
+        }
+        Organizer.OReventcount = count;
+        return OReventcount;
+    }
+
+    public static void setOReventcount(int OReventcount) {
+        Organizer.OReventcount = OReventcount;
     }
 
     // ------------------toString-------------------------------
@@ -30,7 +48,6 @@ public class Organizer extends User {
         System.out.println("Please Click Enter To continue...");
     }
 
-
     public boolean checkClass(Object o) {
         if (o instanceof Organizer) {
             return true;
@@ -39,9 +56,9 @@ public class Organizer extends User {
     }
 
     public boolean equals(Object o) {
-        if (super.equals(o)){
+        if (super.equals(o)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
