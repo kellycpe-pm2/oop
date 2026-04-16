@@ -225,11 +225,11 @@ public class Ticket {
 
     public String toString(){
                 return String.format(
-                             "║          Booking ID     :  %-31s║\n"+
-                             "║          Event ID       :  %-31s║\n"+
-                             "║          Ticket ID      :  %-31s║\n"+
-                             "║          Ticket Type    :  %-31s║\n"+
-                             "║          Seat No        :  %-31s║\n"
+                             "|          Booking ID     :  %-31s|\n"+
+                             "|          Event ID       :  %-31s|\n"+
+                             "|          Ticket ID      :  %-31s|\n"+
+                             "|          Ticket Type    :  %-31s|\n"+
+                             "|          Seat No        :  %-31s|\n"
                              ,this.bookingId, this.eventId, this.ticketId,this.ticketType,this.seatNumber,this.purchaseDate);
     
     } 
