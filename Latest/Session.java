@@ -19,6 +19,10 @@ public class Session {
         return String.format("S%03d", sessionCounter++);
     }
 
+    public Session() {
+        this(" ", " ");
+    }
+
     public Session(String topic, String time) {
         this.sessionID = generateSessionID();
         this.topic = topic;
@@ -66,6 +70,10 @@ public class Session {
         return speakerCount;
     }
 
+    public void setSpeakerCount(int speakerCount) {
+        this.speakerCount = speakerCount;
+    }
+
     /**
      * Returns the raw username array (length MAX_SPEAKERS; only indices
      * 0..speakerCount-1 are populated).
@@ -88,24 +96,24 @@ public class Session {
     }
 
     // Set speaker status by username
-public void setSpeakerStatusByUsername(String username, String status) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
-            speakerStatus[i] = status;
-            return;
+    public void setSpeakerStatusByUsername(String username, String status) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+                speakerStatus[i] = status;
+                return;
+            }
         }
     }
-}
 
-// Set rejection reason by username
-public void setRejectionReasonByUsername(String username, String reason) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
-            rejectionReason[i] = reason;
-            return;
+    // Set rejection reason by username
+    public void setRejectionReasonByUsername(String username, String reason) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerUsernames[i] != null && speakerUsernames[i].equals(username)) {
+                rejectionReason[i] = reason;
+                return;
+            }
         }
     }
-}
 
     // ── Speaker management ───────────────────────────────────────────────────
 
