@@ -527,7 +527,7 @@ public class TestUser {
             for (char charname : namearray) {
                 if (!((int) charname >= 65 && (int) charname <= 90)
                         && !((int) charname >= 97 && (int) charname <= 122)) {
-                    System.out.println("Input Error : Please Enter In alpha !");
+                    System.out.println("Input Error : Please Enter In alphabet !");
                     return false;
                 }
             }
