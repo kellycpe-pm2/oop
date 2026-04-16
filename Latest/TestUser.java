@@ -174,8 +174,7 @@ public class TestUser {
             name = scan.nextLine();
             user.setUserName(name);
 
-            
-        } while (!validationNoExistName( user, alluser, no));
+        } while (!validationNoExistName(user, alluser, no));
 
         do {
 
@@ -232,14 +231,14 @@ public class TestUser {
 
         } while (!validationPassword2(password, password2));
 
-    // Ask for bio only if signing up as speaker
-    if (password.equals(SPEAKER_PSWD)) {
-        System.out.print("\nPlease enter your Bio (optional): ");
-        bio = scan.nextLine();
-        if (bio == null || bio.trim().isEmpty()) {
-            bio = "No bio available";
+        // Ask for bio only if signing up as speaker
+        if (password.equals(SPEAKER_PSWD)) {
+            System.out.print("\nPlease enter your Bio (optional): ");
+            bio = scan.nextLine();
+            if (bio == null || bio.trim().isEmpty()) {
+                bio = "No bio available";
+            }
         }
-    }
 
         System.out.println("------------------------------------------------------------");
 
@@ -248,11 +247,10 @@ public class TestUser {
         createAccount(no, user, alluser, name, password, email, contactNo);
         storeUserData(name, password, email, contactNo);
 
-        
-            // Save bio to speaker.json if speaker
-    if (password.equals(SPEAKER_PSWD)) {
-        saveSpeakerBio(name, bio);
-    }
+        // Save bio to speaker.json if speaker
+        if (password.equals(SPEAKER_PSWD)) {
+            saveSpeakerBio(name, bio);
+        }
 
     }
 
@@ -305,9 +303,9 @@ public class TestUser {
             waitForEnter();
             staffMenu(staff, alluser, no);
         } else {
-            int count=0;
+            int count = 0;
             Attendee attendee = (Attendee) storedUser;
-            
+
             for (Ticket t : tickets) {
                 if (attendee.hasUser(t.getBuyerName())) {
                     attendee.addToTotalSpent(t.getTotalAmount());
@@ -434,7 +432,7 @@ public class TestUser {
 
     public static void createAccount(int[] no, User user, User[] alluser, String name, String password, String email,
             String contactNo) {
-        
+
         if (password.equals(ORGANIZER_PSWD)) {
 
             alluser[no[0]] = new Organizer(name, password, email, contactNo);
@@ -470,28 +468,27 @@ public class TestUser {
         }
     }
 
-// Load bio for a specific speaker by username
-public static String loadSpeakerBio(String username) {
-    try {
-        File bioFile = new File("speaker.json");
-        if (!bioFile.exists()) {
-            return "No bio available";
-        }
-        
-        List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
-        for (int i = 0; i < lines.size(); i += 2) {
-            if (i + 1 < lines.size()) {
-                if (lines.get(i).equals(username)) {
-                    return lines.get(i + 1);
+    // Load bio for a specific speaker by username
+    public static String loadSpeakerBio(String username) {
+        try {
+            File bioFile = new File("speaker.json");
+            if (!bioFile.exists()) {
+                return "No bio available";
+            }
+
+            List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+            for (int i = 0; i < lines.size(); i += 2) {
+                if (i + 1 < lines.size()) {
+                    if (lines.get(i).equals(username)) {
+                        return lines.get(i + 1);
+                    }
                 }
             }
+        } catch (IOException e) {
+            System.out.println("Error loading speaker bio: " + e.getMessage());
         }
-    } catch (IOException e) {
-        System.out.println("Error loading speaker bio: " + e.getMessage());
+        return "No bio available";
     }
-    return "No bio available";
-}
-
 
     // validation for signup
     public static boolean validationExist(String name, User[] existUser) {
@@ -642,7 +639,7 @@ public static String loadSpeakerBio(String username) {
 
     // validation for login
 
-    public static boolean validationNoExistName( User user, User[] existUser, int[] no) {
+    public static boolean validationNoExistName(User user, User[] existUser, int[] no) {
         // check the user input is empty or not
         if (validationEmpty(user.getUsername())) {
             return false;
@@ -1379,7 +1376,7 @@ public static String loadSpeakerBio(String username) {
             System.out.print("\t\t\t|            | ");
 
             int displaybar = (int) ((double) checkinRate / 100 * 49);
-            
+
             for (int i = 0; i < 49; i++) {
                 if (displaybar >= i) {
                     System.out.print("||");
@@ -2374,10 +2371,7 @@ public static String loadSpeakerBio(String username) {
         return confList[idx];
     }
 
-
-
-
-        // validate title (must not be empty and at least 3 characters)
+    // validate title (must not be empty and at least 3 characters)
     public static boolean validationTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             System.out.println("Error: Title cannot be empty !");
@@ -2492,9 +2486,7 @@ public static String loadSpeakerBio(String username) {
         }
     }
 
-
-
- // validate session time (must be HHMM format, 0000 - 2359)
+    // validate session time (must be HHMM format, 0000 - 2359)
     public static boolean validationSessionTime(String time) {
         if (time == null || time.trim().isEmpty()) {
             System.out.println("Error: Session time cannot be empty !");
@@ -2544,143 +2536,144 @@ public static String loadSpeakerBio(String username) {
     }
 
     // Helper class to store speaker data
-static class SpeakerData {
-    String bio = "No bio available";
-    Map<String, String> sessionTopics = new HashMap<>();
-}
+    static class SpeakerData {
+        String bio = "No bio available";
+        Map<String, String> sessionTopics = new HashMap<>();
+    }
 
-// Save speaker bio and session topics to speaker.json
-public static void saveSpeakerData(String username, String bio, Map<String, String> sessionTopics) {
-    try {
-        // Load existing data
-        Map<String, SpeakerData> allSpeakerData = loadAllSpeakerData();
-        
-        // Update or create speaker data
-        SpeakerData data = allSpeakerData.getOrDefault(username, new SpeakerData());
+    // Save speaker bio and session topics to speaker.json
+    public static void saveSpeakerData(String username, String bio, Map<String, String> sessionTopics) {
+        try {
+            // Load existing data
+            Map<String, SpeakerData> allSpeakerData = loadAllSpeakerData();
+
+            // Update or create speaker data
+            SpeakerData data = allSpeakerData.getOrDefault(username, new SpeakerData());
+            data.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
+            data.sessionTopics = sessionTopics;
+            allSpeakerData.put(username, data);
+
+            // Write all data back to file
+            try (Writer writer = new FileWriter("speaker.json")) {
+                for (Map.Entry<String, SpeakerData> entry : allSpeakerData.entrySet()) {
+                    writer.write(entry.getKey() + "\n");
+                    writer.write(entry.getValue().bio + "\n");
+                    // Save session topics
+                    writer.write(entry.getValue().sessionTopics.size() + "\n");
+                    for (Map.Entry<String, String> topic : entry.getValue().sessionTopics.entrySet()) {
+                        writer.write(topic.getKey() + "\n");
+                        writer.write(topic.getValue() + "\n");
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving speaker data: " + e.getMessage());
+        }
+    }
+
+    // Load all speaker data from speaker.json
+    public static Map<String, SpeakerData> loadAllSpeakerData() {
+        Map<String, SpeakerData> allSpeakerData = new HashMap<>();
+        try {
+            File dataFile = new File("speaker.json");
+            if (!dataFile.exists()) {
+                return allSpeakerData;
+            }
+
+            List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
+            int i = 0;
+            while (i < lines.size()) {
+                if (i + 1 >= lines.size())
+                    break;
+
+                String username = lines.get(i++);
+                String bio = lines.get(i++);
+
+                SpeakerData data = new SpeakerData();
+                data.bio = bio;
+
+                // Check if there's a topic count (new format)
+                if (i < lines.size()) {
+                    try {
+                        int topicCount = Integer.parseInt(lines.get(i));
+                        i++; // move past topicCount
+
+                        for (int j = 0; j < topicCount && i + 1 < lines.size(); j++) {
+                            String sessionId = lines.get(i++);
+                            String topic = lines.get(i++);
+                            data.sessionTopics.put(sessionId, topic);
+                        }
+                    } catch (NumberFormatException e) {
+
+                    }
+                }
+
+                allSpeakerData.put(username, data);
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading speaker data: " + e.getMessage());
+        }
+        return allSpeakerData;
+    }
+
+    // Save speaker bio only (for backward compatibility)
+    public static void saveSpeakerBio(String username, String bio) {
+        Map<String, SpeakerData> allData = loadAllSpeakerData();
+        SpeakerData data = allData.getOrDefault(username, new SpeakerData());
         data.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
-        data.sessionTopics = sessionTopics;
-        allSpeakerData.put(username, data);
-        
-        // Write all data back to file
+        allData.put(username, data);
+        saveAllSpeakerData(allData);
+    }
+
+    // Save all speaker data to file
+    public static void saveAllSpeakerData(Map<String, SpeakerData> allData) {
         try (Writer writer = new FileWriter("speaker.json")) {
-            for (Map.Entry<String, SpeakerData> entry : allSpeakerData.entrySet()) {
+            for (Map.Entry<String, SpeakerData> entry : allData.entrySet()) {
                 writer.write(entry.getKey() + "\n");
                 writer.write(entry.getValue().bio + "\n");
-                // Save session topics
                 writer.write(entry.getValue().sessionTopics.size() + "\n");
                 for (Map.Entry<String, String> topic : entry.getValue().sessionTopics.entrySet()) {
                     writer.write(topic.getKey() + "\n");
                     writer.write(topic.getValue() + "\n");
                 }
             }
+        } catch (IOException e) {
+            System.out.println("Error saving speaker data: " + e.getMessage());
         }
-    } catch (IOException e) {
-        System.out.println("Error saving speaker data: " + e.getMessage());
     }
-}
 
-// Load all speaker data from speaker.json
-public static Map<String, SpeakerData> loadAllSpeakerData() {
-    Map<String, SpeakerData> allSpeakerData = new HashMap<>();
-    try {
-        File dataFile = new File("speaker.json");
-        if (!dataFile.exists()) {
-            return allSpeakerData;
-        }
-        
-        List<String> lines = Files.readAllLines(Paths.get("speaker.json"));
-        int i = 0;
-        while (i < lines.size()) {
-            if (i + 1 >= lines.size()) break;
-            
-            String username = lines.get(i++);
-            String bio = lines.get(i++);
-            
-            SpeakerData data = new SpeakerData();
-            data.bio = bio;
-            
-            // Check if there's a topic count (new format)
-            if (i < lines.size()) {
-                try {
-                    int topicCount = Integer.parseInt(lines.get(i));
-                    i++; // move past topicCount
-                    
-                    for (int j = 0; j < topicCount && i + 1 < lines.size(); j++) {
-                        String sessionId = lines.get(i++);
-                        String topic = lines.get(i++);
-                        data.sessionTopics.put(sessionId, topic);
-                    }
-                } catch (NumberFormatException e) {
-                   
-                }
-            }
-            
-            allSpeakerData.put(username, data);
-        }
-    } catch (IOException e) {
-        System.out.println("Error loading speaker data: " + e.getMessage());
+    // Save updated session topic for a speaker
+    public static void saveSpeakerSessionTopic(String username, String sessionId, String newTopic) {
+        Map<String, SpeakerData> allData = loadAllSpeakerData();
+        SpeakerData data = allData.getOrDefault(username, new SpeakerData());
+        data.sessionTopics.put(sessionId, newTopic);
+        allData.put(username, data);
+        saveAllSpeakerData(allData);
     }
-    return allSpeakerData;
-}
 
-// Save speaker bio only (for backward compatibility)
-public static void saveSpeakerBio(String username, String bio) {
-    Map<String, SpeakerData> allData = loadAllSpeakerData();
-    SpeakerData data = allData.getOrDefault(username, new SpeakerData());
-    data.bio = (bio != null && !bio.isEmpty()) ? bio : "No bio available";
-    allData.put(username, data);
-    saveAllSpeakerData(allData);
-}
-
-// Save all speaker data to file
-public static void saveAllSpeakerData(Map<String, SpeakerData> allData) {
-    try (Writer writer = new FileWriter("speaker.json")) {
-        for (Map.Entry<String, SpeakerData> entry : allData.entrySet()) {
-            writer.write(entry.getKey() + "\n");
-            writer.write(entry.getValue().bio + "\n");
-            writer.write(entry.getValue().sessionTopics.size() + "\n");
-            for (Map.Entry<String, String> topic : entry.getValue().sessionTopics.entrySet()) {
-                writer.write(topic.getKey() + "\n");
-                writer.write(topic.getValue() + "\n");
-            }
-        }
-    } catch (IOException e) {
-        System.out.println("Error saving speaker data: " + e.getMessage());
-    }
-}
-
-// Save updated session topic for a speaker
-public static void saveSpeakerSessionTopic(String username, String sessionId, String newTopic) {
-    Map<String, SpeakerData> allData = loadAllSpeakerData();
-    SpeakerData data = allData.getOrDefault(username, new SpeakerData());
-    data.sessionTopics.put(sessionId, newTopic);
-    allData.put(username, data);
-    saveAllSpeakerData(allData);
-}
-
-// Load session topic for a speaker
-public static String loadSpeakerSessionTopic(String username, String sessionId) {
-    Map<String, SpeakerData> allData = loadAllSpeakerData();
-    SpeakerData data = allData.get(username);
-    if (data != null && data.sessionTopics.containsKey(sessionId)) {
-        return data.sessionTopics.get(sessionId);
-    }
-    return null;
-}
-
-// Update loadAllSpeakerBios to also load session topics
-public static void loadAllSpeakerBios() {
-    Map<String, SpeakerData> allData = loadAllSpeakerData();
-    for (int j = 0; j < speakerCount; j++) {
-        String username = speakerPool[j].getUsername();
+    // Load session topic for a speaker
+    public static String loadSpeakerSessionTopic(String username, String sessionId) {
+        Map<String, SpeakerData> allData = loadAllSpeakerData();
         SpeakerData data = allData.get(username);
-        if (data != null) {
-            speakerPool[j].setBio(data.bio);
-            // Store session topics in a map within the speaker object
-            speakerPool[j].setSessionTopics(data.sessionTopics);
+        if (data != null && data.sessionTopics.containsKey(sessionId)) {
+            return data.sessionTopics.get(sessionId);
+        }
+        return null;
+    }
+
+    // Update loadAllSpeakerBios to also load session topics
+    public static void loadAllSpeakerBios() {
+        Map<String, SpeakerData> allData = loadAllSpeakerData();
+        for (int j = 0; j < speakerCount; j++) {
+            String username = speakerPool[j].getUsername();
+            SpeakerData data = allData.get(username);
+            if (data != null) {
+                speakerPool[j].setBio(data.bio);
+                // Store session topics in a map within the speaker object
+                speakerPool[j].setSessionTopics(data.sessionTopics);
+            }
         }
     }
-}
     // -- Conference session speaker management (original, renamed) -------------
 
     // assign a speaker from the pool to a conference session
@@ -3086,6 +3079,7 @@ public static void loadAllSpeakerBios() {
                 System.out.println(mid);
         }
         System.out.println(bot);
+        System.out.println("  the total event = " + eventCount);
     }
 
     // count non-null users in the array
@@ -3206,38 +3200,38 @@ public static void loadAllSpeakerBios() {
      * Session now stores usernames directly (String[]), so No Speaker object is
      * needed.
      */
-private static void writeConferenceRecord(Writer writer, String eventID, String title, LocalDate date, String venue,
-        int maxTickets, int sessionCount, Session[] sessions) {
-    try {
-        writer.write(eventID + "\n");
-        writer.write(title + "\n");
-        writer.write(date.toString() + "\n");
-        writer.write(venue + "\n");
-        writer.write(maxTickets + "\n");
-        writer.write(sessionCount + "\n");
-        for (int s = 0; s < sessionCount; s++) {
-            Session session = sessions[s];
-            writer.write(session.getSessionID() + "\n");
-            writer.write(session.getTopic() + "\n");
-            writer.write(session.getTime() + "\n");
-            writer.write(session.getSpeakerCount() + "\n");
-            
-            // Save speaker usernames
-            String[] usernames = session.getSpeakers();
-            for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
-                writer.write(usernames[sp] + "\n");
+    private static void writeConferenceRecord(Writer writer, String eventID, String title, LocalDate date, String venue,
+            int maxTickets, int sessionCount, Session[] sessions) {
+        try {
+            writer.write(eventID + "\n");
+            writer.write(title + "\n");
+            writer.write(date.toString() + "\n");
+            writer.write(venue + "\n");
+            writer.write(maxTickets + "\n");
+            writer.write(sessionCount + "\n");
+            for (int s = 0; s < sessionCount; s++) {
+                Session session = sessions[s];
+                writer.write(session.getSessionID() + "\n");
+                writer.write(session.getTopic() + "\n");
+                writer.write(session.getTime() + "\n");
+                writer.write(session.getSpeakerCount() + "\n");
+
+                // Save speaker usernames
+                String[] usernames = session.getSpeakers();
+                for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
+                    writer.write(usernames[sp] + "\n");
+                }
+
+                // NEW: Save speaker status and rejection reason for each speaker
+                for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
+                    writer.write(session.getSpeakerStatus(usernames[sp]) + "\n");
+                    writer.write(session.getRejectionReason(usernames[sp]) + "\n");
+                }
             }
-            
-            // NEW: Save speaker status and rejection reason for each speaker
-            for (int sp = 0; sp < session.getSpeakerCount(); sp++) {
-                writer.write(session.getSpeakerStatus(usernames[sp]) + "\n");
-                writer.write(session.getRejectionReason(usernames[sp]) + "\n");
-            }
+        } catch (Exception e) {
+            System.out.println("Error writing conference record: " + e.getMessage());
         }
-    } catch (Exception e) {
-        System.out.println("Error writing conference record: " + e.getMessage());
     }
-}
 
     public void createConferenceFile() {
         try {
@@ -3258,76 +3252,80 @@ private static void writeConferenceRecord(Writer writer, String eventID, String 
      * Session speaker slots are restored as plain usernames (String) No Speaker
      * object is constructed.
      */
-public static List<Conference> readConferenceData() {
-    List<Conference> conferences = new ArrayList<>();
-    try {
-        File confFile = new File("Conference.json");
-        if (!confFile.exists()) {
-            // File doesn't exist, create it and return empty list
-            confFile.createNewFile();
-            return conferences;
-        }
-        
-        List<String> lines = Files.readAllLines(Paths.get("Conference.json"));
-        
-        // If file is empty, return empty list
-        if (lines.isEmpty()) {
-            return conferences;
-        }
-        
-        int i = 0;
-        while (i < lines.size()) {
-            // Make sure we have enough lines before reading
-            if (i + 6 > lines.size()) break;
-            
-            String eventID = lines.get(i++);
-            String title = lines.get(i++);
-            LocalDate date = LocalDate.parse(lines.get(i++));
-            String venue = lines.get(i++);
-            int maxTickets = Integer.parseInt(lines.get(i++));
-            int storedSessionCount = Integer.parseInt(lines.get(i++));
-
-            Conference conf = new Conference(title, date, venue, maxTickets);
-            conf.setEventID(eventID);
-
-            for (int s = 0; s < storedSessionCount; s++) {
-                // Check if we have enough lines for session basic info
-                if (i + 4 > lines.size()) break;
-                
-                String sessionID = lines.get(i++);
-                String topic = lines.get(i++);
-                String time = lines.get(i++);
-                int speakerCount = Integer.parseInt(lines.get(i++));
-                Session session = new Session(topic, time);
-                session.setSessionID(sessionID);
-                
-                // Restore speaker usernames
-                for (int sp = 0; sp < speakerCount; sp++) {
-                    if (i >= lines.size()) break;
-                    String username = lines.get(i++);
-                    session.addSpeaker(username);
-                }
-                
-                // Restore speaker status and rejection reason (if they exist in file)
-                String[] usernames = session.getSpeakers();
-                for (int sp = 0; sp < speakerCount; sp++) {
-                    // Check if we have enough lines for status and reason
-                    if (i + 1 >= lines.size()) break;
-                    String status = lines.get(i++);
-                    String reason = lines.get(i++);
-                    session.setSpeakerStatusByUsername(usernames[sp], status);
-                    session.setRejectionReasonByUsername(usernames[sp], reason);
-                }
-                
-                conf.setSession(session);
+    public static List<Conference> readConferenceData() {
+        List<Conference> conferences = new ArrayList<>();
+        try {
+            File confFile = new File("Conference.json");
+            if (!confFile.exists()) {
+                // File doesn't exist, create it and return empty list
+                confFile.createNewFile();
+                return conferences;
             }
-            conferences.add(conf);
+
+            List<String> lines = Files.readAllLines(Paths.get("Conference.json"));
+
+            // If file is empty, return empty list
+            if (lines.isEmpty()) {
+                return conferences;
+            }
+
+            int i = 0;
+            while (i < lines.size()) {
+                // Make sure we have enough lines before reading
+                if (i + 6 > lines.size())
+                    break;
+
+                String eventID = lines.get(i++);
+                String title = lines.get(i++);
+                LocalDate date = LocalDate.parse(lines.get(i++));
+                String venue = lines.get(i++);
+                int maxTickets = Integer.parseInt(lines.get(i++));
+                int storedSessionCount = Integer.parseInt(lines.get(i++));
+
+                Conference conf = new Conference(title, date, venue, maxTickets);
+                conf.setEventID(eventID);
+
+                for (int s = 0; s < storedSessionCount; s++) {
+                    // Check if we have enough lines for session basic info
+                    if (i + 4 > lines.size())
+                        break;
+
+                    String sessionID = lines.get(i++);
+                    String topic = lines.get(i++);
+                    String time = lines.get(i++);
+                    int speakerCount = Integer.parseInt(lines.get(i++));
+                    Session session = new Session(topic, time);
+                    session.setSessionID(sessionID);
+
+                    // Restore speaker usernames
+                    for (int sp = 0; sp < speakerCount; sp++) {
+                        if (i >= lines.size())
+                            break;
+                        String username = lines.get(i++);
+                        session.addSpeaker(username);
+                    }
+
+                    // Restore speaker status and rejection reason (if they exist in file)
+                    String[] usernames = session.getSpeakers();
+                    for (int sp = 0; sp < speakerCount; sp++) {
+                        // Check if we have enough lines for status and reason
+                        if (i + 1 >= lines.size())
+                            break;
+                        String status = lines.get(i++);
+                        String reason = lines.get(i++);
+                        session.setSpeakerStatusByUsername(usernames[sp], status);
+                        session.setRejectionReasonByUsername(usernames[sp], reason);
+                    }
+
+                    conf.setSession(session);
+                }
+                conferences.add(conf);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading conference data: " + e.getMessage());
         }
-    } catch (IOException e) {
-        System.out.println("Error reading conference data: " + e.getMessage());
+        return conferences;
     }
-    return conferences;
-}
 
     public static void displayAllConferences(List<Conference> conferences) {
         System.out.println("=== Conference Info ===");
@@ -3385,8 +3383,8 @@ public static List<Conference> readConferenceData() {
             writer.write(c.getSpeakers()[i] + "\n");
             writer.write(c.getSpeakerStatus(c.getSpeakers()[i]) + "\n");
             writer.write(c.getRejectionReason(c.getSpeakers()[i]) + "\n");
+        }
     }
-}
 
     // create Concert file
     public static void createConcertFile() {
@@ -3426,13 +3424,12 @@ public static List<Conference> readConferenceData() {
                     for (int s = 0; s < storedSpeakerCount; s++) {
                         c.getSpeakers()[s] = lines.get(i++);
                         c.setSpeakerCount();
-                        c.setSpeakerStatus(c.getSpeakers()[s],lines.get(i++));
-                        c.setRejectionReason(c.getSpeakers()[s],lines.get(i++));
+                        c.setSpeakerStatus(c.getSpeakers()[s], lines.get(i++));
+                        c.setRejectionReason(c.getSpeakers()[s], lines.get(i++));
                     }
-                    
+
                     concerts.add(c);
-                    
-                    
+
                 }
             }
         } catch (IOException e) {
@@ -3516,55 +3513,54 @@ public static List<Conference> readConferenceData() {
         }
     }
 
-public static List<Workshop> readWorkshopData() {
-    List<Workshop> workshops = new ArrayList<>();
-    try {
-        File workshopFile = new File("Workshop.json");
-        if (!workshopFile.exists()) {
-            return workshops;
-        }
-        
-        List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
-        if (!lines.isEmpty()) {
-            int i = 0;
-            while (i + 6 < lines.size()) {
-                String eventID = lines.get(i++);
-                String title = lines.get(i++);
-                LocalDate date = LocalDate.parse(lines.get(i++));
-                String venue = lines.get(i++);
-                int maxTickets = Integer.parseInt(lines.get(i++));
-                int storedSpeakerCount = Integer.parseInt(lines.get(i++));
+    public static List<Workshop> readWorkshopData() {
+        List<Workshop> workshops = new ArrayList<>();
+        try {
+            File workshopFile = new File("Workshop.json");
+            if (!workshopFile.exists()) {
+                return workshops;
+            }
 
-                Workshop w = new Workshop(title, date, venue, maxTickets);
-                w.setEventID(eventID);
+            List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
+            if (!lines.isEmpty()) {
+                int i = 0;
+                while (i + 6 < lines.size()) {
+                    String eventID = lines.get(i++);
+                    String title = lines.get(i++);
+                    LocalDate date = LocalDate.parse(lines.get(i++));
+                    String venue = lines.get(i++);
+                    int maxTickets = Integer.parseInt(lines.get(i++));
+                    int storedSpeakerCount = Integer.parseInt(lines.get(i++));
 
-                for (int s = 0; s < storedSpeakerCount; s++) {
-                    String speakerName = lines.get(i++);
-                    w.assignSpeaker(speakerName);
-                   
-                  
-                                    if (i + 1 < lines.size()) {
-                        String nextLine = lines.get(i);
-                        // Check if next line is a valid status string
-                        if (nextLine != null && (nextLine.equals("pending") || 
-                            nextLine.equals("accepted") || nextLine.equals("rejected"))) {
-                            String status = lines.get(i++);
-                            String reason = lines.get(i++);
-                            w.setSpeakerStatus(speakerName, status);
-                            w.setRejectionReason(speakerName, reason);
+                    Workshop w = new Workshop(title, date, venue, maxTickets);
+                    w.setEventID(eventID);
+
+                    for (int s = 0; s < storedSpeakerCount; s++) {
+                        String speakerName = lines.get(i++);
+                        w.assignSpeaker(speakerName);
+
+                        if (i + 1 < lines.size()) {
+                            String nextLine = lines.get(i);
+                            // Check if next line is a valid status string
+                            if (nextLine != null && (nextLine.equals("pending") ||
+                                    nextLine.equals("accepted") || nextLine.equals("rejected"))) {
+                                String status = lines.get(i++);
+                                String reason = lines.get(i++);
+                                w.setSpeakerStatus(speakerName, status);
+                                w.setRejectionReason(speakerName, reason);
+                            }
                         }
                     }
+                    workshops.add(w);
                 }
-                workshops.add(w);
             }
+        } catch (IOException e) {
+            System.out.println("Error reading workshop data: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error parsing workshop data: " + e.getMessage());
         }
-    } catch (IOException e) {
-        System.out.println("Error reading workshop data: " + e.getMessage());
-    } catch (Exception e) {
-        System.out.println("Error parsing workshop data: " + e.getMessage());
+        return workshops;
     }
-    return workshops;
-}
 
     // -------------------------------------------------------------------------
     // ATTENDEE MENU
@@ -3955,8 +3951,7 @@ public static List<Workshop> readWorkshopData() {
         }
     }
 
-
-       // ticket type part
+    // ticket type part
     // validate the quantity set
     public static boolean validationQuantityTicket(int totalQuantity, int quantityEarlyBird, int quantityStandard,
             int quantityVip) {
@@ -4045,7 +4040,6 @@ public static List<Workshop> readWorkshopData() {
         }
     }
 
-
     // Reads all ticket type from "TicketType.json"
     public static List<TicketType> readTicektTypeData() {
         List<TicketType> ticketTypes = new ArrayList<>();
@@ -4124,291 +4118,327 @@ public static List<Workshop> readWorkshopData() {
     }
 
     // speaker part
-static void speakerMenu(Speaker loggedInSpeaker) {
-    boolean inMenu = true;
+    static void speakerMenu(Speaker loggedInSpeaker) {
+        boolean inMenu = true;
 
-    while (inMenu) {
-        System.out.println("\n--------------------------------");
-        System.out.println("|       SPEAKER MENU           |");
-        System.out.println("|  Logged in: " + String.format("%-17s", loggedInSpeaker.getUsername()) + "|");
-        System.out.println("|------------------------------|");
-        System.out.println("|  1: View & Respond to        |");
-        System.out.println("|     Assigned Activities      |");
-        System.out.println("|  2: View My Assigned         |");
-        System.out.println("|     Activities               |");
-        System.out.println("|  3: Update Session Topic     |");
-        System.out.println("|  4: Update Bio               |");
-        System.out.println("|  5: View My Info             |");
-        System.out.println("|  0: Back to Main Menu        |");
-        System.out.println("--------------------------------");
-        System.out.print("Enter option: ");
-        
-        int choice = -1;
-        try {
-            choice = scan.nextInt();
-            scan.nextLine();
-        } catch (InputMismatchException e) {
-            System.out.println("\nError: Please enter a valid NUMBER (0, 1, 2, 3, 4, or 5)");
-            scan.nextLine(); // Clear the invalid input
-            continue; // Go back to menu
-        }
+        while (inMenu) {
+            System.out.println("\n--------------------------------");
+            System.out.println("|       SPEAKER MENU           |");
+            System.out.println("|  Logged in: " + String.format("%-17s", loggedInSpeaker.getUsername()) + "|");
+            System.out.println("|------------------------------|");
+            System.out.println("|  1: View & Respond to        |");
+            System.out.println("|     Assigned Activities      |");
+            System.out.println("|  2: View My Assigned         |");
+            System.out.println("|     Activities               |");
+            System.out.println("|  3: Update Session Topic     |");
+            System.out.println("|  4: Update Bio               |");
+            System.out.println("|  5: View My Info             |");
+            System.out.println("|  0: Back to Main Menu        |");
+            System.out.println("--------------------------------");
+            System.out.print("Enter option: ");
 
-        switch (choice) {
-            case 1:
-                // View assigned sessions and choose to accept/reject
-                manageAssignedSessions(loggedInSpeaker);
-                break;
+            int choice = -1;
+            try {
+                choice = scan.nextInt();
+                scan.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("\nError: Please enter a valid NUMBER (0, 1, 2, 3, 4, or 5)");
+                scan.nextLine(); // Clear the invalid input
+                continue; // Go back to menu
+            }
 
-            case 2:
-                // View all my sessions (with status only)
-                viewMyAssignedSessions(loggedInSpeaker);
-                break;
+            switch (choice) {
+                case 1:
+                    // View assigned sessions and choose to accept/reject
+                    manageAssignedSessions(loggedInSpeaker);
+                    break;
 
-            case 3:
-                // Update session topic
-                updateSessionTopic(loggedInSpeaker);
-                break;
+                case 2:
+                    // View all my sessions (with status only)
+                    viewMyAssignedSessions(loggedInSpeaker);
+                    break;
 
-            case 4:
-                // Update Bio
-                updateSpeakerBio(loggedInSpeaker);
-                break;
+                case 3:
+                    // Update session topic
+                    updateSessionTopic(loggedInSpeaker);
+                    break;
 
-            case 5:
-                // View My Info
-                loggedInSpeaker.displaySingleInfo();
-                break;
+                case 4:
+                    // Update Bio
+                    updateSpeakerBio(loggedInSpeaker);
+                    break;
 
-            case 0:
-                inMenu = false;
-                break;
+                case 5:
+                    // View My Info
+                    loggedInSpeaker.displaySingleInfo();
+                    break;
 
-            default:
-                System.out.println("\n Invalid option. Please enter 0, 1, 2, 3, 4, or 5.");
+                case 0:
+                    inMenu = false;
+                    break;
+
+                default:
+                    System.out.println("\n Invalid option. Please enter 0, 1, 2, 3, 4, or 5.");
+            }
         }
     }
-}
 
-// Manage all assigned invitations (accept/reject for all event types)
-static void manageAssignedSessions(Speaker speaker) {
-    List<Object> pendingInvitations = new java.util.ArrayList<>();
-    List<String> invitationTypes = new java.util.ArrayList<>();
-    
-    // Collect all pending invitations from conferences, concerts, and workshops
-    for (Event e : events) {
-        if (e != null) {
-            if (e.isConference()) {
+    // Manage all assigned invitations (accept/reject for all event types)
+    static void manageAssignedSessions(Speaker speaker) {
+        List<Object> pendingInvitations = new java.util.ArrayList<>();
+        List<String> invitationTypes = new java.util.ArrayList<>();
+
+        // Collect all pending invitations from conferences, concerts, and workshops
+        for (Event e : events) {
+            if (e != null) {
+                if (e.isConference()) {
+                    Conference conf = (Conference) e;
+                    for (int i = 0; i < conf.getSessionCount(); i++) {
+                        Session session = conf.getSessions()[i];
+                        if (session.hasSpeaker(speaker.getUsername())) {
+                            String status = session.getSpeakerStatus(speaker.getUsername());
+                            if ("pending".equals(status)) {
+                                pendingInvitations.add(session);
+                                invitationTypes.add("Conference Session");
+                            }
+                        }
+                    }
+                } else if (e.isConcert()) {
+                    Concert concert = (Concert) e;
+                    if (concert.hasSpeaker(speaker.getUsername())) {
+                        String status = concert.getSpeakerStatus(speaker.getUsername());
+                        if ("pending".equals(status)) {
+                            pendingInvitations.add(concert);
+                            invitationTypes.add("Concert");
+                        }
+                    }
+                } else if (e.isWorkshop()) {
+                    Workshop workshop = (Workshop) e;
+                    if (workshop.hasSpeaker(speaker.getUsername())) {
+                        String status = workshop.getSpeakerStatus(speaker.getUsername());
+                        if ("pending".equals(status)) {
+                            pendingInvitations.add(workshop);
+                            invitationTypes.add("Workshop");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (pendingInvitations.isEmpty()) {
+            System.out.println("\nYou have no pending invitations.");
+            return;
+        }
+
+        boolean continueManaging = true;
+        while (continueManaging) {
+            System.out
+                    .println("\n------------------------------------------------------------------------------------—");
+            System.out.println("|                         YOUR PENDING INVITATIONS                                 |");
+            System.out.println("|----------------------------------------------------------------------------------|");
+            System.out.println("| No |    Type      |         Event Name       |            Details                |");
+            System.out.println("|----|--------------|--------------------------|-----------------------------------|");
+
+            for (int i = 0; i < pendingInvitations.size(); i++) {
+                Object inv = pendingInvitations.get(i);
+                String type = invitationTypes.get(i);
+                String eventName = "";
+                String details = "";
+
+                if (inv instanceof Session) {
+                    Session s = (Session) inv;
+                    eventName = getConferenceName(s);
+                    details = "Topic: " + truncateString(s.getTopic(), 24) + " @ " + s.getTime();
+                } else if (inv instanceof Concert) {
+                    Concert c = (Concert) inv;
+                    eventName = truncateString(c.getTitle(), 24);
+                    details = "Date: " + c.getDate() + " | Venue: " + truncateString(c.getVenue(), 20);
+                } else if (inv instanceof Workshop) {
+                    Workshop w = (Workshop) inv;
+                    eventName = truncateString(w.getTitle(), 24);
+                    details = "Date: " + w.getDate() + " | Venue: " + truncateString(w.getVenue(), 20);
+                }
+
+                System.out.printf("| %-2d | %-12s | %-24s | %-33s |\n",
+                        (i + 1), type, eventName, details);
+            }
+
+            System.out
+                    .println("---------------------------------------------------------------------------------------");
+            System.out.println("\n0. Back to Main Menu");
+            System.out.print("Select invitation number to respond (or 0 to exit): ");
+
+            int choice = -1;
+            try {
+                choice = scan.nextInt();
+                scan.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Please enter a valid NUMBER");
+                scan.nextLine();
+                continue;
+            }
+
+            if (choice == 0) {
+                continueManaging = false;
+            } else if (choice >= 1 && choice <= pendingInvitations.size()) {
+                Object selected = pendingInvitations.get(choice - 1);
+
+                System.out.println(
+                        "\n----------------------------------------------------------------------------------—");
+                System.out
+                        .println("|                           INVITATION DETAILS                                    |");
+                System.out
+                        .println("----------------------------------------------------------------------------------");
+
+                if (selected instanceof Session) {
+                    Session session = (Session) selected;
+                    System.out.printf("| %-68s |\n", "Type: Conference Session");
+                    System.out.printf("| %-68s |\n", "Conference: " + truncateString(getConferenceName(session), 50));
+                    System.out.printf("| %-68s |\n", "Session ID: " + session.getSessionID());
+                    System.out.printf("| %-68s |\n", "Topic: " + truncateString(session.getTopic(), 50));
+                    System.out.printf("| %-68s |\n", "Time: " + session.getTime());
+                } else if (selected instanceof Concert) {
+                    Concert concert = (Concert) selected;
+                    System.out.printf("| %-68s |\n", "Type: Concert");
+                    System.out.printf("| %-68s |\n", "Event ID: " + concert.getEventID());
+                    System.out.printf("| %-68s |\n", "Title: " + truncateString(concert.getTitle(), 50));
+                    System.out.printf("| %-68s |\n", "Date: " + concert.getDate());
+                    System.out.printf("| %-68s |\n", "Venue: " + truncateString(concert.getVenue(), 50));
+                } else if (selected instanceof Workshop) {
+                    Workshop workshop = (Workshop) selected;
+                    System.out.printf("| %-68s |\n", "Type: Workshop");
+                    System.out.printf("| %-68s |\n", "Event ID: " + workshop.getEventID());
+                    System.out.printf("| %-68s |\n", "Title: " + truncateString(workshop.getTitle(), 50));
+                    System.out.printf("| %-68s |\n", "Date: " + workshop.getDate());
+                    System.out.printf("| %-68s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
+                }
+
+                System.out
+                        .println("----------------------------------------------------------------------------------");
+
+                System.out.println("\nDo you want to ACCEPT or REJECT this invitation?");
+                System.out.println("1. ACCEPT");
+                System.out.println("2. REJECT");
+                System.out.print("Enter your choice (1/2): ");
+
+                int response = -1;
+                try {
+                    response = scan.nextInt();
+                    scan.nextLine();
+                } catch (InputMismatchException e) {
+                    System.out.println("Error: Please enter a valid NUMBER (1 for ACCEPT, 2 for REJECT)");
+                    scan.nextLine();
+                    continue;
+                }
+
+                if (response == 1) {
+                    if (selected instanceof Session) {
+                        ((Session) selected).acceptInvitation(speaker.getUsername());
+                        storeConferenceData();
+                    } else if (selected instanceof Concert) {
+                        ((Concert) selected).acceptInvitation(speaker.getUsername());
+                        storeConcertData(concerts);
+                    } else if (selected instanceof Workshop) {
+                        ((Workshop) selected).acceptInvitation(speaker.getUsername());
+                        storeWorkshopData(workshops);
+                    }
+                    System.out.println("\n You have accepted this invitation!");
+                } else if (response == 2) {
+                    System.out.print("Please provide a reason for rejection: ");
+                    String reason = scan.nextLine();
+                    if (selected instanceof Session) {
+                        ((Session) selected).rejectInvitation(speaker.getUsername(), reason);
+                        storeConferenceData();
+                    } else if (selected instanceof Concert) {
+                        ((Concert) selected).rejectInvitation(speaker.getUsername(), reason);
+                        storeConcertData(concerts);
+                    } else if (selected instanceof Workshop) {
+                        ((Workshop) selected).rejectInvitation(speaker.getUsername(), reason);
+                        storeWorkshopData(workshops);
+                    }
+                    System.out.println("\n-— You have rejected this invitation.");
+                    System.out.println("Reason: " + reason);
+                } else {
+                    System.out.println("Invalid choice. Please enter 1 or 2.");
+                    continue;
+                }
+
+                System.out.println("\nPress Enter to continue...");
+                scan.nextLine();
+            } else {
+                System.out.println("Invalid selection.");
+            }
+        }
+    }
+
+    // Helper method to truncate long strings
+    private static String truncateString(String str, int maxLength) {
+        if (str == null)
+            return "";
+        if (str.length() <= maxLength)
+            return str;
+        return str.substring(0, maxLength - 3) + "...";
+    }
+
+    // View all assigned activities with status
+    static void viewMyAssignedSessions(Speaker speaker) {
+        System.out.println("\n=== My Assigned Activities ===");
+        boolean hasActivities = false;
+
+        // 1. Conference Sessions
+        System.out.println("\n--- Conference Sessions ---");
+        boolean hasSessions = false;
+        for (Event e : events) {
+            if (e != null && e.isConference()) {
                 Conference conf = (Conference) e;
                 for (int i = 0; i < conf.getSessionCount(); i++) {
                     Session session = conf.getSessions()[i];
                     if (session.hasSpeaker(speaker.getUsername())) {
+                        hasSessions = true;
+                        hasActivities = true;
                         String status = session.getSpeakerStatus(speaker.getUsername());
-                        if ("pending".equals(status)) {
-                            pendingInvitations.add(session);
-                            invitationTypes.add("Conference Session");
+
+                        String savedTopic = speaker.getUpdatedSessionTopic(session.getSessionID());
+                        if (savedTopic != null) {
+                            session.setTopic(savedTopic);
+                        }
+
+                        System.out.println("\n  Conference: " + conf.getTitle());
+                        System.out.println("    Session ID: " + session.getSessionID());
+                        System.out.println("    Topic: " + session.getTopic());
+                        System.out.println("    Time: " + session.getTime());
+                        System.out.println("    Status: " + status);
+                        if ("rejected".equals(status)) {
+                            String reason = session.getRejectionReason(speaker.getUsername());
+                            if (!reason.isEmpty()) {
+                                System.out.println("    Rejection Reason: " + reason);
+                            }
                         }
                     }
                 }
-            } else if (e.isConcert()) {
+            }
+        }
+        if (!hasSessions) {
+            System.out.println("  No conference sessions assigned.");
+        }
+
+        // 2. Concerts
+        System.out.println("\n--- Concerts ---");
+        boolean hasConcerts = false;
+        for (Event e : events) {
+            if (e != null && e.isConcert()) {
                 Concert concert = (Concert) e;
                 if (concert.hasSpeaker(speaker.getUsername())) {
-                    String status = concert.getSpeakerStatus(speaker.getUsername());
-                    if ("pending".equals(status)) {
-                        pendingInvitations.add(concert);
-                        invitationTypes.add("Concert");
-                    }
-                }
-            } else if (e.isWorkshop()) {
-                Workshop workshop = (Workshop) e;
-                if (workshop.hasSpeaker(speaker.getUsername())) {
-                    String status = workshop.getSpeakerStatus(speaker.getUsername());
-                    if ("pending".equals(status)) {
-                        pendingInvitations.add(workshop);
-                        invitationTypes.add("Workshop");
-                    }
-                }
-            }
-        }
-    }
-
-    if (pendingInvitations.isEmpty()) {
-        System.out.println("\nYou have no pending invitations.");
-        return;
-    }
-
-    boolean continueManaging = true;
-    while (continueManaging) {
-        System.out.println("\n------------------------------------------------------------------------------------—");
-        System.out.println("|                         YOUR PENDING INVITATIONS                                 |");
-        System.out.println("|----------------------------------------------------------------------------------|");
-        System.out.println("| No |    Type      |         Event Name       |            Details                |");
-        System.out.println("|----|--------------|--------------------------|-----------------------------------|");
-        
-        for (int i = 0; i < pendingInvitations.size(); i++) {
-            Object inv = pendingInvitations.get(i);
-            String type = invitationTypes.get(i);
-            String eventName = "";
-            String details = "";
-            
-            if (inv instanceof Session) {
-                Session s = (Session) inv;
-                eventName = getConferenceName(s);
-                details = "Topic: " + truncateString(s.getTopic(), 24) + " @ " + s.getTime();
-            } else if (inv instanceof Concert) {
-                Concert c = (Concert) inv;
-                eventName = truncateString(c.getTitle(), 24);
-                details = "Date: " + c.getDate() + " | Venue: " + truncateString(c.getVenue(), 20);
-            } else if (inv instanceof Workshop) {
-                Workshop w = (Workshop) inv;
-                eventName = truncateString(w.getTitle(), 24);
-                details = "Date: " + w.getDate() + " | Venue: " + truncateString(w.getVenue(), 20);
-            }
-            
-            System.out.printf("| %-2d | %-12s | %-24s | %-33s |\n", 
-                    (i + 1), type, eventName, details);
-        }
-        
-        System.out.println("---------------------------------------------------------------------------------------");
-        System.out.println("\n0. Back to Main Menu");
-        System.out.print("Select invitation number to respond (or 0 to exit): ");
-        
-        int choice = -1;
-        try {
-            choice = scan.nextInt();
-            scan.nextLine();
-        } catch (InputMismatchException e) {
-            System.out.println("Error: Please enter a valid NUMBER");
-            scan.nextLine();
-            continue;
-        }
-        
-        if (choice == 0) {
-            continueManaging = false;
-        } else if (choice >= 1 && choice <= pendingInvitations.size()) {
-            Object selected = pendingInvitations.get(choice - 1);
-            
-            System.out.println("\n----------------------------------------------------------------------------------—");
-            System.out.println("|                           INVITATION DETAILS                                    |");
-            System.out.println("----------------------------------------------------------------------------------");
-            
-            if (selected instanceof Session) {
-                Session session = (Session) selected;
-                System.out.printf("| %-68s |\n", "Type: Conference Session");
-                System.out.printf("| %-68s |\n", "Conference: " + truncateString(getConferenceName(session), 50));
-                System.out.printf("| %-68s |\n", "Session ID: " + session.getSessionID());
-                System.out.printf("| %-68s |\n", "Topic: " + truncateString(session.getTopic(), 50));
-                System.out.printf("| %-68s |\n", "Time: " + session.getTime());
-            } else if (selected instanceof Concert) {
-                Concert concert = (Concert) selected;
-                System.out.printf("| %-68s |\n", "Type: Concert");
-                System.out.printf("| %-68s |\n", "Event ID: " + concert.getEventID());
-                System.out.printf("| %-68s |\n", "Title: " + truncateString(concert.getTitle(), 50));
-                System.out.printf("| %-68s |\n", "Date: " + concert.getDate());
-                System.out.printf("| %-68s |\n", "Venue: " + truncateString(concert.getVenue(), 50));
-            } else if (selected instanceof Workshop) {
-                Workshop workshop = (Workshop) selected;
-                System.out.printf("| %-68s |\n", "Type: Workshop");
-                System.out.printf("| %-68s |\n", "Event ID: " + workshop.getEventID());
-                System.out.printf("| %-68s |\n", "Title: " + truncateString(workshop.getTitle(), 50));
-                System.out.printf("| %-68s |\n", "Date: " + workshop.getDate());
-                System.out.printf("| %-68s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
-            }
-            
-            System.out.println("----------------------------------------------------------------------------------");
-            
-            System.out.println("\nDo you want to ACCEPT or REJECT this invitation?");
-            System.out.println("1. ACCEPT");
-            System.out.println("2. REJECT");
-            System.out.print("Enter your choice (1/2): ");
-            
-            int response = -1;
-            try {
-                response = scan.nextInt();
-                scan.nextLine();
-            } catch (InputMismatchException e) {
-                System.out.println("Error: Please enter a valid NUMBER (1 for ACCEPT, 2 for REJECT)");
-                scan.nextLine();
-                continue;
-            }
-
-            if (response == 1) {
-                if (selected instanceof Session) {
-                    ((Session) selected).acceptInvitation(speaker.getUsername());
-                    storeConferenceData();
-                } else if (selected instanceof Concert) {
-                    ((Concert) selected).acceptInvitation(speaker.getUsername());
-                    storeConcertData(concerts);
-                } else if (selected instanceof Workshop) {
-                    ((Workshop) selected).acceptInvitation(speaker.getUsername());
-                    storeWorkshopData(workshops);
-                }
-                System.out.println("\n You have accepted this invitation!");
-            } else if (response == 2) {
-                System.out.print("Please provide a reason for rejection: ");
-                String reason = scan.nextLine();
-                if (selected instanceof Session) {
-                    ((Session) selected).rejectInvitation(speaker.getUsername(), reason);
-                    storeConferenceData();
-                } else if (selected instanceof Concert) {
-                    ((Concert) selected).rejectInvitation(speaker.getUsername(), reason);
-                    storeConcertData(concerts);
-                } else if (selected instanceof Workshop) {
-                    ((Workshop) selected).rejectInvitation(speaker.getUsername(), reason);
-                    storeWorkshopData(workshops);
-                }
-                System.out.println("\n-— You have rejected this invitation.");
-                System.out.println("Reason: " + reason);
-            } else {
-                System.out.println("Invalid choice. Please enter 1 or 2.");
-                continue;
-            }
-
-            System.out.println("\nPress Enter to continue...");
-            scan.nextLine();
-        } else {
-            System.out.println("Invalid selection.");
-        }
-    }
-}
-
-// Helper method to truncate long strings
-private static String truncateString(String str, int maxLength) {
-    if (str == null) return "";
-    if (str.length() <= maxLength) return str;
-    return str.substring(0, maxLength - 3) + "...";
-}
-
-    
-// View all assigned activities with status
-static void viewMyAssignedSessions(Speaker speaker) {
-    System.out.println("\n=== My Assigned Activities ===");
-    boolean hasActivities = false;
-    
-    // 1. Conference Sessions
-    System.out.println("\n--- Conference Sessions ---");
-    boolean hasSessions = false;
-    for (Event e : events) {
-        if (e != null && e.isConference()) {
-            Conference conf = (Conference) e;
-            for (int i = 0; i < conf.getSessionCount(); i++) {
-                Session session = conf.getSessions()[i];
-                if (session.hasSpeaker(speaker.getUsername())) {
-                    hasSessions = true;
+                    hasConcerts = true;
                     hasActivities = true;
-                    String status = session.getSpeakerStatus(speaker.getUsername());
-                    
-                    String savedTopic = speaker.getUpdatedSessionTopic(session.getSessionID());
-                    if (savedTopic != null) {
-                        session.setTopic(savedTopic);
-                    }
-                    
-                    System.out.println("\n  Conference: " + conf.getTitle());
-                    System.out.println("    Session ID: " + session.getSessionID());
-                    System.out.println("    Topic: " + session.getTopic());
-                    System.out.println("    Time: " + session.getTime());
+                    String status = concert.getSpeakerStatus(speaker.getUsername());
+                    System.out.println("\n  Concert: " + concert.getTitle());
+                    System.out.println("    Event ID: " + concert.getEventID());
+                    System.out.println("    Date: " + concert.getDate());
+                    System.out.println("    Venue: " + concert.getVenue());
                     System.out.println("    Status: " + status);
                     if ("rejected".equals(status)) {
-                        String reason = session.getRejectionReason(speaker.getUsername());
+                        String reason = concert.getRejectionReason(speaker.getUsername());
                         if (!reason.isEmpty()) {
                             System.out.println("    Rejection Reason: " + reason);
                         }
@@ -4416,71 +4446,42 @@ static void viewMyAssignedSessions(Speaker speaker) {
                 }
             }
         }
-    }
-    if (!hasSessions) {
-        System.out.println("  No conference sessions assigned.");
-    }
-    
-    // 2. Concerts
-    System.out.println("\n--- Concerts ---");
-    boolean hasConcerts = false;
-    for (Event e : events) {
-        if (e != null && e.isConcert()) {
-            Concert concert = (Concert) e;
-            if (concert.hasSpeaker(speaker.getUsername())) {
-                hasConcerts = true;
-                hasActivities = true;
-                String status = concert.getSpeakerStatus(speaker.getUsername());
-                System.out.println("\n  Concert: " + concert.getTitle());
-                System.out.println("    Event ID: " + concert.getEventID());
-                System.out.println("    Date: " + concert.getDate());
-                System.out.println("    Venue: " + concert.getVenue());
-                System.out.println("    Status: " + status);
-                if ("rejected".equals(status)) {
-                    String reason = concert.getRejectionReason(speaker.getUsername());
-                    if (!reason.isEmpty()) {
-                        System.out.println("    Rejection Reason: " + reason);
+        if (!hasConcerts) {
+            System.out.println("  No concerts assigned.");
+        }
+
+        // 3. Workshops
+        System.out.println("\n--- Workshops ---");
+        boolean hasWorkshops = false;
+        for (Event e : events) {
+            if (e != null && e.isWorkshop()) {
+                Workshop workshop = (Workshop) e;
+                if (workshop.hasSpeaker(speaker.getUsername())) {
+                    hasWorkshops = true;
+                    hasActivities = true;
+                    String status = workshop.getSpeakerStatus(speaker.getUsername());
+                    System.out.println("\n  Workshop: " + workshop.getTitle());
+                    System.out.println("    Event ID: " + workshop.getEventID());
+                    System.out.println("    Date: " + workshop.getDate());
+                    System.out.println("    Venue: " + workshop.getVenue());
+                    System.out.println("    Status: " + status);
+                    if ("rejected".equals(status)) {
+                        String reason = workshop.getRejectionReason(speaker.getUsername());
+                        if (!reason.isEmpty()) {
+                            System.out.println("    Rejection Reason: " + reason);
+                        }
                     }
                 }
             }
         }
-    }
-    if (!hasConcerts) {
-        System.out.println("  No concerts assigned.");
-    }
-    
-    // 3. Workshops
-    System.out.println("\n--- Workshops ---");
-    boolean hasWorkshops = false;
-    for (Event e : events) {
-        if (e != null && e.isWorkshop()) {
-            Workshop workshop = (Workshop) e;
-            if (workshop.hasSpeaker(speaker.getUsername())) {
-                hasWorkshops = true;
-                hasActivities = true;
-                String status = workshop.getSpeakerStatus(speaker.getUsername());
-                System.out.println("\n  Workshop: " + workshop.getTitle());
-                System.out.println("    Event ID: " + workshop.getEventID());
-                System.out.println("    Date: " + workshop.getDate());
-                System.out.println("    Venue: " + workshop.getVenue());
-                System.out.println("    Status: " + status);
-                if ("rejected".equals(status)) {
-                    String reason = workshop.getRejectionReason(speaker.getUsername());
-                    if (!reason.isEmpty()) {
-                        System.out.println("    Rejection Reason: " + reason);
-                    }
-                }
-            }
+        if (!hasWorkshops) {
+            System.out.println("  No workshops assigned.");
+        }
+
+        if (!hasActivities) {
+            System.out.println("\nYou are not assigned to any activities.");
         }
     }
-    if (!hasWorkshops) {
-        System.out.println("  No workshops assigned.");
-    }
-    
-    if (!hasActivities) {
-        System.out.println("\nYou are not assigned to any activities.");
-    }
-}
 
     // View editable sessions (accepted sessions only)
     static void viewEditableSessions(Speaker speaker) {
@@ -4514,65 +4515,66 @@ static void viewMyAssignedSessions(Speaker speaker) {
     }
 
     // Update session topic
-   static void updateSessionTopic(Speaker speaker) {
-    viewEditableSessions(speaker);
+    static void updateSessionTopic(Speaker speaker) {
+        viewEditableSessions(speaker);
 
-    System.out.print("\nEnter Session ID to update topic: ");
-    String sessionId = scan.nextLine();
+        System.out.print("\nEnter Session ID to update topic: ");
+        String sessionId = scan.nextLine();
 
-    // Find the session
-    Session targetSession = null;
-    for (Event e : events) {
-        if (e != null && e.isConference()) {
-            Conference conf = (Conference) e;
-            for (int i = 0; i < conf.getSessionCount(); i++) {
-                Session s = conf.getSessions()[i];
-                if (s.getSessionID().equals(sessionId)) {
-                    targetSession = s;
-                    break;
+        // Find the session
+        Session targetSession = null;
+        for (Event e : events) {
+            if (e != null && e.isConference()) {
+                Conference conf = (Conference) e;
+                for (int i = 0; i < conf.getSessionCount(); i++) {
+                    Session s = conf.getSessions()[i];
+                    if (s.getSessionID().equals(sessionId)) {
+                        targetSession = s;
+                        break;
+                    }
                 }
             }
+            if (targetSession != null)
+                break;
         }
-        if (targetSession != null)
-            break;
+
+        if (targetSession == null) {
+            System.out.println("Session not found!");
+            return;
+        }
+
+        System.out.print("Enter new topic: ");
+        String newTopic = scan.nextLine();
+
+        // Update the session topic in memory
+        ems.uploadSessionTopic(speaker.getUsername(), targetSession, newTopic);
+
+        // Save the updated topic to speaker.json
+        saveSpeakerSessionTopic(speaker.getUsername(), sessionId, newTopic);
+
+        System.out.println("Session topic updated and saved successfully!");
     }
 
-    if (targetSession == null) {
-        System.out.println("Session not found!");
-        return;
-    }
-
-    System.out.print("Enter new topic: ");
-    String newTopic = scan.nextLine();
-
-    // Update the session topic in memory
-    ems.uploadSessionTopic(speaker.getUsername(), targetSession, newTopic);
-    
-    // Save the updated topic to speaker.json
-    saveSpeakerSessionTopic(speaker.getUsername(), sessionId, newTopic);
-    
-    System.out.println("Session topic updated and saved successfully!");
-}
     // Update speaker bio
- static void updateSpeakerBio(Speaker speaker) {
-    System.out.println("\n--- Update Your Bio ---");
-    System.out.println("Current Bio: " + speaker.getBio());
-    System.out.print("Enter new bio: ");
-    String newBio = scan.nextLine();
+    static void updateSpeakerBio(Speaker speaker) {
+        System.out.println("\n--- Update Your Bio ---");
+        System.out.println("Current Bio: " + speaker.getBio());
+        System.out.print("Enter new bio: ");
+        String newBio = scan.nextLine();
 
-    if (newBio != null && !newBio.trim().isEmpty()) {
-        boolean success = speaker.uploadBio(newBio);
-        if (success) {
-            // Save to speaker.json
-            saveSpeakerBio(speaker.getUsername(), newBio);
-            System.out.println("Bio updated successfully!");
+        if (newBio != null && !newBio.trim().isEmpty()) {
+            boolean success = speaker.uploadBio(newBio);
+            if (success) {
+                // Save to speaker.json
+                saveSpeakerBio(speaker.getUsername(), newBio);
+                System.out.println("Bio updated successfully!");
+            } else {
+                System.out.println("Failed to update bio.");
+            }
         } else {
-            System.out.println("Failed to update bio.");
+            System.out.println("Bio cannot be empty. Update cancelled.");
         }
-    } else {
-        System.out.println("Bio cannot be empty. Update cancelled.");
     }
-}
 
     // Helper method to get conference name
     static String getConferenceName(Session session) {
