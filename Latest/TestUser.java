@@ -432,6 +432,7 @@ public class TestUser {
 
     public static void createAccount(int[] no, User user, User[] alluser, String name, String password, String email,
             String contactNo) {
+        no[0]++;
 
         if (password.equals(ORGANIZER_PSWD)) {
 
@@ -1591,12 +1592,16 @@ public class TestUser {
             writer.write("\t\t|  |----|--------------------|---------------------|--------------|-----------| |\n");
             Attendee usertemp = new Attendee();
             int no = 1;
+            if (tickets == null){
+            	System.out.println("Error : No Any Buyer");
+            	return;
+            }
             for (Ticket ticket : tickets) {
                 usertemp.setUserName(ticket.getBuyerName());
                 if (ticket != null) {
                     for (User user : alluser) {
                         if (user.equals(usertemp)) {
-                            writer.write(String.format("\t\t|  %2d | %-18s | %-19s | %-12s | %-8s | |\n",
+                            writer.write(String.format("\t\t|  %2d | %-18s | %-19s | %-12s | %-8s |\n",
                                     no++, ticket.getBuyerName(), user.getEmail(),
                                     ticket.getTicketId(), status_ToString(ticket.getStatus())));
                             break;
@@ -4590,4 +4595,3 @@ public class TestUser {
     }
 
 }
-
