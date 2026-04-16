@@ -14,6 +14,10 @@ public abstract class Event {
         return String.format("E%03d", eventCounter++);
     }
 
+    public Event() {
+        this(" ", LocalDate.now(), " ", 0);
+    }
+
     public Event(String title, LocalDate date, String venue, int maxTickets) {
         this.eventID = generateEventID();
         this.title = title;
@@ -43,7 +47,7 @@ public abstract class Event {
         return maxTickets;
     }
 
-    public static int getEventCounter(){
+    public static int getEventCounter() {
         return Event.eventCounter;
     }
 
@@ -72,20 +76,23 @@ public abstract class Event {
     public abstract boolean isConcert();
 
     public abstract boolean isConference();
-    
+
     public abstract boolean isWorkshop();
 
     @Override
     public String toString() {
         return String.format("\t\t\t│ %-10s │ %-18s │ %-17s │ %-10s │",
-                            getEventID(),
-                            getTitle(),
-                            getVenue(),
-                            getDate());
+                getEventID(),
+                getTitle(),
+                getVenue(),
+                getDate());
     }
+
     public boolean equals(Object o) {
-       if(this == o){return true;}
-       if (o==null){
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
             return false;
         }
         if (o instanceof Event) {
@@ -95,8 +102,8 @@ public abstract class Event {
         return false; // the object does Not belong to Event
     }
 
-    public boolean hasEvent(String eventId){
-        if (this.eventID.equals(eventId)){
+    public boolean hasEvent(String eventId) {
+        if (this.eventID.equals(eventId)) {
             return true;
         }
         return false;
