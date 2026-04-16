@@ -709,7 +709,7 @@ public class TestUser {
                 System.out.println("|                      STAFF Menu                            |");
                 System.out.println("-------------------------------------------------------------|");
                 System.out.println("|           CHECK-IN MENU:                                   |");
-                System.out.println("|     1. Check-in Attendee by Ticket ID                      |");
+                System.out.println("|     1. Check-in Attendee                                   |");
                 System.out.println("|     2. View Check-in List                                  |");
                 System.out.println("|     3. View Pending Attendees List                         |");
                 System.out.println("-------------------------------------------------------------|");
