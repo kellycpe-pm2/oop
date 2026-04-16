@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Workshop extends Event {
 
-    // Speaker names only — no dependency on Speaker class
+    // Speaker names only  no dependency on Speaker class
     private static final int MAX_SPEAKERS = 1;
     private String[] speakerNames = new String[MAX_SPEAKERS];
     private int speakerCount = 0;
@@ -30,7 +30,7 @@ public class Workshop extends Event {
         }
     }
 
-    // ── Speaker management ──────────────────────────────────────────────────
+    //  Speaker management 
 
     public String[] getSpeakers() {
         return speakerNames;
@@ -264,7 +264,7 @@ public class Workshop extends Event {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("%-14s│\n", TYPE);
+        return super.toString() + String.format("%-14s|\n", TYPE);
     }
 
     public boolean equals(Object o) {
