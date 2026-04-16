@@ -2,7 +2,7 @@ public class Organizer extends User {
 
     // instance variable
     private final String ROLE = "Organizer";
-    private static int OReventcount;
+    private static int oREventCount;
 
     // ------------------constructor-------------------------------
     public Organizer() {
@@ -16,18 +16,18 @@ public class Organizer extends User {
     // ------------------OReventcount getter/setter-------------------------------
 
     // Counts non-null events directly from TestUser.events array.
-    public static int getOReventcount() {
+    public static int getoREventCount() {
         int count = 0;
         for (Event e : TestUser.events) {
             if (e != null)
                 count++;
         }
-        Organizer.OReventcount = count;
-        return OReventcount;
+        Organizer.oREventCount = count;
+        return oREventCount;
     }
 
-    public static void setOReventcount(int OReventcount) {
-        Organizer.OReventcount = OReventcount;
+    public static void setoREventCount(int oREventCount) {
+        Organizer.oREventCount = oREventCount;
     }
 
     // ------------------toString-------------------------------
