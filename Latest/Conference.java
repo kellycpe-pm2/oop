@@ -7,6 +7,10 @@ public class Conference extends Event {
     private static final int MAX_SESSIONS = 10;
     private final String TYPE = "Conference";
 
+    public Conference() {
+        this(" ", LocalDate.now(), " ", 0);
+    }
+
     public Conference(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
         this.sessions = new Session[MAX_SESSIONS];
@@ -18,6 +22,10 @@ public class Conference extends Event {
         return sessionCount;
     }
 
+    public void setSessionCount(int sessionCount) {
+        this.sessionCount = sessionCount;
+    }
+
     public Session[] getSessions() {
         return sessions;
     }
@@ -27,7 +35,6 @@ public class Conference extends Event {
     }
 
     // ── Session management ───────────────────────────────────────────────────
-
 
     /**
      * Returns true if {@code newTime} (format "HHMM", e.g. "0900") is within
