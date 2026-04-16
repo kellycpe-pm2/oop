@@ -7,18 +7,22 @@ public class Workshop extends Event {
     private static final int MAX_SPEAKERS = 1;
     private String[] speakerNames = new String[MAX_SPEAKERS];
     private int speakerCount = 0;
-    
+
     // Speaker status tracking
     private String[] speakerStatus = new String[MAX_SPEAKERS];
     private String[] rejectionReason = new String[MAX_SPEAKERS];
-    
+
     private final String TYPE = "Workshop";
+
+    public Workshop() {
+        this(" ", LocalDate.now(), " ", 0);
+    }
 
     public Workshop(String title, LocalDate date, String venue, int maxTickets) {
         super(title, date, venue, maxTickets);
         initializeStatusArrays();
     }
-    
+
     private void initializeStatusArrays() {
         for (int i = 0; i < MAX_SPEAKERS; i++) {
             speakerStatus[i] = "pending";
@@ -32,10 +36,14 @@ public class Workshop extends Event {
         return speakerNames;
     }
 
+    public void setSpeakers(String[] speakerNames) {
+        this.speakerNames = speakerNames;
+    }
+
     public int getSpeakerCount() {
         return speakerCount;
     }
-    
+
     // Get speaker status by name
     public String getSpeakerStatus(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
@@ -45,7 +53,7 @@ public class Workshop extends Event {
         }
         return "not_assigned";
     }
-    
+
     // Get rejection reason by name
     public String getRejectionReason(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
@@ -55,26 +63,25 @@ public class Workshop extends Event {
         }
         return "no";
     }
-    
+
     // Add these methods after getRejectionReason() method
-public void setSpeakerStatus(String speakerName, String status) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
-            speakerStatus[i] = status;
-            return;
+    public void setSpeakerStatus(String speakerName, String status) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
+                speakerStatus[i] = status;
+                return;
+            }
         }
     }
-}
 
-public void setRejectionReason(String speakerName, String reason) {
-    for (int i = 0; i < speakerCount; i++) {
-        if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
-            rejectionReason[i] = reason;
-            return;
+    public void setRejectionReason(String speakerName, String reason) {
+        for (int i = 0; i < speakerCount; i++) {
+            if (speakerNames[i] != null && speakerNames[i].equals(speakerName)) {
+                rejectionReason[i] = reason;
+                return;
+            }
         }
     }
-}
-
 
     // Accept invitation
     public boolean acceptInvitation(String speakerName) {
@@ -96,7 +103,7 @@ public void setRejectionReason(String speakerName, String reason) {
         System.out.println("Speaker [" + speakerName + "] not found in this workshop.");
         return false;
     }
-    
+
     // Reject invitation with reason
     public boolean rejectInvitation(String speakerName, String reason) {
         for (int i = 0; i < speakerCount; i++) {
@@ -119,7 +126,7 @@ public void setRejectionReason(String speakerName, String reason) {
         System.out.println("Speaker [" + speakerName + "] not found in this workshop.");
         return false;
     }
-    
+
     // Check if speaker is assigned
     public boolean hasSpeaker(String speakerName) {
         for (int i = 0; i < speakerCount; i++) {
@@ -206,7 +213,7 @@ public void setRejectionReason(String speakerName, String reason) {
             System.out.println("    No speakers assigned.");
         } else {
             for (int i = 0; i < speakerCount; i++) {
-                System.out.println("    " + (i + 1) + ": " + speakerNames[i] + 
+                System.out.println("    " + (i + 1) + ": " + speakerNames[i] +
                         " [" + speakerStatus[i] + "]");
                 if ("rejected".equals(speakerStatus[i]) && !rejectionReason[i].isEmpty()) {
                     System.out.println("       Reason: " + rejectionReason[i]);
