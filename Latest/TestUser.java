@@ -3743,7 +3743,7 @@ public class TestUser {
             TicketType tt = TicketType.findTicketTypeById(ticketTypes, e.getEventID());
 
             System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-19s | %3d              |%n",
-                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getEarlyBirdEnd(), tt.getSalesEnd(),
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(), tt.getEarlyBirdEnd(),
                     tt.getAvailableQuantity());
         }
         System.out.println(
