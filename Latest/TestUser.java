@@ -3839,45 +3839,24 @@ public class TestUser {
                 tt.setPerks(perks);
                 break;
             case 4:
-                Event eventForSalesStart = null;
-                for (Event e : events) {
-                    if (e != null && e.hasEvent(tt.getEventId())) {
-                        eventForSalesStart = e;
-                        break;
-                    }
-                }
-                if (eventForSalesStart == null) {
-                    System.out.println("Error: Event not found for this ticket type.");
-                    break;
-                }
                 String ssdate;
                 LocalDate salesStartDate;
                 do {
                     System.out.print("\nSales Start Date (YYYY-MM-DD) : ");
                     ssdate = scan.nextLine();
-                    salesStartDate = validationSalesStartDate(ssdate, eventForSalesStart.getDate());
+                    salesStartDate = validationSalesStartDate(ssdate,
+                            ems.findEventById(tt.getEventId()).getDate());
                 } while (salesStartDate == null);
                 tt.setSalesStart(salesStartDate);
                 break;
             case 5:
-                Event eventForSalesEnd = null;
-                for (Event e : events) {
-                    if (e != null && e.hasEvent(tt.getEventId())) {
-                        eventForSalesEnd = e;
-                        break;
-                    }
-                }
-                if (eventForSalesEnd == null) {
-                    System.out.println("Error: Event not found for this ticket type.");
-                    break;
-                }
                 String sedate;
                 LocalDate salesEndDate;
                 do {
                     System.out.print("\nSales End Date (YYYY-MM-DD) : ");
                     sedate = scan.nextLine();
                     salesEndDate = validationSalesEndDate(sedate, tt.getSalesStart(),
-                            eventForSalesEnd.getDate());
+                            ems.getEventById(tt.getEventId()).getDate());
                 } while (salesEndDate == null);
                 tt.setSalesEnd(salesEndDate);
                 break;
