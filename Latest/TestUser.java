@@ -4254,11 +4254,11 @@ public class TestUser {
 
         boolean continueManaging = true;
         while (continueManaging) {
-            System.out.println("------------------------------------------------------------------------------------");
-            System.out.println("|                         YOUR PENDING INVITATIONS                                 |");
-            System.out.println("|----------------------------------------------------------------------------------|");
-            System.out.println("| No |    Type      |         Event Name       |            Details                |");
-            System.out.println("|----|--------------|--------------------------|-----------------------------------|");
+            System.out.println("-------------------------------------------------------------------------------------------------------------");
+            System.out.println("|                                       YOUR PENDING INVITATIONS                                            |");
+            System.out.println("|-----------------------------------------------------------------------------------------------------------|");
+            System.out.println("| No |    Type                     |         Event Name       |                   Details                   |");
+            System.out.println("|----|-----------------------------|--------------------------|---------------------------------------------|");
 
             for (int i = 0; i < pendingInvitations.size(); i++) {
                 Object inv = pendingInvitations.get(i);
@@ -4280,11 +4280,11 @@ public class TestUser {
                     details = "Date: " + w.getDate() + " | Venue: " + truncateString(w.getVenue(), 20);
                 }
 
-                System.out.printf("| %-2d | %-12s | %-24s | %-33s |\n",
+                System.out.printf("| %-2d | %-27s | %-24s | %-43s |\n",
                         (i + 1), type, eventName, details);
             }
 
-            System.out.println("---------------------------------------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------------------------------");
             System.out.println("\n0. Back to Main Menu");
             System.out.print("Select invitation number to respond (or 0 to exit): ");
 
@@ -4308,25 +4308,25 @@ public class TestUser {
 
                 if (selected instanceof Session) {
                     Session session = (Session) selected;
-                    System.out.printf("| %-68s |\n", "Type: Conference Session");
-                    System.out.printf("| %-68s |\n", "Conference: " + truncateString(getConferenceName(session), 50));
-                    System.out.printf("| %-68s |\n", "Session ID: " + session.getSessionID());
-                    System.out.printf("| %-68s |\n", "Topic: " + truncateString(session.getTopic(), 50));
-                    System.out.printf("| %-68s |\n", "Time: " + session.getTime());
+                    System.out.printf("| %-79s |\n", "Type: Conference Session");
+                    System.out.printf("| %-79s |\n", "Conference: " + truncateString(getConferenceName(session), 50));
+                    System.out.printf("| %-79s |\n", "Session ID: " + session.getSessionID());
+                    System.out.printf("| %-79s |\n", "Topic: " + truncateString(session.getTopic(), 50));
+                    System.out.printf("| %-79s |\n", "Time: " + session.getTime());
                 } else if (selected instanceof Concert) {
                     Concert concert = (Concert) selected;
-                    System.out.printf("| %-68s |\n", "Type: Concert");
-                    System.out.printf("| %-68s |\n", "Event ID: " + concert.getEventID());
-                    System.out.printf("| %-68s |\n", "Title: " + truncateString(concert.getTitle(), 50));
-                    System.out.printf("| %-68s |\n", "Date: " + concert.getDate());
-                    System.out.printf("| %-68s |\n", "Venue: " + truncateString(concert.getVenue(), 50));
+                    System.out.printf("| %-79s |\n", "Type: Concert");
+                    System.out.printf("| %-79s |\n", "Event ID: " + concert.getEventID());
+                    System.out.printf("| %-79s |\n", "Title: " + truncateString(concert.getTitle(), 50));
+                    System.out.printf("| %-79s |\n", "Date: " + concert.getDate());
+                    System.out.printf("| %-79s |\n", "Venue: " + truncateString(concert.getVenue(), 50));
                 } else if (selected instanceof Workshop) {
                     Workshop workshop = (Workshop) selected;
-                    System.out.printf("| %-68s |\n", "Type: Workshop");
-                    System.out.printf("| %-68s |\n", "Event ID: " + workshop.getEventID());
-                    System.out.printf("| %-68s |\n", "Title: " + truncateString(workshop.getTitle(), 50));
-                    System.out.printf("| %-68s |\n", "Date: " + workshop.getDate());
-                    System.out.printf("| %-68s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
+                    System.out.printf("| %-79s |\n", "Type: Workshop");
+                    System.out.printf("| %-79s |\n", "Event ID: " + workshop.getEventID());
+                    System.out.printf("| %-79s |\n", "Title: " + truncateString(workshop.getTitle(), 50));
+                    System.out.printf("| %-79s |\n", "Date: " + workshop.getDate());
+                    System.out.printf("| %-79s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
                 }
 
                 System.out.println("----------------------------------------------------------------------------------");
