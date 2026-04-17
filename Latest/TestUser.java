@@ -2682,7 +2682,7 @@ public class TestUser {
         // Refresh pool so speakers added this session are visible
         loadSpeakersFromUsers(ems.getUsers(), countUsers(ems.getUsers()));
         if (speakerCount == 0) {
-            System.out.println("No speakers available. Create a Speaker account first (sign up with password 54321).");
+            System.out.println("No speakers available. Create a Speaker account first.");
             return;
         }
         Conference conf = selectConference();
