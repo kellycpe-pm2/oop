@@ -3634,6 +3634,16 @@ public class TestUser {
             System.out.println("Error: No ticket types configured for this event yet.");
             return;
         }
+        
+        if (tt.getAvailableQuantity()== 0){
+            System.out.println("Sorry, all tickets for this event are sold out.");
+            return;	
+        }
+        
+        if (tt.getSalesEnd().isBefore(LocalDate.now())){
+            System.out.println("Sorry, the sales period for this event is already over.");
+            return;
+        }
 
         // pick ticket type
         String ticketType = "";
