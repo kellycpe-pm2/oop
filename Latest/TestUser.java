@@ -3624,7 +3624,7 @@ public class TestUser {
             if (ems.validationInputEventId(eventId)) {
                 break;
             } else {
-                System.out.println("Invalid Event ID. Try again.");
+                System.out.println("\nInvalid Event ID. Try again.\n");
             }
         }
 
@@ -3730,11 +3730,11 @@ public class TestUser {
 
     static void displayEvents() {
         System.out.println(
-                "  -------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %16s |%n",
-                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Available Ticket");
+                "  -----------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-18s | %16s |%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Early Bird End Date", "Available Ticket");
         System.out.println(
-                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|------------------|");
+                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|---------------------|------------------|");
         for (int i = 0; i < eventCount; i++) {
             Event e = events[i];
             String type = e.getClass().getSimpleName();
@@ -3742,12 +3742,12 @@ public class TestUser {
             String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
             TicketType tt = TicketType.findTicketTypeById(ticketTypes, e.getEventID());
 
-            System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %3d              |%n",
-                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(),
+            System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-19s | %3d              |%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getEarlyBirdEnd(), tt.getSalesEnd(),
                     tt.getAvailableQuantity());
         }
         System.out.println(
-                "  -------------------------------------------------------------------------------------------------------------------------------------------");
+                "  -----------------------------------------------------------------------------------------------------------------------------------------------------------------");
     }
 
     static void UpdateTicketType() {
