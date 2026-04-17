@@ -4238,11 +4238,11 @@ public class TestUser {
 
         boolean continueManaging = true;
         while (continueManaging) {
-            System.out.println("------------------------------------------------------------------------------------");
-            System.out.println("|                         YOUR PENDING INVITATIONS                                 |");
-            System.out.println("|----------------------------------------------------------------------------------|");
-            System.out.println("| No |    Type      |         Event Name       |            Details                |");
-            System.out.println("|----|--------------|--------------------------|-----------------------------------|");
+            System.out.println("-------------------------------------------------------------------------------------------------------------");
+            System.out.println("|                                       YOUR PENDING INVITATIONS                                            |");
+            System.out.println("|-----------------------------------------------------------------------------------------------------------|");
+            System.out.println("| No |    Type                     |         Event Name       |                   Details                   |");
+            System.out.println("|----|-----------------------------|--------------------------|---------------------------------------------|");
 
             for (int i = 0; i < pendingInvitations.size(); i++) {
                 Object inv = pendingInvitations.get(i);
@@ -4264,11 +4264,11 @@ public class TestUser {
                     details = "Date: " + w.getDate() + " | Venue: " + truncateString(w.getVenue(), 20);
                 }
 
-                System.out.printf("| %-2d | %-12s | %-24s | %-33s |\n",
+                System.out.printf("| %-2d | %-27s | %-24s | %-43s |\n",
                         (i + 1), type, eventName, details);
             }
 
-            System.out.println("---------------------------------------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------------------------------");
             System.out.println("\n0. Back to Main Menu");
             System.out.print("Select invitation number to respond (or 0 to exit): ");
 
