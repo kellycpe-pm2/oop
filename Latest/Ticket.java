@@ -34,17 +34,13 @@ public class Ticket {
         this.eventId = eventId;
         this.purchaseDate = LocalDate.now();
 
-        //update the data using the old data
-        Ticket.ticketCount=ticketCount;
+        Ticket.ticketCount=ticketCount+1;
         this.ticketId = "T" + String.format("%05d", Ticket.ticketCount);
 
         this.totalAmount=tt.getPrice(ticketType);
         this.seatNumber=tt.getSeat(ticketType);
         this.perks=tt.getPerks();
         tt.reduceQuantity(ticketType);
-        //increase for the next use        
-        Ticket.ticketCount++;
-
     }
 
     // Constructor for loading EXISTING ticket from file
