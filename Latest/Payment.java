@@ -34,7 +34,8 @@ public class Payment{
 
     //generate Booking ID
     public String generateBookingId(String eventId){
-        bookingId= "B" + eventId+String.format("%03d", bookingNo++);
+        bookingNo++;
+        bookingId= "B" + eventId+String.format("%03d", bookingNo);
         return bookingId;
     }
 
