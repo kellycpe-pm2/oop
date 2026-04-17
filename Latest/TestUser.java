@@ -4292,25 +4292,25 @@ public class TestUser {
 
                 if (selected instanceof Session) {
                     Session session = (Session) selected;
-                    System.out.printf("| %-68s |\n", "Type: Conference Session");
-                    System.out.printf("| %-68s |\n", "Conference: " + truncateString(getConferenceName(session), 50));
-                    System.out.printf("| %-68s |\n", "Session ID: " + session.getSessionID());
-                    System.out.printf("| %-68s |\n", "Topic: " + truncateString(session.getTopic(), 50));
-                    System.out.printf("| %-68s |\n", "Time: " + session.getTime());
+                    System.out.printf("| %-79s |\n", "Type: Conference Session");
+                    System.out.printf("| %-79s |\n", "Conference: " + truncateString(getConferenceName(session), 50));
+                    System.out.printf("| %-79s |\n", "Session ID: " + session.getSessionID());
+                    System.out.printf("| %-79s |\n", "Topic: " + truncateString(session.getTopic(), 50));
+                    System.out.printf("| %-79s |\n", "Time: " + session.getTime());
                 } else if (selected instanceof Concert) {
                     Concert concert = (Concert) selected;
-                    System.out.printf("| %-68s |\n", "Type: Concert");
-                    System.out.printf("| %-68s |\n", "Event ID: " + concert.getEventID());
-                    System.out.printf("| %-68s |\n", "Title: " + truncateString(concert.getTitle(), 50));
-                    System.out.printf("| %-68s |\n", "Date: " + concert.getDate());
-                    System.out.printf("| %-68s |\n", "Venue: " + truncateString(concert.getVenue(), 50));
+                    System.out.printf("| %-79s |\n", "Type: Concert");
+                    System.out.printf("| %-79s |\n", "Event ID: " + concert.getEventID());
+                    System.out.printf("| %-79s |\n", "Title: " + truncateString(concert.getTitle(), 50));
+                    System.out.printf("| %-79s |\n", "Date: " + concert.getDate());
+                    System.out.printf("| %-79s |\n", "Venue: " + truncateString(concert.getVenue(), 50));
                 } else if (selected instanceof Workshop) {
                     Workshop workshop = (Workshop) selected;
-                    System.out.printf("| %-68s |\n", "Type: Workshop");
-                    System.out.printf("| %-68s |\n", "Event ID: " + workshop.getEventID());
-                    System.out.printf("| %-68s |\n", "Title: " + truncateString(workshop.getTitle(), 50));
-                    System.out.printf("| %-68s |\n", "Date: " + workshop.getDate());
-                    System.out.printf("| %-68s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
+                    System.out.printf("| %-79s |\n", "Type: Workshop");
+                    System.out.printf("| %-79s |\n", "Event ID: " + workshop.getEventID());
+                    System.out.printf("| %-79s |\n", "Title: " + truncateString(workshop.getTitle(), 50));
+                    System.out.printf("| %-79s |\n", "Date: " + workshop.getDate());
+                    System.out.printf("| %-79s |\n", "Venue: " + truncateString(workshop.getVenue(), 50));
                 }
 
                 System.out.println("----------------------------------------------------------------------------------");
