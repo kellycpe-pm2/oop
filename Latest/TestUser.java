@@ -3569,33 +3569,37 @@ public class TestUser {
     static void attendeeMenu(Attendee attendee) {
         boolean inMenu = true;
         while (inMenu) {
-            System.out.println("\n--------------------------------");
-            System.out.println("|       ATTENDEE MENU          |");
-            System.out.println("|------------------------------|");
-            System.out.println("|  1: View Events              |");
-            System.out.println("|  2: Purchase Ticket          |");
-            System.out.println("|  3: View History             |");
-            System.out.println("|  0: Back to Main Menu        |");
-            System.out.println("--------------------------------");
-            System.out.print("Enter option: ");
-            int choice = scan.nextInt();
-            System.out.println("\n");
+            try{
+                System.out.println("\n--------------------------------");
+                System.out.println("|       ATTENDEE MENU          |");
+                System.out.println("|------------------------------|");
+                System.out.println("|  1: View Events              |");
+                System.out.println("|  2: Purchase Ticket          |");
+                System.out.println("|  3: View History             |");
+                System.out.println("|  0: Back to Main Menu        |");
+                System.out.println("--------------------------------");
+                System.out.print("Enter option: ");
+                int choice = scan.nextInt();
+                System.out.println("\n");
 
-            switch (choice) {
-                case 1:
-                    displayEvents();
-                    break;
-                case 2:
-                    purchaseTicket(attendee);
-                    break;
-                case 3:
-                    attendee.TicketPurchasedHistory(tickets);
-                    break;
-                case 0:
-                    inMenu = false;
-                    break;
-                default:
-                    System.out.println("Invalid option. Try again.");
+                switch (choice) {
+                    case 1:
+                        displayEvents();
+                        break;
+                    case 2:
+                        purchaseTicket(attendee);
+                        break;
+                    case 3:
+                        attendee.TicketPurchasedHistory(tickets);
+                        break;
+                    case 0:
+                        inMenu = false;
+                        break;
+                    default:
+                        System.out.println("Invalid option. Try again.");
+                }
+            }catch(Exception e){
+                System.out.println("Invalid option. Try again.");
             }
         }
     }
@@ -3700,13 +3704,12 @@ public class TestUser {
         Ticket ticket = ems.purchaseTicket(tt, eventId, ticketType, p, ticketCount);
 
         if (ticket != null) {
-            scan.nextLine();
-            System.out.println("\nPurchase completed successfully!");
+            System.out.println("\n\nPurchase completed successfully!");
             scan.nextLine();
             ticket.displayTicketDetails();
-            tickets.add(ticket);
             storeTicketData(tickets);
             storeTicketTypeData(ticketTypes); // update available quantity
+            ticketCount++;
             scan.nextLine();
         } else {
             System.out.println("Purchase failed. Please try again.");
@@ -3717,8 +3720,10 @@ public class TestUser {
         if (ticketTypes.isEmpty()) {
             System.out.println("No ticket type created.");
         }
-        System.out.println("\nAll Ticket Type\n-----------------------------");
-        TicketType.displayAllTicketType(ticketTypes);
+        else{
+            System.out.println("\nAll Ticket Type\n-----------------------------");
+            TicketType.displayAllTicketType(ticketTypes);
+        }
     }
 
     static void displayEvents() {
