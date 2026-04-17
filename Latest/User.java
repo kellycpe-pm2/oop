@@ -44,6 +44,17 @@ public class User {
     public void setUserName(String username){
         this.username=username;
     }
+    
+    public void setEmail( String email) {
+        	this.email =email;
+    }
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
    
    
     // -------------------------- method---------------------------
