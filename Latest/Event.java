@@ -54,6 +54,15 @@ public abstract class Event {
     // Setters
     public void setEventID(String eventID) {
         this.eventID = eventID;
+        // Sync counter so future events don't duplicate loaded IDs
+        try {
+            int num = Integer.parseInt(eventID.substring(1)); // "E004" → 4
+            if (num >= eventCounter) {
+                eventCounter = num + 1; // ensure next ID is not duplicate
+            }
+        } catch (NumberFormatException e) {
+            // ignore malformed IDs
+        }
     }
 
     public void setTitle(String title) {
