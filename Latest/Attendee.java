@@ -56,6 +56,7 @@ public class Attendee extends User{
             if (hasUser(t.getBuyerName())) {
                 t.displayTicketDetails();
                 System.out.println();
+                eventCount++;
             }
         }
 
