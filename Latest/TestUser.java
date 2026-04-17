@@ -2130,17 +2130,22 @@ public class TestUser {
                 } else if (events[i].isConference()) {
                     Conference.removeConference(conferences, eventID);
                     storeConferenceData();
-                    // remove from flat events array
-                    for (int z = i; z < eventCount - 1; z++) {
-                        events[z] = events[z + 1];
-                    }
-                    events[eventCount - 1] = null;
-                    eventCount--;
-                    found = true;
-                    break;
                 }
-            }
 
+                // Remove from flat events[] array and close the gap
+                for (int z = i; z < eventCount - 1; z++) {
+                    events[z] = events[z + 1];
+                }
+                events[eventCount - 1] = null;
+                eventCount--;
+
+                // Remove the matching TicketType record so the tables stay in sync
+                ticketTypes.removeIf(tt -> tt.getEventId().equals(eventID));
+                storeTicketTypeData(ticketTypes);
+
+                found = true;
+                break;
+            }
         }
         if (!found) {
             System.out.println("Error: Event [" + eventID + "] not found !");
@@ -2424,7 +2429,6 @@ public class TestUser {
             return true;
         }
     }
-
 
     // -------------------------------------------------------------------------
     // MANAGE SPEAKERS MENU
@@ -3146,7 +3150,7 @@ public class TestUser {
         concerts = readConcertData();
         workshops = readWorkshopData();
         conferences = readConferenceData();
-        ticketTypes = readTicketTypeData(); // load ticket types so purchase works
+        ticketTypes = readTicektTypeData(); // load ticket types so purchase works
         for (Concert c : concerts) {
             events[eventCount++] = c;
         }
@@ -3601,7 +3605,6 @@ public class TestUser {
                 }
             }catch(Exception e){
                 System.out.println("Invalid option. Try again.");
-                scan.nextLine();
             }
         }
     }
@@ -3624,7 +3627,7 @@ public class TestUser {
             if (ems.validationInputEventId(eventId)) {
                 break;
             } else {
-                System.out.println("\nInvalid Event ID. Try again.\n");
+                System.out.println("Invalid Event ID. Try again.");
             }
         }
 
@@ -3634,22 +3637,12 @@ public class TestUser {
             System.out.println("Error: No ticket types configured for this event yet.");
             return;
         }
-        
-        if (tt.getAvailableQuantity()== 0){
-            System.out.println("Sorry, all tickets for this event are sold out.");
-            return;	
-        }
-        
-        if (tt.getSalesEnd().isBefore(LocalDate.now())){
-            System.out.println("Sorry, the sales period for this event is already over.");
-            return;
-        }
 
         // pick ticket type
         String ticketType = "";
         while (true) {
             try {
-                System.out.println("\n===== Ticket Type =====");
+                System.out.println("===== Ticket Type =====");
                 System.out.println("1. EarlyBird  - RM " + tt.getPrice("earlybird") + " ("
                         + tt.getAvailableType("earlybird") + " tickets available)");
                 System.out.println("2. Standard   - RM " + tt.getPrice("standard") + " ("
@@ -3690,7 +3683,7 @@ public class TestUser {
         System.out.println("\nThe total amount = RM " + tt.getPrice(ticketType));
         while (true) {
             try {
-                System.out.println("\n==== Payment Method ====");
+                System.out.println("Payment Method");
                 System.out.println("1. Touch N Go");
                 System.out.println("2. Credit/Debit Card");
                 System.out.println("3. Online Banking");
@@ -3708,7 +3701,7 @@ public class TestUser {
             }
         }
         System.out.println("\nProcessing payment...");
-        System.out.println("\nPayment Success!\n");
+        System.out.println("Payment Success!");
 
         Payment p = new Payment(a, eventId, tt.getPrice(ticketType));
         payments[ticketCount] = p;
@@ -3740,11 +3733,11 @@ public class TestUser {
 
     static void displayEvents() {
         System.out.println(
-                "  -----------------------------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-18s | %16s |%n",
-                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Early Bird End Date", "Available Ticket");
+                "  -------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %16s |%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Available Ticket");
         System.out.println(
-                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|---------------------|------------------|");
+                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|------------------|");
         for (int i = 0; i < eventCount; i++) {
             Event e = events[i];
             String type = e.getClass().getSimpleName();
@@ -3752,12 +3745,12 @@ public class TestUser {
             String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
             TicketType tt = TicketType.findTicketTypeById(ticketTypes, e.getEventID());
 
-            System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-19s | %3d              |%n",
-                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(), tt.getEarlyBirdEnd(),
+            System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %3d              |%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(),
                     tt.getAvailableQuantity());
         }
         System.out.println(
-                "  -----------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                "  -------------------------------------------------------------------------------------------------------------------------------------------");
     }
 
     static void UpdateTicketType() {
@@ -3891,13 +3884,6 @@ public class TestUser {
     public static List<Ticket> readTicketFile() {
         List<Ticket> tickets = new ArrayList<>();
         try {
-        	File ticketFile = new File("Ticket.json");
-            if (!ticketFile.exists()) {
-                // File doesn't exist, create it and return empty list
-                ticketFile.createNewFile();
-                return tickets;
-            }
-        	
             List<String> lines = Files.readAllLines(Paths.get("Ticket.json"));
             if (!lines.isEmpty()) {
                 int i = 0;
@@ -3921,7 +3907,7 @@ public class TestUser {
                 }
             }
         } catch (IOException e) {
-        	System.out.println("Error reading ticket data: " + e.getMessage());
+            System.out.println("Error reading ticket data: " + e.getMessage());
         }
         return tickets;
     }
@@ -4066,16 +4052,9 @@ public class TestUser {
     }
 
     // Reads all ticket type from "TicketType.json"
-    public static List<TicketType> readTicketTypeData() {
+    public static List<TicketType> readTicektTypeData() {
         List<TicketType> ticketTypes = new ArrayList<>();
         try {
-        	File ttFile = new File("TicketType.json");
-            if (!ttFile.exists()) {
-                // File doesn't exist, create it and return empty list
-                ttFile.createNewFile();
-                return ticketTypes;
-            }
-        	
             List<String> lines = Files.readAllLines(Paths.get("TicketType.json"));
             if (!lines.isEmpty()) {
                 int i = 0;
