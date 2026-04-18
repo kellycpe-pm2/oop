@@ -3581,6 +3581,7 @@ public class TestUser {
                 System.out.println("|  1: View Events              |");
                 System.out.println("|  2: Purchase Ticket          |");
                 System.out.println("|  3: View History             |");
+                System.out.println("|  4: View My Profile          |");
                 System.out.println("|  0: Back to Main Menu        |");
                 System.out.println("--------------------------------");
                 System.out.print("Enter option: ");
@@ -3597,6 +3598,13 @@ public class TestUser {
                     case 3:
                         attendee.TicketPurchasedHistory(tickets);
                         break;
+                    case 4:
+                    	System.out.println("\n-------------------------------------------------------------");
+                    	System.out.println("|                     My Profile                            |");
+                    	System.out.println("-------------------------------------------------------------");
+                    	System.out.print(attendee.toString());
+                    	System.out.println("-------------------------------------------------------------");
+                    	break;
                     case 0:
                         inMenu = false;
                         break;
