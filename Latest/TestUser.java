@@ -4355,6 +4355,10 @@ public class TestUser {
                         storeWorkshopData(workshops);
                     }
                     System.out.println("\n You have accepted this invitation!");
+                        System.out.println("\nPress Enter to return to main menu...");
+    					scan.nextLine();
+    					continueManaging = false;  // Exit the while loop
+    					break;  // Break out of the switch
                 } else if (response == 2) {
                     System.out.print("Please provide a reason for rejection: ");
                     String reason = scan.nextLine();
@@ -4370,14 +4374,16 @@ public class TestUser {
                     }
               		System.out.println("\n-- You have rejected this invitation.");     
                     System.out.println("Reason: " + reason);
+                    System.out.println("\nPress Enter to return to main menu...");
+    				scan.nextLine();
+    				continueManaging = false;  // Exit the while loop
+    				break;  // Break out of the switch
                 } else {
                     System.out.println("Invalid choice. Please enter 1 or 2.");
                     continue;
                 }
 
-                System.out.println("\nPress Enter to continue...");
-                scan.nextLine();
-            } else {
+            }else {
                 System.out.println("Invalid selection.");
             }
         }
