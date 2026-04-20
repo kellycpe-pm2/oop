@@ -2139,16 +2139,15 @@ public class TestUser {
                 events[eventCount - 1] = null;
                 eventCount--;
 
+                // Remove the matching TicketType record so the tables stay in sync
+                ticketTypes.removeIf(tt -> tt.getEventId().equals(eventID));
+                storeTicketTypeData(ticketTypes);
+
                 found = true;
                 break;
             }
-            for (int j = 0; j < ticketTypes.size(); j++){
-                if (ticketTypes.get(j).getEventId().equals(eventID)){
-                    ticketTypes.remove(j);
-                    storeTicketTypeData(ticketTypes);
-                }
-            }
         }
+
         if (!found) {
             System.out.println("Error: Event [" + eventID + "] not found !");
         }
