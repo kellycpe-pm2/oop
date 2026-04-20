@@ -3531,7 +3531,7 @@ public class TestUser {
             List<String> lines = Files.readAllLines(Paths.get("Workshop.json"));
             if (!lines.isEmpty()) {
                 int i = 0;
-                while (i + 6 < lines.size()) {
+                while (i < lines.size()) {
                     String eventID = lines.get(i++);
                     String title = lines.get(i++);
                     LocalDate date = LocalDate.parse(lines.get(i++));
