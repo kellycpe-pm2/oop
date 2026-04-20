@@ -3485,8 +3485,8 @@ public class TestUser {
         writer.write(w.getSpeakerCount() + "\n");
         for (int i = 0; i < w.getSpeakerCount(); i++) {
             writer.write(w.getSpeakers()[i] + "\n");
-            writer.write(w.getRejectionReason(w.getSpeakers()[i]) + "\n");
             writer.write(w.getSpeakerStatus(w.getSpeakers()[i]) + "\n");
+            writer.write(w.getRejectionReason(w.getSpeakers()[i]) + "\n");
         }
     }
 
