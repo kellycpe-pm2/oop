@@ -2146,7 +2146,12 @@ public class TestUser {
                 found = true;
                 break;
             }
-        }
+            for (int j = 0; j < ticketTypes.size(); j++){
+                if (ticketTypes.get(j).getEventId().equals(eventID)){
+                    ticketTypes.remove(j);
+                    storeTicketTypeData(ticketTypes);
+                }
+            }
         if (!found) {
             System.out.println("Error: Event [" + eventID + "] not found !");
         }
@@ -3741,11 +3746,11 @@ public class TestUser {
 
     static void displayEvents() {
         System.out.println(
-                "  -------------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %16s |%n",
-                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Available Ticket");
+                "  -----------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("  | %-2s | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-18s | %16s |%n",
+                "No", "ID", "Type", "Title", "Date", "Venue", "Sales Start Date", "Sales End Date", "Early Bird End Date", "Available Ticket");
         System.out.println(
-                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|------------------|");
+                "  |----|------|--------------|-----------------|------------|-----------------|---------------------|--------------------|---------------------|------------------|");
         for (int i = 0; i < eventCount; i++) {
             Event e = events[i];
             String type = e.getClass().getSimpleName();
@@ -3753,14 +3758,13 @@ public class TestUser {
             String venue = e.getVenue().length() > 20 ? e.getVenue().substring(0, 17) + "..." : e.getVenue();
             TicketType tt = TicketType.findTicketTypeById(ticketTypes, e.getEventID());
 
-            System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %3d              |%n",
-                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(),
+            System.out.printf("  | %-2d | %-4s | %-12s | %-15s | %-10s | %-15s | %-19s | %-18s | %-19s | %3d              |%n",
+                    (i + 1), e.getEventID(), type, title, e.getDate(), venue, tt.getSalesStart(), tt.getSalesEnd(), tt.getEarlyBirdEnd(),
                     tt.getAvailableQuantity());
         }
         System.out.println(
-                "  -------------------------------------------------------------------------------------------------------------------------------------------");
+                "  -----------------------------------------------------------------------------------------------------------------------------------------------------------------");
     }
-
     static void UpdateTicketType() {
         if (ticketTypes.isEmpty()) {
             System.out.println("No ticket type created.");
